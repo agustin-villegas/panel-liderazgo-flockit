@@ -16,7 +16,7 @@
 **Nota:** el backend con dependencias pesa ~288 MB (litellm). Supera los 250 MB de Vercel →
 evaluar en fase 5 (plan B: Render).
 
-## Fase 1 · Base y auth ✅ (falta probar contra Supabase real)
+## Fase 1 · Base y auth ✅
 
 - [x] Settings con validación al arrancar (hash argon2id obligatorio, secretos con largo mínimo)
 - [x] Migración `0001_auth`: users, sessions, login_attempts, audit_events (RLS on) — aplicada en Supabase
@@ -28,4 +28,4 @@ evaluar en fase 5 (plan B: Render).
 - [x] Errores tipados (`AppError` → JSON) y headers de seguridad
 - [x] Auditoría: login, login fallido, bloqueo, logout (sin secretos)
 - [x] 14 tests verdes
-- [ ] Smoke test con `DATABASE_URL` real
+- [x] Smoke test contra Supabase: login, me, logout y auditoría OK
