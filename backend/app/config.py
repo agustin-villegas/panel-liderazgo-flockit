@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     ai_model: str = ""  # vacío = DEFAULT_MODEL
     openai_api_key: str = ""
     google_api_key: str = ""
+    # local con antivirus que inspecciona HTTPS (ej. Kaspersky): confiar en los certs del SO
+    system_certs: bool = False
 
     @model_validator(mode="after")
     def _need_db(self) -> "Settings":

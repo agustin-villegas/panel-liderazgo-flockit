@@ -30,6 +30,10 @@ logging.basicConfig(level=logging.INFO, format=LOG_FMT)
 def create_app(cfg: Settings | None = None, db: Database | None = None) -> FastAPI:
     """Arma la app. En tests se inyectan config y base."""
     cfg = cfg or get_settings()
+    if cfg.system_certs:
+        import truststore  # solo para desarrollo local; en Vercel no hace falta
+
+        truststore.inject_into_ssl()
     mcp = McpApp()
 
     @asynccontextmanager
