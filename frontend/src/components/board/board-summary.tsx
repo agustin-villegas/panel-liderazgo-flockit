@@ -5,11 +5,13 @@ import { AlertTriangle, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api, type Project, type SprintBoard } from "@/lib/api/client";
 import { pct } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { BrandBar } from "@/components/viz/brand-bar";
+import { Gauge } from "@/components/viz/gauge";
+import { PACE_CHIP, pace } from "@/components/viz/pace";
 
 import { LANES, LANE_ORDER } from "./lanes";
 
@@ -21,7 +23,7 @@ export function BoardSummary({ project }: { project: Project }) {
     refetchInterval: 60_000,
   });
 
-  const behind = data?.sprint && (data.done_pct ?? 0) + 0.15 < data.sprint.time_pct;
+  const p = data?.sprint ? pace(data.done_pct ?? 0, data.sprint.time_pct) : null;
 
   return (
     <Link
@@ -46,9 +48,17 @@ export function BoardSummary({ project }: { project: Project }) {
                   </span>
                 )}
               </div>
-              <div className="grid gap-2 text-xs">
-                <Row label="Tiempo" value={data.sprint?.time_pct ?? 0} />
-                <Row label="Finalizadas" value={data.done_pct ?? 0} />
+              <div className="grid grid-cols-[auto_1fr] items-center gap-4">
+                <Gauge
+                  value={data.done_pct ?? 0}
+                  label="Finalizadas"
+                  tone={p?.tone ?? "brand"}
+                  size={88}
+                />
+                <div className="grid gap-2 text-xs">
+                  <Row label="Tiempo" value={data.sprint?.time_pct ?? 0} />
+                  <Row label="Finalizadas" value={data.done_pct ?? 0} tone={p?.tone} />
+                </div>
               </div>
               <div className="grid grid-cols-4 gap-1 text-center">
                 {LANE_ORDER.map((k) => (
@@ -62,9 +72,15 @@ export function BoardSummary({ project }: { project: Project }) {
                 ))}
               </div>
               <div className="flex items-center justify-between border-t pt-3 text-xs">
-                {behind ? (
-                  <span className="flex items-center gap-1 font-medium text-warn-fg">
-                    <AlertTriangle className="size-3.5" /> Va atrasado vs el tiempo
+                {p ? (
+                  <span
+                    className={cn(
+                      "flex items-center gap-1 rounded-full border px-2 py-0.5 font-semibold",
+                      PACE_CHIP[p.tone],
+                    )}
+                  >
+                    {p.tone !== "ok" && <AlertTriangle className="size-3.5" />}
+                    {p.label}
                   </span>
                 ) : (
                   <span className="text-muted-foreground">{data.counts.total} issues</span>
@@ -81,12 +97,22 @@ export function BoardSummary({ project }: { project: Project }) {
   );
 }
 
-function Row({ label, value }: { label: string; value: number }) {
+function Row({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone?: "ok" | "warn" | "crit";
+}) {
   return (
-    <div className="grid grid-cols-[72px_1fr_36px] items-center gap-2">
-      <span className="text-muted-foreground">{label}</span>
-      <Progress value={Math.round(value * 100)} aria-label={label} />
-      <span className="text-right font-semibold">{pct(value)}</span>
+    <div className="grid gap-1">
+      <div className="flex justify-between">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="font-semibold">{pct(value)}</span>
+      </div>
+      <BrandBar value={value} label={label} tone={tone ?? "brand"} size="sm" />
     </div>
   );
 }

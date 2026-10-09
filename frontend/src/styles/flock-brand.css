@@ -245,3 +245,21 @@
     display: none;
   }
 }
+
+/* Barra de marca: brillo que recorre la barra */
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+.bar-shine {
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.45), transparent);
+  animation: shimmer 2.4s ease-in-out infinite;
+}

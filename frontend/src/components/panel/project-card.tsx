@@ -2,7 +2,7 @@ import { AlertTriangle, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { BrandBar } from "@/components/viz/brand-bar";
 import type { Card as CardData } from "@/lib/api/client";
 import { month, pct, pts } from "@/lib/format";
 
@@ -57,10 +57,7 @@ export function ProjectCard({ card }: { card: CardData }) {
                       {pts(active.burned)}/{pts(active.planned)} pts
                     </span>
                   </div>
-                  <Progress
-                    value={Math.round((active.pct ?? 0) * 100)}
-                    aria-label="Avance del sprint activo"
-                  />
+                  <BrandBar value={active.pct ?? 0} label="Avance del sprint activo" size="sm" />
                 </div>
               )}
 
