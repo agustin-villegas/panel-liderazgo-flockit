@@ -3,8 +3,8 @@
 from datetime import UTC, datetime
 
 import pytest
-from app.compliance.engine import Engine
 
+from app.compliance.engine import Engine
 from app.compliance.models import Issue, Reason, Sprint, SprintResult, State
 
 
