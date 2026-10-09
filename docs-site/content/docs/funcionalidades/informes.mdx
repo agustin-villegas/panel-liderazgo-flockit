@@ -1,0 +1,34 @@
+---
+title: Informes
+description: Informe de sprint con números del motor y una lectura redactada por IA.
+---
+
+## Qué es
+
+Un informe de sprint con el resultado del sprint, la tendencia, las issues pendientes, el corte por
+tipo de issue y el detalle por persona (cerradas y abiertas). Se arma para una **audiencia**:
+`equipo`, `cliente` o `gerencia`, y la narrativa ajusta el tono.
+
+## Flujo
+
+1. **Vista previa** (`POST /api/informes/preview`): el backend calcula los datos con el motor y le
+   pide a la IA una lectura (resumen de hasta 4 oraciones y 3 puntos clave).
+2. El usuario puede **editar la narrativa**.
+3. **Guardar** (`POST /api/informes`): se guarda una foto de los datos y la narrativa.
+4. Los informes guardados se listan (`GET /api/informes`) y se abren por id.
+
+## Reglas de la narrativa
+
+- La IA recibe números **ya calculados** y los copia tal cual: no suma, no promedia, no redondea.
+- El texto que viene de Jira (títulos, objetivo) va marcado como dato externo y nunca se trata como
+  instrucción.
+- Si el modelo falla, el informe sigue sin narrativa (los números no dependen de la IA).
+
+## Inmutables
+
+La tabla `reports` tiene un trigger que **bloquea los UPDATE**: un informe guardado no cambia.
+Cada usuario ve los informes según su alcance de proyectos.
+
+## PDF
+
+El informe se imprime a PDF desde la pantalla.

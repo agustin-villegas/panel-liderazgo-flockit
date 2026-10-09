@@ -1,0 +1,41 @@
+---
+title: Proyectos y sprints
+description: Detalle de cumplimiento, auditoría por sprint y tablero del sprint activo.
+---
+
+## Detalle de proyecto
+
+`GET /api/proyectos/{id}/cumplimiento` devuelve todos los sprints del proyecto (sin los futuros) y
+los agregados por mes. En la pantalla:
+
+- Gráfico de **planificados vs quemados** con el porcentaje por sprint.
+- Tablas por sprint, por persona y por mes.
+- El sprint activo aparece como **provisorio** ("En curso").
+- Si el proyecto define un **sprint de inicio de medición**, se descartan los anteriores.
+
+## Auditoría por sprint
+
+`GET /api/proyectos/{id}/sprints/{sid}` abre la página del sprint: objetivo (si Jira lo trae),
+tarjetas por estado y una tabla con **cada issue**: clave (con link a Jira), título, estado,
+responsable, SP, sprints por los que pasó, fecha de finalización, sprint de quemado y **motivo**.
+Es lo que permite verificar cualquier número contra Jira.
+
+## Recalcular
+
+Los resultados se cachean 5 minutos. `POST /api/proyectos/{id}/recalcular` fuerza una lectura
+fresca de Jira.
+
+## Tablero del sprint activo
+
+`GET /api/proyectos/{id}/tablero` (solo lectura, caché de 60 s en el backend):
+
+- Carriles según la **categoría de estado de Jira**: por hacer, en curso, bloqueado y finalizado.
+  Una tarjeta cuenta como bloqueada si tiene el flag de Jira o si el nombre del estado sugiere
+  bloqueo (por ejemplo "bloqueado", "impedido", "en espera").
+- Día X de Y hábiles, con % de tiempo vs % de tarjetas finalizadas.
+- Resumen, torta por estado, prioridad o tipo, kanban y tabla con filtros.
+- Refresco automático cada 60 s.
+
+## Exportar
+
+Toda tabla se exporta a **Excel** (CSV con BOM) y **PDF** (impresión por sección).

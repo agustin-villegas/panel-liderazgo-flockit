@@ -1,0 +1,102 @@
+---
+title: API
+description: Endpoints del backend, sacados de los routers de FastAPI.
+---
+
+Todos los endpoints cuelgan de `/api` y usan la cookie de sesión, salvo los que se indican.
+"Admin" significa rol admin; "Asistente" significa admin o Team Manager; "Sesión" es cualquier usuario
+logueado (los datos igual se filtran por permisos).
+
+## Swagger (OpenAPI)
+
+- **Local**: [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
+- **Producción**: `<front>/api/docs`, **solo para admins**.
+
+El contrato también se exporta con `uv run python scripts/openapi.py`, y el front genera sus tipos
+con `pnpm gen:api`.
+
+## Endpoints
+
+### Salud y auth
+
+| Método | Ruta                 | Acceso  | Descripción                      |
+| ------ | -------------------- | ------- | -------------------------------- |
+| GET    | `/api/health`        | Público | Estado y versión                 |
+| POST   | `/api/auth/login`    | Público | Login; setea la cookie de sesión |
+| POST   | `/api/auth/logout`   | Sesión  | Cierra la sesión                 |
+| GET    | `/api/auth/me`       | Sesión  | Usuario actual                   |
+| POST   | `/api/auth/password` | Sesión  | Cambia la contraseña             |
+
+### Conexiones
+
+| Método | Ruta                                   | Acceso | Descripción                      |
+| ------ | -------------------------------------- | ------ | -------------------------------- |
+| GET    | `/api/conexiones`                      | Admin  | Lista conexiones (sin token)     |
+| POST   | `/api/conexiones`                      | Admin  | Crea (prueba obligatoria)        |
+| POST   | `/api/conexiones/probar`               | Admin  | Prueba credenciales sin guardar  |
+| PATCH  | `/api/conexiones/{cid}`                | Admin  | Edita                            |
+| DELETE | `/api/conexiones/{cid}?confirm=nombre` | Admin  | Borra, confirmando el nombre     |
+| GET    | `/api/conexiones/{cid}/boards`         | Admin  | Boards de Jira                   |
+| GET    | `/api/conexiones/{cid}/campos`         | Admin  | Campos candidatos a story points |
+
+### Cuentas y proyectos
+
+| Método | Ruta                   | Acceso | Descripción        |
+| ------ | ---------------------- | ------ | ------------------ |
+| GET    | `/api/cuentas`         | Sesión | Lista cuentas      |
+| POST   | `/api/cuentas`         | Admin  | Crea cuenta        |
+| GET    | `/api/proyectos`       | Sesión | Proyectos visibles |
+| POST   | `/api/proyectos`       | Admin  | Crea proyecto      |
+| PATCH  | `/api/proyectos/{pid}` | Admin  | Edita proyecto     |
+| DELETE | `/api/proyectos/{pid}` | Admin  | Archiva proyecto   |
+
+### Cumplimiento y tablero
+
+| Método | Ruta                                 | Acceso | Descripción                                         |
+| ------ | ------------------------------------ | ------ | --------------------------------------------------- |
+| GET    | `/api/cartera`                       | Sesión | Una card por proyecto visible, ordenadas por riesgo |
+| GET    | `/api/proyectos/{pid}/cumplimiento`  | Sesión | Sprints y meses del proyecto                        |
+| GET    | `/api/proyectos/{pid}/sprints/{sid}` | Sesión | Detalle auditable del sprint                        |
+| POST   | `/api/proyectos/{pid}/recalcular`    | Sesión | Fuerza lectura fresca de Jira                       |
+| GET    | `/api/proyectos/{pid}/tablero`       | Sesión | Tablero del sprint activo                           |
+
+### Informes
+
+| Método | Ruta                    | Acceso | Descripción                   |
+| ------ | ----------------------- | ------ | ----------------------------- |
+| POST   | `/api/informes/preview` | Sesión | Calcula y redacta sin guardar |
+| POST   | `/api/informes`         | Sesión | Guarda el informe (inmutable) |
+| GET    | `/api/informes`         | Sesión | Lista informes                |
+| GET    | `/api/informes/{rid}`   | Sesión | Un informe                    |
+
+### Notificaciones
+
+| Método | Ruta                              | Acceso | Descripción                        |
+| ------ | --------------------------------- | ------ | ---------------------------------- |
+| GET    | `/api/notificaciones`             | Sesión | Avisos propios y cantidad sin leer |
+| POST   | `/api/notificaciones/leer-todas`  | Sesión | Marca todas como leídas            |
+| POST   | `/api/notificaciones/{nid}/leida` | Sesión | Marca una como leída               |
+
+### Asistente y tokens MCP
+
+| Método | Ruta                           | Acceso    | Descripción                           |
+| ------ | ------------------------------ | --------- | ------------------------------------- |
+| POST   | `/api/asistente/mensaje`       | Asistente | Un turno del chat                     |
+| GET    | `/api/perfil/tokens-mcp`       | Asistente | Lista tokens propios                  |
+| POST   | `/api/perfil/tokens-mcp`       | Asistente | Crea un token (valor visible una vez) |
+| DELETE | `/api/perfil/tokens-mcp/{tid}` | Asistente | Revoca un token                       |
+
+### Fuera de `/api`
+
+| Método | Ruta                            | Acceso                  | Descripción                                     |
+| ------ | ------------------------------- | ----------------------- | ----------------------------------------------- |
+| POST   | `/internal/jobs/notificaciones` | Header `X-Cron-Secret`  | Cron de avisos para todos los proyectos activos |
+| \*     | `/mcp`                          | `Authorization: Bearer` | Servidor MCP                                    |
+
+Estas dos rutas no aparecen en el OpenAPI.
+
+## Errores
+
+Los errores de negocio salen como JSON tipado (`AppError`) con el código de estado
+correspondiente: 401 sin sesión, 403 sin permiso, 404 si no existe, 422 si la entrada es inválida
+y 502 si Jira falla.

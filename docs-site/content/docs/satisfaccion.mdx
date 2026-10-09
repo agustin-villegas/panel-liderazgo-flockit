@@ -1,0 +1,39 @@
+---
+title: Satisfacción (NPS y CSAT)
+description: Fórmulas definidas en la spec. Todavía no están implementadas en el código.
+---
+
+<Callout type="warn" title="Estado: pendiente">
+  En la rama actual no existe un módulo `backend/app/satisfaction`, ni tablas o endpoints de
+  NPS/CSAT. Esta página documenta lo que define la spec (§8, prioridad P1). Cuando se implemente, el
+  código manda y esta página se actualiza.
+</Callout>
+
+## Qué se registra
+
+Desde un proyecto, una respuesta con tipo (NPS o CSAT), período (un sprint o un mes), quién
+respondió (opcional), puntajes y comentario. Todas las escalas son de **1 a 10**.
+
+- **NPS**: una pregunta, "¿Qué tan probable es que nos recomiendes?".
+- **CSAT**: tres preguntas: satisfacción del mes, progreso del proyecto y gestión del proyecto.
+
+## Fórmulas
+
+```text
+NPS  = %promotores (9-10) - %detractores (1-6)      1 decimal
+       (los pasivos, 7-8, cuentan en el total)
+
+CSAT = promedio de las 3 preguntas por respuesta,
+       y después promedio entre respuestas          1 decimal
+```
+
+- El NPS se calcula **siempre desde las respuestas crudas**, nunca promediando NPS de períodos.
+- NPS y CSAT **nunca se mezclan**.
+- Tramos de CSAT: 9-10 muy satisfecho, 7-8 satisfecho, 5-6 neutro, 1-4 insatisfecho.
+
+## Ejemplos de la spec
+
+| Caso                                              | Resultado         |
+| ------------------------------------------------- | ----------------- |
+| 10 respuestas NPS: 5 de 9-10, 3 de 7-8 y 2 de 1-6 | NPS = 30,0        |
+| CSAT de 2 respuestas: (9, 8, 10) y (6, 7, 8)      | (9 + 7) / 2 = 8,0 |

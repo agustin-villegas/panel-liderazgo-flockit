@@ -1,0 +1,109 @@
+---
+title: Desarrollo y deploy
+description: Correr en local, variables de entorno, tests, deploy en Vercel y la metodología SDD.
+---
+
+## Requisitos
+
+Python 3.12 con [uv](https://docs.astral.sh/uv/) y Node 24 con pnpm.
+
+## Correr en local
+
+**Backend** ([http://localhost:8000](http://localhost:8000))
+
+```bash
+cd backend
+cp .env.example .env
+uv sync
+uv run uvicorn app.main:app --reload --port 8000
+```
+
+**Frontend** ([http://localhost:3000](http://localhost:3000))
+
+```bash
+cd frontend
+cp .env.example .env.local
+pnpm install
+pnpm dev
+```
+
+**Este sitio de docs**
+
+```bash
+cd docs-site
+pnpm install
+pnpm dev
+```
+
+Para ver datos al instante: Configuración → Proyectos → Nuevo proyecto, con la conexión **Demo**.
+
+## Comandos
+
+|               | Backend (`cd backend`)                                | Frontend (`cd frontend`)         |
+| ------------- | ----------------------------------------------------- | -------------------------------- |
+| Dev           | `uv run uvicorn app.main:app --reload`                | `pnpm dev`                       |
+| Lint          | `uv run ruff check . && uv run ruff format --check .` | `pnpm lint && pnpm format:check` |
+| Tests / tipos | `uv run pytest`                                       | `pnpm typecheck`                 |
+
+Útiles: `uv run python scripts/generar_hash.py` (hash de la contraseña del admin),
+`uv run python scripts/openapi.py` (exporta el contrato) y `pnpm gen:api` (tipos TS desde ese
+contrato).
+
+## Variables de entorno
+
+Solo nombres; los valores van en tu `.env` local (nunca en el repo).
+
+### Backend (`backend/.env.example`)
+
+| Variable                                                  | Para qué                                                 |
+| --------------------------------------------------------- | -------------------------------------------------------- |
+| `DB_PASSWORD`, `DB_USER`, `DB_HOST`, `DB_PORT`, `DB_NAME` | Conexión a Supabase Postgres (o `DATABASE_URL` completa) |
+| `OPENAI_API_KEY`                                          | Clave del modelo de IA                                   |
+| `AI_MODEL`                                                | Modelo a usar (vacío = el default)                       |
+| `GOOGLE_API_KEY`                                          | Alternativa Gemini                                       |
+| `SYSTEM_CERTS`                                            | `true` si un antivirus inspecciona HTTPS en tu máquina   |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`                      | Admin inicial                                            |
+| `SESSION_SECRET`                                          | Secreto de sesión (32+ caracteres)                       |
+| `ENCRYPTION_KEY`                                          | Clave de cifrado de tokens de Jira (32 bytes en base64)  |
+| `CRON_SECRET`                                             | Secreto del endpoint de cron (16+ caracteres)            |
+| `FRONTEND_ORIGIN`                                         | Origen del front                                         |
+| `WEBAUTHN_RP_ID`                                          | Reservada para passkeys (todavía sin uso)                |
+
+### Frontend (`frontend/.env.example`)
+
+| Variable      | Para qué                                      |
+| ------------- | --------------------------------------------- |
+| `BACKEND_URL` | Destino del rewrite de `/api` (solo servidor) |
+
+## Deploy
+
+Dos proyectos de Vercel para el panel: `frontend/` (Next.js) y `backend/` (FastAPI nativo). El front
+reenvía `/api/*` al backend con `BACKEND_URL`.
+
+Este sitio de docs es un **tercer proyecto** de Vercel: root directory `docs-site`, framework
+Next.js, comando de build `pnpm build`.
+
+## CI
+
+GitHub Actions: `ci-backend`, `ci-frontend` y `ci-docs` (instala con lockfile y hace build del sitio
+cuando cambia `docs-site/`).
+
+## Metodología SDD
+
+Spec-Driven Development, con aprobación entre etapas:
+
+1. **intent** (`docs/sdd/intent.md`): qué problema se resuelve y para quién.
+2. **spec** (`docs/sdd/spec.md`): comportamiento esperado.
+3. **plan** (`docs/sdd/plan.md`): con qué y en qué orden se construye.
+4. **tasks** (`docs/sdd/tasks.md`): checklist por fase.
+
+Si el código contradice la doc, **gana el código** y la doc se actualiza en el mismo cambio. Ramas
+por fase (`feat/fase-N-...`), conventional commits en español y PR con CI verde.
+
+## Reglas del proyecto
+
+- Los números los calcula el motor, nunca el LLM.
+- Permisos siempre en el backend.
+- Cero secretos en el repo; repo público con datos sintéticos.
+- Un solo tema de marca, con tokens en `frontend/src/styles/flock-brand.css`.
+- Toda tabla exporta a Excel y PDF.

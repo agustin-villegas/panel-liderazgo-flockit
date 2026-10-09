@@ -1,0 +1,73 @@
+---
+title: Arquitectura
+description: Cómo se conectan el frontend, el backend, la base y los servicios externos.
+---
+
+## Vista general
+
+<Mermaid
+  chart={`
+flowchart LR
+  U[Navegador] --> F[Frontend Next.js - Vercel]
+  F -- "/api/* (rewrite)" --> B[Backend FastAPI - Vercel]
+  C[Claude Code / Cursor] -- "/mcp (token personal)" --> B
+  P[Supabase pg_cron] -- "POST /internal/jobs/notificaciones" --> B
+  B --> D[(Supabase Postgres)]
+  B --> J[Jira Cloud - solo lectura]
+  B --> L[Modelo de IA - ADK]
+`}
+/>
+
+## Piezas
+
+| Pieza       | Tecnología                                                            | Rol                                                                             |
+| ----------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `frontend/` | Next.js 16, React 19, TypeScript, Tailwind v4, shadcn/ui, next-themes | Interfaz. Oculta lo que no corresponde, pero **no decide permisos**.            |
+| `backend/`  | Python 3.12, FastAPI, SQLAlchemy async, Google ADK, MCP               | API, motor de cumplimiento, IA, avisos, MCP. **Toda la autorización vive acá.** |
+| Base        | Supabase Postgres                                                     | Solo el backend accede. RLS activo sin políticas.                               |
+| Deploy      | Vercel                                                                | Un proyecto para el front y otro para el back.                                  |
+
+## El proxy `/api/*`
+
+El front no llama al backend directo: `next.config.ts` reescribe `/api/:path*` hacia
+`BACKEND_URL` (solo servidor). Así:
+
+- La cookie de sesión (`panel_session`, `HttpOnly`, `SameSite=Lax`) es _first-party_: sin CORS abierto ni
+  cookies de terceros.
+- El front **no tiene secretos**: su única variable es `BACKEND_URL`.
+- `proxy.ts` de Next solo redirige a `/login` si no hay cookie. Es comodidad de UX; el permiso real lo
+  verifica el backend en cada request.
+
+## Un solo cálculo
+
+El motor de cumplimiento es código puro, sin red ni base. Lo usan la API, el asistente, el MCP, los
+informes y los avisos: hay **un único lugar** donde se calcula un número.
+
+## Seguridad
+
+- Contraseñas con argon2id. Sesiones opacas guardadas en base como hash (revocables desde el servidor).
+- Tokens de Jira cifrados (AES-256-GCM); la API nunca los devuelve.
+- Tokens MCP personales: se muestran una sola vez, en base queda el hash.
+- Login con límite de intentos (por defecto 5 fallos en 15 minutos por email e IP).
+- Headers de seguridad en toda respuesta de la API.
+- Texto que viene de Jira se trata como dato no confiable: se escapa y se marca antes de pasarlo al modelo.
+- Auditoría de login, alta/baja de conexiones y proyectos, e informes guardados.
+
+## Estructura del backend
+
+```text
+backend/app/
+├── main.py           app, routers, headers de seguridad
+├── config.py         settings; no arranca si falta algo obligatorio
+├── auth/             contraseñas, sesiones, límite de login, permisos
+├── jira/             cliente real (cloud.py), demo sintético, mapeo
+├── compliance/       motor de cumplimiento (puro) y servicio
+├── connections/      conexiones a Jira (token cifrado)
+├── projects/         cuentas, proyectos, cartera
+├── board/            tablero del sprint activo
+├── reports/          informes de sprint
+├── notifications/    detector de avisos y servicio
+├── ai/               asistente (ADK), tools, narrativa, guard
+├── mcp/              servidor MCP y tokens personales
+└── db/migrations/    SQL plano versionado (0001 a 0005)
+```

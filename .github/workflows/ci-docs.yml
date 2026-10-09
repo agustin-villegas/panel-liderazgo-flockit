@@ -1,0 +1,35 @@
+name: ci-docs
+
+on:
+  push:
+    branches: [main]
+    paths: ["docs-site/**", ".github/workflows/ci-docs.yml"]
+  pull_request:
+    paths: ["docs-site/**", ".github/workflows/ci-docs.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs-site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: docs-site/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: docs-site/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint && pnpm format:check
+      - name: Tipos
+        run: pnpm typecheck
+      - name: Build
+        run: pnpm build

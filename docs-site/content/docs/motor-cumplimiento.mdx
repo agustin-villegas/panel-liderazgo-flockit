@@ -1,0 +1,87 @@
+---
+title: Motor de cumplimiento
+description: Las reglas y fórmulas con las que se calcula planificados vs quemados desde Jira.
+---
+
+El motor vive en `backend/app/compliance/engine.py` (clase `Engine`). Es **puro**: recibe issues y
+sprints ya leídos de Jira y devuelve resultados, sin tocar red ni base.
+
+## Datos de entrada
+
+- **Sprint**: id, nombre, inicio, fin planificado, cierre real (si cerró), estado (`future`,
+  `active`, `closed`) y objetivo.
+- **Issue**: clave, story points (`None` si no está estimada), si está en categoría **Done**,
+  ids de sprint por los que pasó, **fecha de finalización**, responsable y si es sub-tarea.
+
+La fecha de finalización es la **última vez que la issue entró a un estado de categoría Done**
+(según el changelog de Jira); si no hay, se usa `resolutiondate`. Los nombres de estado no
+importan: "Cerrado", "Finalizada" y "Done" cuentan igual si su categoría es Done.
+
+## Reglas
+
+1. **Issues del sprint**: las que tienen ese sprint en su campo Sprint de Jira. Si la conexión lo
+   indica, se excluyen las sub-tareas.
+2. **Planificados(S)** = suma de SP de las issues del sprint, **sin importar su estado**. Una issue
+   sin estimar suma 0 y se lista aparte como "sin estimar".
+3. **Sprint de quemado** de una issue terminada: el **primer** sprint propio (ordenado por inicio)
+   cuyo **fin efectivo** sea mayor o igual a la fecha de finalización. El fin efectivo es el cierre
+   real o, si el sprint sigue abierto, el fin planificado.
+4. **No duplicación**: cada issue terminada quema en **un solo** sprint.
+5. **Corte por sprint**: cada sprint se calcula solo con sus issues. No hay arrastre ni redistribución.
+6. **Quemados(S)** = suma de SP de las issues terminadas cuyo sprint de quemado es S.
+
+```text
+Cumplimiento(S) = Quemados(S) / Planificados(S)      (None si Planificados = 0)
+```
+
+Si no hay planificados, el resultado es `None` y la UI muestra "—" (no 0 % ni error).
+
+### Casos borde
+
+| Caso                                                  | Resultado                                                                |
+| ----------------------------------------------------- | ------------------------------------------------------------------------ |
+| Issue terminada sin fecha de finalización             | Quema en el último sprint propio (motivo "terminada sin fecha")          |
+| Terminada después del cierre del último sprint propio | Quema en el último sprint propio ("terminada después del último sprint") |
+| Terminada en el hueco entre dos sprints               | Quema en el siguiente sprint propio (el primero con fin mayor o igual)   |
+| Issue en S1 y S2, terminada en S2                     | S1: planificados suma, quemados 0. S2: suma planificados y quemados      |
+| Reabierta y vuelta a terminar                         | Vale la última finalización                                              |
+
+Cada issue de un sprint sale con su **motivo**: "terminada en el sprint", "terminada después del
+último sprint", "quemada en otro sprint", "no terminada" o "terminada sin fecha (se asigna al último
+sprint)". Eso es lo que se ve en el detalle auditable.
+
+## Agregados
+
+- **Por persona** (dentro de un sprint): planificados y quemados agrupados por el **responsable
+  actual**. Las issues sin responsable van a "Sin asignar".
+- **Por mes**: suma de quemados dividida por suma de planificados de los sprints **cerrados** cuya
+  fecha de fin efectiva cae en ese mes (clave `AAAA-MM`). Nunca se promedian porcentajes.
+- **Sprint activo**: es **provisorio** y no entra en el mes hasta cerrar.
+
+## Semáforo
+
+Se aplica al cumplimiento del último sprint cerrado (`compliance/service.py`):
+
+| Cumplimiento         | Estado             |
+| -------------------- | ------------------ |
+| 85 % o más           | En margen (`ok`)   |
+| 70 % a menos de 85 % | Atención (`warn`)  |
+| Menos de 70 %        | En riesgo (`crit`) |
+| Sin planificados     | Sin datos (`none`) |
+
+<Callout type="warn" title="Umbrales fijos por ahora">
+  La spec prevé umbrales configurables por el admin, pero en el código actual son constantes (`OK =
+  0.85`, `WARN = 0.70`).
+</Callout>
+
+## Caché
+
+`ComplianceService` guarda en memoria el resultado por proyecto durante 5 minutos. Se puede forzar
+el recálculo con `POST /api/proyectos/{id}/recalcular`. Las fotos persistentes de sprints cerrados
+(`sprint_snapshots`) todavía no están implementadas.
+
+## Tests
+
+Los casos de la metodología (sprint simple, issue en dos sprints, reapertura, hueco entre sprints,
+sin SP, sub-tareas, categorías de estado, sprint vacío, agregado mensual y regresión contra la
+planilla histórica) son tests unitarios del motor y se escribieron antes que el código.

@@ -1,0 +1,49 @@
+---
+title: Panel único de liderazgo
+description: Un solo lugar para que los líderes de Flockit vean cómo viene cada proyecto.
+---
+
+## Qué es
+
+El panel junta en una sola pantalla lo que un Team Manager hoy arma saltando entre Jira,
+Flocktools y Flock Platform: **cumplimiento de sprints** calculado desde Jira, **informes** con
+narrativa de IA, **avisos** automáticos y un **asistente** que responde sobre los datos.
+
+## Para quién
+
+| Rol              | Qué hace en el panel                                                                              |
+| ---------------- | ------------------------------------------------------------------------------------------------- |
+| **Admin**        | Configura conexiones a Jira, cuentas y proyectos. Ve toda la cartera.                             |
+| **Team Manager** | Ve solo los proyectos que tiene asignados: cartera, sprints, informes, avisos y asistente.        |
+| **Cliente**      | Existe como rol, pero hoy no tiene proyectos visibles (el portal del cliente queda para después). |
+
+## Qué resuelve
+
+- El cumplimiento de sprint (planificados vs quemados) se cargaba a mano o desde un Excel y **no se
+  podía auditar contra Jira**. Ahora lo calcula un motor con reglas explícitas y tests.
+- No había un lugar para ver **todos** los proyectos juntos y detectar a tiempo cuál viene mal.
+  La cartera los ordena por riesgo con un semáforo.
+- Armar un informe de sprint llevaba tiempo de recolección manual. Ahora sale del mismo cálculo y
+  se puede guardar como foto inmutable.
+
+<Callout type="info" title="Los números no los calcula la IA">
+  Todo número sale del motor (`backend/app/compliance`). El asistente y los informes solo redactan
+  sobre valores ya calculados.
+</Callout>
+
+## Dónde seguir
+
+<Cards>
+  <Card title="Arquitectura" href="/docs/arquitectura">
+    Front, back, Supabase y Vercel.
+  </Card>
+  <Card title="Motor de cumplimiento" href="/docs/motor-cumplimiento">
+    Las reglas y fórmulas exactas.
+  </Card>
+  <Card title="API" href="/docs/api">
+    Endpoints y Swagger.
+  </Card>
+  <Card title="Desarrollo" href="/docs/desarrollo">
+    Correr en local, variables y deploy.
+  </Card>
+</Cards>

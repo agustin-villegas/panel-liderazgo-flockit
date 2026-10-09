@@ -1,0 +1,57 @@
+---
+title: Avisos
+description: Notificaciones dentro de la app y el cron que las dispara cada 15 minutos.
+---
+
+## Tipos de aviso
+
+El detector (`backend/app/notifications/detector.py`) es código puro: dado el estado de un proyecto
+devuelve los eventos que corresponden.
+
+| Tipo       | Cuándo                                                                                                           |
+| ---------- | ---------------------------------------------------------------------------------------------------------------- |
+| `cierre`   | Cerró un sprint (solo si cerró hace 14 días o menos). Informa planificados, quemados y cumplimiento.             |
+| `inicio`   | Arrancó un sprint activo. Informa fechas, planificados y cuántas issues no tienen SP.                            |
+| `sinsp`    | Hay issues del sprint activo sin story points. Se repite una vez más al segundo día hábil si siguen sin estimar. |
+| `siniciar` | Pasaron al menos 2 días hábiles desde el cierre del último sprint y no hay uno activo.                           |
+| `sinmov`   | Una issue no finalizada lleva 3 días hábiles o más sin actualizarse.                                             |
+
+Cada aviso tiene una **clave de deduplicación** y es único por usuario: no se repite aunque el
+detector corra muchas veces.
+
+## Dos formas de dispararse
+
+1. **Al abrir la campana**: `GET /api/notificaciones` revisa los proyectos del usuario si la última
+   corrida fue hace más de 15 minutos.
+2. **Cron**: Supabase `pg_cron` + `pg_net` llaman cada **15 minutos** a
+   `POST /internal/jobs/notificaciones` con el header `X-Cron-Secret`. Ese endpoint revisa todos los
+   proyectos activos y no aparece en el OpenAPI.
+
+El secreto se compara en tiempo constante con la variable de entorno `CRON_SECRET` del backend. Si no
+coincide, responde con error de autenticación.
+
+<Callout type="warn" title="Por qué no el cron de Vercel">
+  El plan Hobby de Vercel solo permite un cron por día. Por eso el disparador vive en Supabase.
+</Callout>
+
+## Configurar el cron
+
+En el repo no hay un script SQL versionado para esto: se crea una sola vez en Supabase (SQL Editor)
+con las extensiones `pg_cron` y `pg_net`. La forma es:
+
+```sql
+select cron.schedule(
+  'notificaciones-panel',
+  '*/15 * * * *',
+  $$ select net.http_post(
+       url     := 'https://<backend>/internal/jobs/notificaciones',
+       headers := jsonb_build_object('X-Cron-Secret', '<CRON_SECRET>')
+     ) $$
+);
+```
+
+Reemplazá `<backend>` y `<CRON_SECRET>` con tus valores. **No commitees el secreto.**
+
+## Marcar como leídas
+
+`POST /api/notificaciones/{id}/leida` y `POST /api/notificaciones/leer-todas`.
