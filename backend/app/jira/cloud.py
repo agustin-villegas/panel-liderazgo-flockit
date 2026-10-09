@@ -50,7 +50,8 @@ class JiraCloud:
                 await asyncio.sleep(wait)
                 continue
             if res.status_code >= 400:
-                raise JiraError(ERRORS.get(res.status_code, f"Jira devolvió {res.status_code}"))
+                msg = ERRORS.get(res.status_code, f"Jira devolvió {res.status_code}")
+                raise JiraError(msg, res.status_code)
             return res.json()
         raise JiraError("Jira está limitando consultas, probá en un rato")
 
@@ -80,13 +81,20 @@ class JiraCloud:
         ]
 
     async def boards(self) -> list[Board]:
-        rows = await self._paged("/rest/agile/1.0/board", "values", type="scrum")
+        """Boards que el usuario puede ver: scrum, kanban y team-managed (simple)."""
+        rows = await self._paged("/rest/agile/1.0/board", "values")
         return [
             Board(b["id"], b["name"], (b.get("location") or {}).get("projectKey", "")) for b in rows
         ]
 
     async def sprints(self, board: int) -> list[Sprint]:
-        rows = await self._paged(f"/rest/agile/1.0/board/{board}/sprint", "values")
+        """Sprints del board. Vacío si ese board no usa sprints."""
+        try:
+            rows = await self._paged(f"/rest/agile/1.0/board/{board}/sprint", "values")
+        except JiraError as e:
+            if e.status == 400:
+                return []
+            raise
         return [to_sprint(s) for s in rows if s.get("startDate")]
 
     async def issues(self, sprint: str, sp_field: str) -> list[Issue]:

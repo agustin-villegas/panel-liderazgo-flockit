@@ -131,6 +131,7 @@ class ComplianceService:
             light=light(r.pct),
             unestimated=len(r.unestimated),
             provisional=r.provisional,
+            goal=s.goal,
             people=[
                 PersonOut(
                     name=n,

@@ -116,7 +116,7 @@ Prioridad de cada módulo: **P0** = imprescindible para la demo · **P1** = dese
 ## 5. Cuentas y proyectos (P0)
 
 - **Cuenta**: nombre y logo (opcional).
-- **Proyecto**: nombre, cuenta, conexión y **board** (desplegable con los boards scrum del sitio, vía `/rest/agile/1.0/board`), y Team Managers asignados.
+- **Proyecto**: nombre, cuenta, conexión y **board** (desplegable con todos los boards que el usuario de la conexión puede ver — scrum, kanban y team-managed — vía `/rest/agile/1.0/board`, sin filtrar por tipo), y Team Managers asignados. Un board que no usa sprints deja la medición vacía.
 - Al vincular un board se traen sus sprints. Se puede elegir **desde qué sprint** se mide, para ignorar sprints viejos o de prueba.
 
 **Criterios de aceptación**
@@ -162,7 +162,7 @@ Para cada sprint **S** de un proyecto:
 - **Sprint activo**: se muestra como **provisorio** (badge "En curso") y no entra en el mes hasta cerrar.
 
 ### 7.3 Auditoría
-- Todo número tiene un **"ver detalle"** que lista las issues que lo componen: clave (con link a Jira), título, tipo, SP, estado, responsable, sprints por los que pasó, fecha de finalización, sprint de quemado y **motivo** ("terminada dentro del sprint", "terminada después del último sprint", "no terminada", "sin estimar").
+- Todo número tiene un **"ver detalle"** que abre una página del sprint (no un panel lateral). Arriba, tarjetas por estado y el objetivo del sprint si Jira lo trae. Abajo, una tabla paginada con filtros (texto, estado, responsable, motivo) y export. Cada fila trae: clave (con link a Jira), título, tipo, SP, estado, responsable, sprints por los que pasó, fecha de finalización, sprint de quemado y **motivo** ("terminada dentro del sprint", "terminada después del último sprint", "no terminada", "sin estimar").
 - Se avisa de: issues sin estimar, issues con SP cambiado durante el sprint (si el changelog lo muestra) y sprints sin issues.
 
 ### 7.4 Casos de prueba obligatorios (tests unitarios del motor)
@@ -229,12 +229,14 @@ Para cada sprint **S** de un proyecto:
 ### 9.3 Informes (P0: sprint · P2: cliente)
 - **Informe de sprint**: elegís proyecto, sprint y audiencia (equipo, cliente o gerencia). Contiene:
   - encabezado con la marca;
+  - **objetivo del sprint** tal como viene de Jira (si no hay, se dice);
   - KPIs del sprint;
-  - gráfico de planificados vs quemados de los últimos sprints;
-  - tabla por persona;
+  - gráfico de planificados vs quemados de los últimos sprints, con la línea de cumplimiento;
+  - corte por **tipo de issue** (cantidad, SP planificados y SP quemados);
+  - por persona: planificados vs quemados, y las issues que cerró en este sprint y las que siguen abiertas;
   - issues no terminadas;
   - NPS y CSAT del período (si hay);
-  - **narrativa con IA**.
+  - **narrativa con IA**, que contrasta la entrega contra el objetivo sin inventar alcance.
 - **Informe de cliente** (P2): por cuenta y mes, con todos sus proyectos, cumplimiento del mes, tendencia y satisfacción.
 - **Narrativa con IA**: recibe **solo los números ya calculados** y redacta un resumen en 3 o 4 oraciones según la audiencia. Si la IA falla, el informe se genera igual sin narrativa. El texto se puede editar antes de guardar.
 - **Guardar** congela el informe como una **foto inmutable** (datos + narrativa + fecha + autor). El historial lista los informes guardados.
@@ -321,7 +323,8 @@ Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo
 | `proyectos_en_riesgo()` | Proyectos bajo umbral, con motivo |
 
 ### 10.2 Asistente en la app
-- Es un chat lateral.
+- Es un widget flotante (**Asistente TM**) abajo a la derecha: se abre, se agranda y se minimiza sin tapar la página; conserva la conversación en la pestaña. En el celular ocupa toda la pantalla.
+- La respuesta viene con formato (Markdown: negritas, listas, tablas) y **tarjetas visuales** armadas con la salida de las tools (sprint con medidor, riesgo con semáforo, tendencia, tablero, issues). Los números de las tarjetas salen del motor, no del texto del modelo.
 - El modelo decide qué tools llamar, con un **máximo de 5 llamadas por turno**.
 - Las tools **filtran por los permisos del usuario**: un Team Manager no puede consultar proyectos ajenos aunque lo pida.
 - **Los números de la respuesta salen de las tools.** El prompt prohíbe calcular y exige citar el sprint o mes de cada dato.
@@ -333,7 +336,6 @@ Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo
 
 ### 10.4 Observabilidad
 - Cada turno del asistente registra modelo, tools llamadas con sus argumentos, tokens de entrada y salida, costo estimado y latencia.
-- Hay una vista "Uso de IA" en Auditoría.
 
 ### 10.5 Evals
 - Golden set de **al menos 15 preguntas** con respuesta esperada: qué tools se llaman y qué números aparecen.

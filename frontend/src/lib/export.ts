@@ -19,7 +19,14 @@ export function toPdf(section: string) {
   const el = document.querySelector<HTMLElement>(`[data-section="${section}"]`);
   if (el) el.dataset.printing = "1";
   document.body.dataset.print = "1";
-  window.print();
-  delete document.body.dataset.print;
-  if (el) delete el.dataset.printing;
+  const done = () => {
+    delete document.body.dataset.print;
+    if (el) delete el.dataset.printing;
+    window.removeEventListener("afterprint", done);
+  };
+  window.addEventListener("afterprint", done);
+  // dos frames: el CSS de impresión tiene que aplicar antes de que Chrome saque la foto
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => window.print());
+  });
 }

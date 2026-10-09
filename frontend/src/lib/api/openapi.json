@@ -942,6 +942,207 @@
           }
         }
       }
+    },
+    "/api/notificaciones": {
+      "get": {
+        "tags": ["notificaciones"],
+        "summary": "Mine",
+        "description": "Avisos del usuario; antes revisa sus proyectos si la última corrida fue hace >15 min.",
+        "operationId": "mine_api_notificaciones_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationsOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notificaciones/leer-todas": {
+      "post": {
+        "tags": ["notificaciones"],
+        "summary": "Read All",
+        "operationId": "read_all_api_notificaciones_leer_todas_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/api/notificaciones/{nid}/leida": {
+      "post": {
+        "tags": ["notificaciones"],
+        "summary": "Read One",
+        "operationId": "read_one_api_notificaciones__nid__leida_post",
+        "parameters": [
+          {
+            "name": "nid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Nid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/asistente/mensaje": {
+      "post": {
+        "tags": ["asistente"],
+        "summary": "Message",
+        "description": "Un turno del chat: el modelo llama tools de solo lectura con tus permisos.",
+        "operationId": "message_api_asistente_mensaje_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/perfil/tokens-mcp": {
+      "get": {
+        "tags": ["asistente"],
+        "summary": "List Tokens",
+        "operationId": "list_tokens_api_perfil_tokens_mcp_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TokenOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Tokens Api Perfil Tokens Mcp Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["asistente"],
+        "summary": "Create Token",
+        "description": "Crea un token. El valor crudo se devuelve una sola vez.",
+        "operationId": "create_token_api_perfil_tokens_mcp_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenNew"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/perfil/tokens-mcp/{tid}": {
+      "delete": {
+        "tags": ["asistente"],
+        "summary": "Revoke Token",
+        "operationId": "revoke_token_api_perfil_tokens_mcp__tid__delete",
+        "parameters": [
+          {
+            "name": "tid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1012,6 +1213,81 @@
         "type": "object",
         "required": ["name", "day", "days", "planned", "burned", "pct"],
         "title": "ActiveOut"
+      },
+      "BoardCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "tablero",
+            "title": "Kind",
+            "default": "tablero"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sprint"
+          },
+          "todo": {
+            "type": "integer",
+            "title": "Todo"
+          },
+          "doing": {
+            "type": "integer",
+            "title": "Doing"
+          },
+          "blocked": {
+            "type": "integer",
+            "title": "Blocked"
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          },
+          "done_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done Pct"
+          },
+          "time_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Pct"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project",
+          "sprint",
+          "todo",
+          "doing",
+          "blocked",
+          "done",
+          "done_pct",
+          "time_pct"
+        ],
+        "title": "BoardCard"
       },
       "BoardOut": {
         "properties": {
@@ -1111,6 +1387,78 @@
         "required": ["id", "name", "account", "light", "last", "active", "trend", "month"],
         "title": "CardOut",
         "description": "Una card del panel de cartera."
+      },
+      "ChatIn": {
+        "properties": {
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/MsgIn"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Messages"
+          }
+        },
+        "type": "object",
+        "required": ["messages"],
+        "title": "ChatIn"
+      },
+      "ChatOut": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "title": "Answer"
+          },
+          "tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tools"
+          },
+          "cards": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SprintCard"
+                },
+                {
+                  "$ref": "#/components/schemas/RiskCard"
+                },
+                {
+                  "$ref": "#/components/schemas/TrendCard"
+                },
+                {
+                  "$ref": "#/components/schemas/BoardCard"
+                },
+                {
+                  "$ref": "#/components/schemas/IssuesCard"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "kind",
+                "mapping": {
+                  "issues": "#/components/schemas/IssuesCard",
+                  "riesgo": "#/components/schemas/RiskCard",
+                  "sprint": "#/components/schemas/SprintCard",
+                  "tablero": "#/components/schemas/BoardCard",
+                  "tendencia": "#/components/schemas/TrendCard"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Cards"
+          },
+          "trace_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Trace Id"
+          }
+        },
+        "type": "object",
+        "required": ["answer", "tools", "trace_id"],
+        "title": "ChatOut"
       },
       "ComplianceOut": {
         "properties": {
@@ -1344,6 +1692,17 @@
             },
             "type": "array",
             "title": "Lines"
+          },
+          "site": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site"
           }
         },
         "type": "object",
@@ -1392,6 +1751,72 @@
         "type": "object",
         "required": ["status", "version"],
         "title": "Health"
+      },
+      "IssueItem": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "assignee": {
+            "type": "string",
+            "title": "Assignee"
+          },
+          "sp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp"
+          }
+        },
+        "type": "object",
+        "required": ["key", "title", "status", "assignee", "sp"],
+        "title": "IssueItem"
+      },
+      "IssuesCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "issues",
+            "title": "Kind",
+            "default": "issues"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "type": "string",
+            "title": "Sprint"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IssueItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": ["project", "sprint", "total", "items"],
+        "title": "IssuesCard"
       },
       "LineOut": {
         "properties": {
@@ -1573,6 +1998,92 @@
         "required": ["month", "planned", "burned", "pct", "light", "sprints"],
         "title": "MonthOut"
       },
+      "MsgIn": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": ["user", "assistant"],
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": ["role", "content"],
+        "title": "MsgIn"
+      },
+      "NotificationOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "link": {
+            "type": "string",
+            "title": "Link"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          }
+        },
+        "type": "object",
+        "required": ["id", "project_id", "kind", "title", "body", "link", "created_at", "read_at"],
+        "title": "NotificationOut"
+      },
+      "NotificationsOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "unread": {
+            "type": "integer",
+            "title": "Unread"
+          }
+        },
+        "type": "object",
+        "required": ["items", "unread"],
+        "title": "NotificationsOut"
+      },
       "PasswordIn": {
         "properties": {
           "current": {
@@ -1662,6 +2173,98 @@
         "type": "object",
         "required": ["name", "planned", "burned", "pct"],
         "title": "PersonOut"
+      },
+      "PersonWork": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "planned": {
+            "type": "number",
+            "title": "Planned"
+          },
+          "burned": {
+            "type": "number",
+            "title": "Burned"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "closed": {
+            "items": {
+              "$ref": "#/components/schemas/WorkItem"
+            },
+            "type": "array",
+            "title": "Closed"
+          },
+          "open": {
+            "items": {
+              "$ref": "#/components/schemas/WorkItem"
+            },
+            "type": "array",
+            "title": "Open"
+          }
+        },
+        "type": "object",
+        "required": ["name", "planned", "burned", "pct", "closed", "open"],
+        "title": "PersonWork"
+      },
+      "Point": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          },
+          "planned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned"
+          },
+          "burned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Burned"
+          }
+        },
+        "type": "object",
+        "required": ["label", "pct", "light"],
+        "title": "Point"
       },
       "PreviewOut": {
         "properties": {
@@ -1873,6 +2476,22 @@
                 "type": "null"
               }
             ]
+          },
+          "types": {
+            "items": {
+              "$ref": "#/components/schemas/TypeSlice"
+            },
+            "type": "array",
+            "title": "Types",
+            "default": []
+          },
+          "work": {
+            "items": {
+              "$ref": "#/components/schemas/PersonWork"
+            },
+            "type": "array",
+            "title": "Work",
+            "default": []
           }
         },
         "type": "object",
@@ -2016,6 +2635,63 @@
         "required": ["id", "title", "audience", "project", "pct", "created_at", "author"],
         "title": "ReportRow"
       },
+      "RiskCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "riesgo",
+            "title": "Kind",
+            "default": "riesgo"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RiskItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "no_data": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "No Data"
+          }
+        },
+        "type": "object",
+        "required": ["items", "no_data"],
+        "title": "RiskCard"
+      },
+      "RiskItem": {
+        "properties": {
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "type": "string",
+            "title": "Sprint"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          }
+        },
+        "type": "object",
+        "required": ["project", "sprint", "pct", "light"],
+        "title": "RiskItem"
+      },
       "SaveIn": {
         "properties": {
           "project_id": {
@@ -2098,6 +2774,75 @@
         "type": "object",
         "required": ["sprint", "counts", "done_pct", "cards"],
         "title": "SprintBoardOut"
+      },
+      "SprintCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "sprint",
+            "title": "Kind",
+            "default": "sprint"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "type": "string",
+            "title": "Sprint"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          },
+          "planned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned"
+          },
+          "burned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Burned"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            },
+            "type": "array",
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": ["project", "sprint", "state", "pct", "light", "planned", "burned", "people"],
+        "title": "SprintCard"
       },
       "SprintInfo": {
         "properties": {
@@ -2194,6 +2939,17 @@
           "provisional": {
             "type": "boolean",
             "title": "Provisional"
+          },
+          "goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal"
           },
           "people": {
             "items": {
@@ -2408,6 +3164,125 @@
         ],
         "title": "TicketOut"
       },
+      "TokenIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": ["name"],
+        "title": "TokenIn"
+      },
+      "TokenNew": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "last4": {
+            "type": "string",
+            "title": "Last4"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "last4", "created_at", "last_used_at", "token"],
+        "title": "TokenNew"
+      },
+      "TokenOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "last4": {
+            "type": "string",
+            "title": "Last4"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "last4", "created_at", "last_used_at"],
+        "title": "TokenOut"
+      },
+      "TrendCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "tendencia",
+            "title": "Kind",
+            "default": "tendencia"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": ["project", "title", "points"],
+        "title": "TrendCard"
+      },
       "TrendPoint": {
         "properties": {
           "name": {
@@ -2437,6 +3312,29 @@
         "type": "object",
         "required": ["name", "planned", "burned", "pct"],
         "title": "TrendPoint"
+      },
+      "TypeSlice": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "planned": {
+            "type": "number",
+            "title": "Planned"
+          },
+          "burned": {
+            "type": "number",
+            "title": "Burned"
+          }
+        },
+        "type": "object",
+        "required": ["name", "count", "planned", "burned"],
+        "title": "TypeSlice"
       },
       "ValidationError": {
         "properties": {
@@ -2473,6 +3371,36 @@
         "type": "object",
         "required": ["loc", "msg", "type"],
         "title": "ValidationError"
+      },
+      "WorkItem": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "sp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": ["key", "title", "sp", "status"],
+        "title": "WorkItem"
       }
     }
   }

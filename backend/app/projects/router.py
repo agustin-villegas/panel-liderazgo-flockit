@@ -108,7 +108,11 @@ async def compliance(
 async def sprint_detail(
     pid: UUID, sid: str, user: CurrentUser, db: Db, svc: Projects, comp: Compliance
 ) -> DetailOut:
-    return comp.detail(await _load(pid, user, db, svc, comp), sid)
+    proj = await svc.get(pid, user)
+    conn = await db.get(Connection, proj.conn_id) if proj.conn_id else None
+    site = conn.site.rstrip("/") if conn and conn.site else None
+    out = comp.detail(await _load(pid, user, db, svc, comp), sid)
+    return out.model_copy(update={"site": site})
 
 
 @router.post("/proyectos/{pid}/recalcular", status_code=204)

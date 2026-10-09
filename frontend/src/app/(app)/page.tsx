@@ -1,13 +1,16 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { FolderPlus } from "lucide-react";
+import { AlertTriangle, CheckCircle2, FolderKanban, FolderPlus, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 
+import { PortfolioChart } from "@/components/panel/portfolio-chart";
 import { ProjectCard } from "@/components/panel/project-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Empty } from "@/components/viz/empty";
+import { StatTile } from "@/components/viz/stat-tile";
 import { useMe } from "@/hooks/use-me";
 import { api, type Card as CardData } from "@/lib/api/client";
 
@@ -20,10 +23,20 @@ export default function PortfolioPage() {
 
   const count = (l: string) => data?.filter((c) => c.light === l).length ?? 0;
   const kpis = [
-    { label: "Proyectos", value: data?.length ?? 0, cls: "" },
-    { label: "En riesgo", value: count("crit"), cls: "text-crit-fg" },
-    { label: "Atención", value: count("warn"), cls: "text-warn-fg" },
-    { label: "En margen", value: count("ok"), cls: "text-ok-fg" },
+    { label: "Proyectos", value: data?.length ?? 0, icon: FolderKanban, chip: "" },
+    {
+      label: "En riesgo",
+      value: count("crit"),
+      icon: ShieldAlert,
+      chip: "bg-crit-bg text-crit-fg",
+    },
+    {
+      label: "Atención",
+      value: count("warn"),
+      icon: AlertTriangle,
+      chip: "bg-warn-bg text-warn-fg",
+    },
+    { label: "En margen", value: count("ok"), icon: CheckCircle2, chip: "bg-ok-bg text-ok-fg" },
   ];
 
   return (
@@ -37,18 +50,23 @@ export default function PortfolioPage() {
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Indicadores">
         {kpis.map((k) => (
-          <Card key={k.label} className="py-4">
-            <CardContent>
-              <p className="text-xs font-medium text-muted-foreground">{k.label}</p>
-              {isLoading ? (
-                <Skeleton className="mt-2 h-8 w-12" />
-              ) : (
-                <p className={`text-3xl leading-none font-bold ${k.cls}`}>{k.value}</p>
-              )}
-            </CardContent>
-          </Card>
+          <StatTile key={k.label} {...k} loading={isLoading} />
         ))}
       </section>
+
+      {data && data.some((c) => c.trend.length > 0) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Cartera: cumplimiento por sprint</CardTitle>
+            <CardDescription>
+              Últimos 6 sprints cerrados de cada proyecto. “Último” es el más reciente.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <PortfolioChart cards={data} />
+          </CardContent>
+        </Card>
+      )}
 
       {error && (
         <p className="text-sm text-crit-fg">No se pudo cargar la cartera: {error.message}</p>
@@ -57,27 +75,28 @@ export default function PortfolioPage() {
       {isLoading && (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 3 }, (_, i) => (
-            <Skeleton key={i} className="h-64 rounded-xl" />
+            <Skeleton key={i} className="h-[17.5rem] rounded-xl" />
           ))}
         </div>
       )}
 
       {data && data.length === 0 && (
-        <Card className="items-center py-12 text-center">
-          <CardContent className="grid justify-items-center gap-3">
-            <FolderPlus className="size-10 text-muted-foreground" />
-            <p className="font-semibold">Todavía no hay proyectos</p>
-            <p className="max-w-sm text-sm text-muted-foreground">
-              {me?.role === "admin"
+        <Card>
+          <Empty
+            icon={FolderPlus}
+            title="Todavía no hay proyectos"
+            hint={
+              me?.role === "admin"
                 ? "Creá un proyecto y vinculalo a un board de Jira (o a la conexión Demo)."
-                : "Pedile a un admin que te asigne proyectos."}
-            </p>
+                : "Pedile a un admin que te asigne proyectos."
+            }
+          >
             {me?.role === "admin" && (
               <Button nativeButton={false} render={<Link href="/configuracion/proyectos" />}>
                 Crear proyecto
               </Button>
             )}
-          </CardContent>
+          </Empty>
         </Card>
       )}
 

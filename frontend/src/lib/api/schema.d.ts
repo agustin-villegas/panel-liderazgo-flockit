@@ -376,6 +376,118 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/notificaciones": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Mine
+     * @description Avisos del usuario; antes revisa sus proyectos si la última corrida fue hace >15 min.
+     */
+    get: operations["mine_api_notificaciones_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/notificaciones/leer-todas": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Read All */
+    post: operations["read_all_api_notificaciones_leer_todas_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/notificaciones/{nid}/leida": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Read One */
+    post: operations["read_one_api_notificaciones__nid__leida_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/asistente/mensaje": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Message
+     * @description Un turno del chat: el modelo llama tools de solo lectura con tus permisos.
+     */
+    post: operations["message_api_asistente_mensaje_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/perfil/tokens-mcp": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Tokens */
+    get: operations["list_tokens_api_perfil_tokens_mcp_get"];
+    put?: never;
+    /**
+     * Create Token
+     * @description Crea un token. El valor crudo se devuelve una sola vez.
+     */
+    post: operations["create_token_api_perfil_tokens_mcp_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/perfil/tokens-mcp/{tid}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Revoke Token */
+    delete: operations["revoke_token_api_perfil_tokens_mcp__tid__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -410,6 +522,30 @@ export interface components {
       /** Pct */
       pct: number | null;
     };
+    /** BoardCard */
+    BoardCard: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "tablero";
+      /** Project */
+      project: string;
+      /** Sprint */
+      sprint: string | null;
+      /** Todo */
+      todo: number;
+      /** Doing */
+      doing: number;
+      /** Blocked */
+      blocked: number;
+      /** Done */
+      done: number;
+      /** Done Pct */
+      done_pct: number | null;
+      /** Time Pct */
+      time_pct: number | null;
+    };
     /** BoardOut */
     BoardOut: {
       /** Id */
@@ -442,6 +578,31 @@ export interface components {
       month: components["schemas"]["MonthOut"] | null;
       /** Error */
       error?: string | null;
+    };
+    /** ChatIn */
+    ChatIn: {
+      /** Messages */
+      messages: components["schemas"]["MsgIn"][];
+    };
+    /** ChatOut */
+    ChatOut: {
+      /** Answer */
+      answer: string;
+      /** Tools */
+      tools: string[];
+      /** Cards */
+      cards?: (
+        | components["schemas"]["SprintCard"]
+        | components["schemas"]["RiskCard"]
+        | components["schemas"]["TrendCard"]
+        | components["schemas"]["BoardCard"]
+        | components["schemas"]["IssuesCard"]
+      )[];
+      /**
+       * Trace Id
+       * Format: uuid
+       */
+      trace_id: string;
     };
     /** ComplianceOut */
     ComplianceOut: {
@@ -530,6 +691,8 @@ export interface components {
       sprint: components["schemas"]["SprintOut"];
       /** Lines */
       lines: components["schemas"]["LineOut"][];
+      /** Site */
+      site?: string | null;
     };
     /** FieldOut */
     FieldOut: {
@@ -549,6 +712,35 @@ export interface components {
       status: string;
       /** Version */
       version: string;
+    };
+    /** IssueItem */
+    IssueItem: {
+      /** Key */
+      key: string;
+      /** Title */
+      title: string;
+      /** Status */
+      status: string;
+      /** Assignee */
+      assignee: string;
+      /** Sp */
+      sp: number | null;
+    };
+    /** IssuesCard */
+    IssuesCard: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "issues";
+      /** Project */
+      project: string;
+      /** Sprint */
+      sprint: string;
+      /** Total */
+      total: number;
+      /** Items */
+      items: components["schemas"]["IssueItem"][];
     };
     /** LineOut */
     LineOut: {
@@ -613,6 +805,51 @@ export interface components {
       /** Sprints */
       sprints: number;
     };
+    /** MsgIn */
+    MsgIn: {
+      /**
+       * Role
+       * @enum {string}
+       */
+      role: "user" | "assistant";
+      /** Content */
+      content: string;
+    };
+    /** NotificationOut */
+    NotificationOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Project Id
+       * Format: uuid
+       */
+      project_id: string;
+      /** Kind */
+      kind: string;
+      /** Title */
+      title: string;
+      /** Body */
+      body: string;
+      /** Link */
+      link: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Read At */
+      read_at: string | null;
+    };
+    /** NotificationsOut */
+    NotificationsOut: {
+      /** Items */
+      items: components["schemas"]["NotificationOut"][];
+      /** Unread */
+      unread: number;
+    };
     /** PasswordIn */
     PasswordIn: {
       /** Current */
@@ -643,6 +880,34 @@ export interface components {
       burned: number;
       /** Pct */
       pct: number | null;
+    };
+    /** PersonWork */
+    PersonWork: {
+      /** Name */
+      name: string;
+      /** Planned */
+      planned: number;
+      /** Burned */
+      burned: number;
+      /** Pct */
+      pct: number | null;
+      /** Closed */
+      closed: components["schemas"]["WorkItem"][];
+      /** Open */
+      open: components["schemas"]["WorkItem"][];
+    };
+    /** Point */
+    Point: {
+      /** Label */
+      label: string;
+      /** Pct */
+      pct: number | null;
+      /** Light */
+      light: string;
+      /** Planned */
+      planned?: number | null;
+      /** Burned */
+      burned?: number | null;
     };
     /** PreviewOut */
     PreviewOut: {
@@ -718,6 +983,16 @@ export interface components {
       /** Pending */
       pending: components["schemas"]["Pending"][];
       month: components["schemas"]["MonthOut"] | null;
+      /**
+       * Types
+       * @default []
+       */
+      types: components["schemas"]["TypeSlice"][];
+      /**
+       * Work
+       * @default []
+       */
+      work: components["schemas"]["PersonWork"][];
     };
     /** ReportIn */
     ReportIn: {
@@ -786,6 +1061,29 @@ export interface components {
       /** Author */
       author: string;
     };
+    /** RiskCard */
+    RiskCard: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "riesgo";
+      /** Items */
+      items: components["schemas"]["RiskItem"][];
+      /** No Data */
+      no_data: string[];
+    };
+    /** RiskItem */
+    RiskItem: {
+      /** Project */
+      project: string;
+      /** Sprint */
+      sprint: string;
+      /** Pct */
+      pct: number | null;
+      /** Light */
+      light: string;
+    };
     /** SaveIn */
     SaveIn: {
       /**
@@ -813,6 +1111,30 @@ export interface components {
       cards: components["schemas"]["TicketOut"][];
       /** Notice */
       notice?: string | null;
+    };
+    /** SprintCard */
+    SprintCard: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "sprint";
+      /** Project */
+      project: string;
+      /** Sprint */
+      sprint: string;
+      /** State */
+      state: string;
+      /** Pct */
+      pct: number | null;
+      /** Light */
+      light: string;
+      /** Planned */
+      planned: number | null;
+      /** Burned */
+      burned: number | null;
+      /** People */
+      people: components["schemas"]["Point"][];
     };
     /** SprintInfo */
     SprintInfo: {
@@ -869,6 +1191,8 @@ export interface components {
       unestimated: number;
       /** Provisional */
       provisional: boolean;
+      /** Goal */
+      goal?: string | null;
       /** People */
       people: components["schemas"]["PersonOut"][];
     };
@@ -927,6 +1251,65 @@ export interface components {
       /** Updated */
       updated: string | null;
     };
+    /** TokenIn */
+    TokenIn: {
+      /** Name */
+      name: string;
+    };
+    /** TokenNew */
+    TokenNew: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Last4 */
+      last4: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Last Used At */
+      last_used_at: string | null;
+      /** Token */
+      token: string;
+    };
+    /** TokenOut */
+    TokenOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Last4 */
+      last4: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Last Used At */
+      last_used_at: string | null;
+    };
+    /** TrendCard */
+    TrendCard: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "tendencia";
+      /** Project */
+      project: string;
+      /** Title */
+      title: string;
+      /** Points */
+      points: components["schemas"]["Point"][];
+    };
     /** TrendPoint */
     TrendPoint: {
       /** Name */
@@ -937,6 +1320,17 @@ export interface components {
       burned: number;
       /** Pct */
       pct: number | null;
+    };
+    /** TypeSlice */
+    TypeSlice: {
+      /** Name */
+      name: string;
+      /** Count */
+      count: number;
+      /** Planned */
+      planned: number;
+      /** Burned */
+      burned: number;
     };
     /** ValidationError */
     ValidationError: {
@@ -950,6 +1344,17 @@ export interface components {
       input?: unknown;
       /** Context */
       ctx?: Record<string, never>;
+    };
+    /** WorkItem */
+    WorkItem: {
+      /** Key */
+      key: string;
+      /** Title */
+      title: string;
+      /** Sp */
+      sp: number | null;
+      /** Status */
+      status: string;
     };
   };
   responses: never;
@@ -1714,6 +2119,188 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["ReportOut"];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  mine_api_notificaciones_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["NotificationsOut"];
+        };
+      };
+    };
+  };
+  read_all_api_notificaciones_leer_todas_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  read_one_api_notificaciones__nid__leida_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        nid: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  message_api_asistente_mensaje_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChatIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ChatOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_tokens_api_perfil_tokens_mcp_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TokenOut"][];
+        };
+      };
+    };
+  };
+  create_token_api_perfil_tokens_mcp_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TokenIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TokenNew"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  revoke_token_api_perfil_tokens_mcp__tid__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tid: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Validation Error */
       422: {

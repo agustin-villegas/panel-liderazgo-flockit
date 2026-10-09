@@ -39,6 +39,29 @@ class Pending(BaseModel):
     sp: float | None
 
 
+class TypeSlice(BaseModel):
+    name: str
+    count: int
+    planned: float
+    burned: float
+
+
+class WorkItem(BaseModel):
+    key: str
+    title: str
+    sp: float | None
+    status: str
+
+
+class PersonWork(BaseModel):
+    name: str
+    planned: float
+    burned: float
+    pct: float | None
+    closed: list[WorkItem]
+    open: list[WorkItem]
+
+
 class ReportData(BaseModel):
     """Los números del informe: salen del motor, no de la IA."""
 
@@ -48,6 +71,8 @@ class ReportData(BaseModel):
     trend: list[TrendPoint]
     pending: list[Pending]
     month: MonthOut | None
+    types: list[TypeSlice] = []  # fotos viejas no lo traen
+    work: list[PersonWork] = []
 
 
 class PreviewOut(BaseModel):

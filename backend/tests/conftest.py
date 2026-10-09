@@ -22,6 +22,8 @@ os.environ.update(
         "ADMIN_PASSWORD_HASH": get_passwords().hash(PWD),
     }
 )
+# los tests nunca usan la key real del .env local: sin red ni costo
+os.environ["OPENAI_API_KEY"] = ""
 
 from app.config import Settings  # noqa: E402
 from app.db.database import Database  # noqa: E402

@@ -1,10 +1,11 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { KeyRound, LogOut } from "lucide-react";
+import { KeyRound, LogOut, Plug } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { AssistantWidget } from "@/components/assistant/assistant-widget";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useMe } from "@/hooks/use-me";
 import { post } from "@/lib/api/client";
 
+import { McpDialog } from "./mcp-dialog";
+import { NotificationBell } from "./notification-bell";
 import { PasswordDialog } from "./password-dialog";
 
 const ROLES: Record<string, string> = {
@@ -34,6 +37,9 @@ export function Topbar() {
   const qc = useQueryClient();
   const { data: me } = useMe();
   const [pwd, setPwd] = useState(false);
+  const [mcp, setMcp] = useState(false);
+  // el back decide; el front solo oculta (spec §2: el cliente no usa el asistente)
+  const ai = !!me && me.role !== "cliente";
 
   async function logout() {
     await post("/auth/logout").catch(() => undefined);
@@ -45,6 +51,7 @@ export function Topbar() {
     <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur">
       <SidebarTrigger />
       <div className="flex-1" />
+      <NotificationBell />
       <ThemeToggle />
       <DropdownMenu>
         <DropdownMenuTrigger
@@ -75,6 +82,12 @@ export function Topbar() {
             <KeyRound className="size-4" />
             Cambiar contraseña
           </DropdownMenuItem>
+          {ai && (
+            <DropdownMenuItem onClick={() => setMcp(true)}>
+              <Plug className="size-4" />
+              Tokens MCP
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem variant="destructive" onClick={logout}>
             <LogOut className="size-4" />
             Cerrar sesión
@@ -82,6 +95,8 @@ export function Topbar() {
         </DropdownMenuContent>
       </DropdownMenu>
       <PasswordDialog open={pwd} onClose={() => setPwd(false)} />
+      {ai && <AssistantWidget />}
+      {ai && <McpDialog open={mcp} onClose={() => setMcp(false)} />}
     </header>
   );
 }
