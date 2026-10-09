@@ -10,7 +10,11 @@ log = logging.getLogger(__name__)
 
 
 async def ensure_admin(db: AsyncSession, cfg: Settings) -> None:
-    """Crea o actualiza el admin inicial desde ADMIN_EMAIL / ADMIN_PASSWORD_HASH."""
+    """Crea el admin inicial desde ADMIN_EMAIL / ADMIN_PASSWORD_HASH.
+
+    Si ya existe, conserva su contraseña (la pudo cambiar desde la app).
+    Con ADMIN_RESET_PASSWORD=true se fuerza la del .env (para recuperar acceso).
+    """
     email = cfg.admin_email.strip().lower()
     user = await db.scalar(select(User).where(User.email == email))
     if user is None:
@@ -18,6 +22,8 @@ async def ensure_admin(db: AsyncSession, cfg: Settings) -> None:
         log.info("Admin inicial creado: %s", email)
     else:
         user.role = Role.ADMIN
-        user.pwd_hash = cfg.admin_password_hash
         user.disabled_at = None
+        if cfg.admin_reset_password:
+            user.pwd_hash = cfg.admin_password_hash
+            log.warning("Contraseña del admin restablecida desde el .env")
     await db.commit()

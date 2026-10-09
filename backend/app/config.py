@@ -27,6 +27,7 @@ class Settings(BaseSettings):
 
     admin_email: str
     admin_password_hash: str = Field(pattern=r"^\$argon2id\$")
+    admin_reset_password: bool = False
 
     session_hours: int = 8
     login_max_fails: int = 5

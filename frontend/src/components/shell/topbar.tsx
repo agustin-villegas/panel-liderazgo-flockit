@@ -1,7 +1,9 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { KeyRound, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -9,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -18,6 +21,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useMe } from "@/hooks/use-me";
 import { post } from "@/lib/api/client";
 
+import { PasswordDialog } from "./password-dialog";
+
 const ROLES: Record<string, string> = {
   admin: "Admin",
   team_manager: "Team Manager",
@@ -26,10 +31,13 @@ const ROLES: Record<string, string> = {
 
 export function Topbar() {
   const router = useRouter();
+  const qc = useQueryClient();
   const { data: me } = useMe();
+  const [pwd, setPwd] = useState(false);
 
   async function logout() {
     await post("/auth/logout").catch(() => undefined);
+    qc.clear(); // no dejar datos del usuario anterior en memoria
     router.replace("/login");
   }
 
@@ -41,7 +49,7 @@ export function Topbar() {
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button variant="ghost" size="icon" className="rounded-full" aria-label="Cuenta" />
+            <Button variant="ghost" size="icon" className="rounded-full" aria-label="Mi perfil" />
           }
         >
           <Avatar className="size-8">
@@ -50,20 +58,30 @@ export function Topbar() {
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>
-            <p className="truncate">{me?.email}</p>
-            <p className="text-xs font-normal text-muted-foreground">
-              {ROLES[me?.role ?? ""] ?? ""}
-            </p>
-          </DropdownMenuLabel>
+        <DropdownMenuContent align="end" className="w-64">
+          {/* base-ui: el Label tiene que vivir dentro de un Group */}
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              Mi perfil
+            </DropdownMenuLabel>
+            <div className="grid gap-0.5 px-2 pb-2 text-sm">
+              <span className="font-medium">{me?.name}</span>
+              <span className="truncate text-muted-foreground">{me?.email}</span>
+              <span className="text-xs text-primary">{ROLES[me?.role ?? ""] ?? ""}</span>
+            </div>
+          </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={logout}>
+          <DropdownMenuItem onClick={() => setPwd(true)}>
+            <KeyRound className="size-4" />
+            Cambiar contraseña
+          </DropdownMenuItem>
+          <DropdownMenuItem variant="destructive" onClick={logout}>
             <LogOut className="size-4" />
             Cerrar sesión
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <PasswordDialog open={pwd} onClose={() => setPwd(false)} />
     </header>
   );
 }

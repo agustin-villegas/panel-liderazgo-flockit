@@ -16,3 +16,8 @@ class Me(BaseModel):
     name: str
     role: str
     must_change_pwd: bool
+
+
+class PasswordIn(BaseModel):
+    current: str = Field(min_length=1, max_length=200)
+    new: str = Field(min_length=12, max_length=200)

@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Request, Response
 
 from app.auth.deps import COOKIE, Cfg, CurrentUser, client_ip, get_auth
-from app.auth.schemas import LoginIn, Me
+from app.auth.schemas import LoginIn, Me, PasswordIn
 from app.auth.service import AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -37,3 +37,11 @@ async def logout(req: Request, res: Response, user: CurrentUser, auth: Auth) -> 
 @router.get("/me")
 async def me(user: CurrentUser) -> Me:
     return Me.model_validate(user)
+
+
+@router.post("/password", status_code=204)
+async def change_password(body: PasswordIn, req: Request, user: CurrentUser, auth: Auth) -> None:
+    """Cambia la contraseña del usuario logueado."""
+    await auth.change_password(
+        user, body.current, body.new, req.cookies.get(COOKIE, ""), client_ip(req)
+    )
