@@ -9,7 +9,7 @@ from sqlalchemy import select
 from app.ai.agent import MAX_CALLS, Reply, ToolCall
 from app.ai.factory import make_box
 from app.ai.models import AiTrace, McpToken
-from app.auth.models import User
+from app.auth.models import Role, User
 from app.auth.tokens import digest
 from tests.conftest import PWD
 from tests.test_projects_api import TM, add_user, new_project, run
@@ -327,3 +327,11 @@ def test_mcp_token_revocado_deja_de_andar(admin):
 
 def test_mcp_no_rompe_el_lifespan_ni_las_rutas_api(client):
     assert client.get("/api/health").status_code == 200
+
+
+def test_cliente_sin_asistente_ni_tokens(admin, login):
+    add_user(admin, "cli@panel.test", Role.CLIENT)
+    login("cli@panel.test", PWD)
+    admin.app.state.chat = FakeChat([Reply("no debería llegar")])
+    assert ask(admin).status_code == 403
+    assert admin.post("/api/perfil/tokens-mcp", json={"name": "x"}).status_code == 403

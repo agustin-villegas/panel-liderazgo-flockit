@@ -8,10 +8,14 @@ from app.ai.agent import Assistant, AssistantError, ChatClient, OpenAIChat
 from app.ai.factory import make_box
 from app.ai.models import AiTrace
 from app.ai.schemas import ChatIn, ChatOut, TokenIn, TokenNew, TokenOut
-from app.auth.deps import Cfg, CurrentUser, Db
+from app.auth.deps import Cfg, Db, require_role
+from app.auth.models import Role, User
 from app.mcp.tokens import McpTokenService
 
 router = APIRouter(tags=["asistente"])
+
+# el cliente no usa el asistente ni el MCP (spec §2)
+AiUser = Annotated[User, Depends(require_role(Role.ADMIN, Role.MANAGER))]
 
 
 def get_chat(req: Request, cfg: Cfg) -> ChatClient:
@@ -28,7 +32,7 @@ def get_chat(req: Request, cfg: Cfg) -> ChatClient:
 async def message(
     body: ChatIn,
     req: Request,
-    user: CurrentUser,
+    user: AiUser,
     db: Db,
     chat: Annotated[ChatClient, Depends(get_chat)],
 ) -> ChatOut:
@@ -59,16 +63,16 @@ Tokens = Annotated[McpTokenService, Depends(get_tokens)]
 
 
 @router.get("/perfil/tokens-mcp")
-async def list_tokens(user: CurrentUser, svc: Tokens) -> list[TokenOut]:
+async def list_tokens(user: AiUser, svc: Tokens) -> list[TokenOut]:
     return await svc.all(user)
 
 
 @router.post("/perfil/tokens-mcp", status_code=201)
-async def create_token(body: TokenIn, user: CurrentUser, svc: Tokens) -> TokenNew:
+async def create_token(body: TokenIn, user: AiUser, svc: Tokens) -> TokenNew:
     """Crea un token. El valor crudo se devuelve una sola vez."""
     return await svc.create(user, body.name)
 
 
 @router.delete("/perfil/tokens-mcp/{tid}", status_code=204)
-async def revoke_token(tid: UUID, user: CurrentUser, svc: Tokens) -> None:
+async def revoke_token(tid: UUID, user: AiUser, svc: Tokens) -> None:
     await svc.revoke(tid, user)

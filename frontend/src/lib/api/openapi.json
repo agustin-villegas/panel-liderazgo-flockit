@@ -1008,6 +1008,141 @@
           }
         }
       }
+    },
+    "/api/asistente/mensaje": {
+      "post": {
+        "tags": ["asistente"],
+        "summary": "Message",
+        "description": "Un turno del chat: el modelo llama tools de solo lectura con tus permisos.",
+        "operationId": "message_api_asistente_mensaje_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/perfil/tokens-mcp": {
+      "get": {
+        "tags": ["asistente"],
+        "summary": "List Tokens",
+        "operationId": "list_tokens_api_perfil_tokens_mcp_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TokenOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Tokens Api Perfil Tokens Mcp Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["asistente"],
+        "summary": "Create Token",
+        "description": "Crea un token. El valor crudo se devuelve una sola vez.",
+        "operationId": "create_token_api_perfil_tokens_mcp_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenNew"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/perfil/tokens-mcp/{tid}": {
+      "delete": {
+        "tags": ["asistente"],
+        "summary": "Revoke Token",
+        "operationId": "revoke_token_api_perfil_tokens_mcp__tid__delete",
+        "parameters": [
+          {
+            "name": "tid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1177,6 +1312,45 @@
         "required": ["id", "name", "account", "light", "last", "active", "trend", "month"],
         "title": "CardOut",
         "description": "Una card del panel de cartera."
+      },
+      "ChatIn": {
+        "properties": {
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/MsgIn"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Messages"
+          }
+        },
+        "type": "object",
+        "required": ["messages"],
+        "title": "ChatIn"
+      },
+      "ChatOut": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "title": "Answer"
+          },
+          "tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tools"
+          },
+          "trace_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Trace Id"
+          }
+        },
+        "type": "object",
+        "required": ["answer", "tools", "trace_id"],
+        "title": "ChatOut"
       },
       "ComplianceOut": {
         "properties": {
@@ -1649,6 +1823,24 @@
         "type": "object",
         "required": ["month", "planned", "burned", "pct", "light", "sprints"],
         "title": "MonthOut"
+      },
+      "MsgIn": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": ["user", "assistant"],
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": ["role", "content"],
+        "title": "MsgIn"
       },
       "NotificationOut": {
         "properties": {
@@ -2563,6 +2755,97 @@
           "updated"
         ],
         "title": "TicketOut"
+      },
+      "TokenIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": ["name"],
+        "title": "TokenIn"
+      },
+      "TokenNew": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "last4": {
+            "type": "string",
+            "title": "Last4"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "last4", "created_at", "last_used_at", "token"],
+        "title": "TokenNew"
+      },
+      "TokenOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "last4": {
+            "type": "string",
+            "title": "Last4"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "last4", "created_at", "last_used_at"],
+        "title": "TokenOut"
       },
       "TrendPoint": {
         "properties": {

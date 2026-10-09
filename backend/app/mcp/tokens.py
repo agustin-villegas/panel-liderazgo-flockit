@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.models import McpToken
 from app.ai.schemas import TokenNew, TokenOut
-from app.auth.models import User
+from app.auth.models import Role, User
 from app.auth.tokens import digest, new_token
 from app.core.clock import now
 from app.core.errors import NotFoundError
@@ -59,7 +59,7 @@ class McpTokenService:
         if not found:
             return None
         tok, user = found
-        if tok.revoked_at or not user.active:
+        if tok.revoked_at or not user.active or user.role == Role.CLIENT:
             return None
         tok.last_used_at = now()
         await self.db.commit()

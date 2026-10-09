@@ -164,6 +164,8 @@ Todas las tablas tienen **RLS activado sin políticas**. Solo el backend, con su
 - **Logs**: nunca contienen tokens ni contraseñas; el filtro de logging los enmascara.
 
 ### 4.6 IA (`ai/`)
+> **Desvío implementado (2026-10-09):** `agent.py` y `narrative.py` usan el SDK de **OpenAI** directo (chat-completions con tool-calling y un loop propio de máx. 5 llamadas), no ADK. Las trazas se guardan desde el router en `ai_traces` (sin costo todavía). Evals con ADK y la vista "Uso de IA" quedan pendientes. Lo de abajo es el diseño original.
+
 - **`tools.py`**: las 7 tools de la spec §10.1. Reciben el usuario del contexto y **filtran por sus permisos**. Devuelven datos del motor, con el texto de Jira envuelto por `guard.py`.
 - **`agent.py`**: un `LlmAgent` de ADK con esas tools, instrucción en español y límite de **5 llamadas** por turno (`RunConfig.max_llm_calls`). Un solo agente: no hace falta multi-agente para consultas de solo lectura, y sumarlo agregaría costo y latencia sin beneficio.
 - **`narrative.py`**: un agente redactor con `output_schema` (resumen y puntos clave). Recibe solo el JSON de números ya calculados. Si falla, el informe sale sin narrativa.

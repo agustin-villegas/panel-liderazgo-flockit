@@ -430,6 +430,64 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/asistente/mensaje": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Message
+     * @description Un turno del chat: el modelo llama tools de solo lectura con tus permisos.
+     */
+    post: operations["message_api_asistente_mensaje_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/perfil/tokens-mcp": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Tokens */
+    get: operations["list_tokens_api_perfil_tokens_mcp_get"];
+    put?: never;
+    /**
+     * Create Token
+     * @description Crea un token. El valor crudo se devuelve una sola vez.
+     */
+    post: operations["create_token_api_perfil_tokens_mcp_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/perfil/tokens-mcp/{tid}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Revoke Token */
+    delete: operations["revoke_token_api_perfil_tokens_mcp__tid__delete"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -496,6 +554,23 @@ export interface components {
       month: components["schemas"]["MonthOut"] | null;
       /** Error */
       error?: string | null;
+    };
+    /** ChatIn */
+    ChatIn: {
+      /** Messages */
+      messages: components["schemas"]["MsgIn"][];
+    };
+    /** ChatOut */
+    ChatOut: {
+      /** Answer */
+      answer: string;
+      /** Tools */
+      tools: string[];
+      /**
+       * Trace Id
+       * Format: uuid
+       */
+      trace_id: string;
     };
     /** ComplianceOut */
     ComplianceOut: {
@@ -668,6 +743,16 @@ export interface components {
       light: string;
       /** Sprints */
       sprints: number;
+    };
+    /** MsgIn */
+    MsgIn: {
+      /**
+       * Role
+       * @enum {string}
+       */
+      role: "user" | "assistant";
+      /** Content */
+      content: string;
     };
     /** NotificationOut */
     NotificationOut: {
@@ -1019,6 +1104,51 @@ export interface components {
       labels: string[];
       /** Updated */
       updated: string | null;
+    };
+    /** TokenIn */
+    TokenIn: {
+      /** Name */
+      name: string;
+    };
+    /** TokenNew */
+    TokenNew: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Last4 */
+      last4: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Last Used At */
+      last_used_at: string | null;
+      /** Token */
+      token: string;
+    };
+    /** TokenOut */
+    TokenOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Last4 */
+      last4: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Last Used At */
+      last_used_at: string | null;
     };
     /** TrendPoint */
     TrendPoint: {
@@ -1863,6 +1993,121 @@ export interface operations {
       header?: never;
       path: {
         nid: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  message_api_asistente_mensaje_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ChatIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ChatOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_tokens_api_perfil_tokens_mcp_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TokenOut"][];
+        };
+      };
+    };
+  };
+  create_token_api_perfil_tokens_mcp_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TokenIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TokenNew"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  revoke_token_api_perfil_tokens_mcp__tid__delete: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        tid: string;
       };
       cookie?: never;
     };
