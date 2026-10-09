@@ -3,6 +3,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.fmt import fmt, pct
 from app.ai.guard import wrap
 from app.ai.narrative import Writer
 from app.audit.service import AuditService
@@ -189,12 +190,3 @@ class ReportService:
             if d.month is None
             else {"mes": d.month.month, "cumplimiento": pct(d.month.pct)},
         }
-
-
-def pct(v: float | None) -> str:
-    """0.208 -> '20,8 %'."""
-    return "sin datos" if v is None else f"{v * 100:.1f} %".replace(".", ",")
-
-
-def fmt(v: float) -> str:
-    return str(int(v)) if float(v).is_integer() else f"{v:.1f}".replace(".", ",")
