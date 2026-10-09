@@ -1,0 +1,69 @@
+---
+title: Proyecto
+description: Cumplimiento del proyecto por sprint, por persona y por mes.
+---
+
+**Quién la ve**: todos los roles, si el proyecto les corresponde. Se llega desde la
+[cartera](/docs/guia/cartera) o desde Configuración → Proyectos.
+
+## Para qué sirve
+
+Entender cómo viene el cumplimiento de un proyecto en el tiempo: planificados vs. quemados, con
+detalle por sprint, por persona y por mes. Las reglas de cálculo están en el
+[motor de cumplimiento](/docs/motor-cumplimiento).
+
+## Qué muestra
+
+El encabezado indica el último sprint cerrado y su porcentaje. Tiene dos pestañas:
+
+- **Cumplimiento**: un gráfico de planificados vs. quemados por sprint y, debajo, tres tablas.
+- **Tablero de Jira**: el mismo [tablero](/docs/guia/tableros) del sprint en curso.
+
+### Tablas de cumplimiento
+
+| Pestaña         | Contenido                                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Por sprint**  | Cada sprint con fechas, planificados, quemados, % y semáforo. "En curso" marca el sprint activo; "sin estimar" avisa de issues sin story points. |
+| **Por persona** | Planificados, quemados y % por persona, para el sprint que elijas en el selector.                                                                |
+| **Por mes**     | Suma de quemados dividida por suma de planificados de los sprints que **terminan** en ese mes.                                                   |
+
+## Acciones
+
+<Steps>
+<Step>
+
+Elegí la pestaña **Por sprint**, **Por persona** o **Por mes**.
+
+</Step>
+<Step>
+
+En **Por persona**, cambiá el sprint con el selector.
+
+</Step>
+<Step>
+
+En **Por sprint**, tocá **Ver detalle** para abrir la [auditoría del sprint](/docs/guia/detalle-sprint).
+
+</Step>
+<Step>
+
+Tocá **Recalcular** (arriba a la derecha) para forzar una lectura fresca desde Jira. Aparece el
+mensaje "Datos actualizados desde Jira".
+
+</Step>
+</Steps>
+
+<Callout type="info" title="Cuándo recalcular">
+  Los datos de Jira se guardan en memoria unos minutos. Si acabás de cerrar o corregir un sprint y
+  no lo ves reflejado, usá Recalcular.
+</Callout>
+
+## Estados
+
+- **Sin sprints**: "Todavía no hay sprints. Cuando el board tenga sprints, aparecen acá."
+- **Sin sprints cerrados**: el encabezado dice "Sin sprints cerrados todavía".
+- **Error** (por ejemplo Jira caído o credenciales vencidas): mensaje con **Reintentar**.
+
+## Exportar
+
+Cada tabla tiene su **Excel** (CSV con lo que ves) y su **PDF** (imprime esa tabla).

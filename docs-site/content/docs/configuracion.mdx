@@ -31,24 +31,34 @@ Reglas:
 - Un **proyecto** (`/api/proyectos`) tiene cuenta, conexión, board de Jira y, opcionalmente, un
   **sprint de inicio de medición**: los sprints anteriores se ignoran.
 - Archivar un proyecto lo oculta; no se borra.
-- Cada proyecto tiene **Team Managers asignados**, que son los que lo ven.
+- Cada proyecto tiene **usuarios asignados** (`managers`), que son los que lo ven además de los
+  admins. Se asignan por API; la pantalla de proyectos aún no los edita y los conserva al guardar.
 
 ## Roles y permisos
 
 Los permisos los decide siempre el backend (el front solo oculta opciones).
 
-| Acción                                                 | Admin |  Team Manager  |    Cliente    |
-| ------------------------------------------------------ | :---: | :------------: | :-----------: |
-| Ver cartera, proyectos, sprints y tablero              | Todos | Solo asignados | Sin proyectos |
-| Informes (vista previa, guardar, listar)               | Todos | Solo asignados | Sin proyectos |
-| Avisos propios                                         |  Sí   |       Sí       |      Sí       |
-| Asistente IA y tokens MCP                              |  Sí   |       Sí       |      No       |
-| Conexiones, cuentas, alta/edición/archivo de proyectos |  Sí   |       No       |      No       |
+| Acción                                                 | Admin |  Team Manager  |    Cliente     |
+| ------------------------------------------------------ | :---: | :------------: | :------------: |
+| Ver cartera, proyectos, sprints y tablero              | Todos | Solo asignados | Solo asignados |
+| Informes (vista previa, guardar, listar)               | Todos | Solo asignados | Solo asignados |
+| Avisos propios                                         |  Sí   |       Sí       |       Sí       |
+| Asistente IA y tokens MCP                              |  Sí   |       Sí       |       No       |
+| Conexiones, cuentas, alta/edición/archivo de proyectos |  Sí   |       No       |       No       |
+| Usuarios (alta, edición, deshabilitar y habilitar)     |  Sí   |       No       |       No       |
 
-<Callout type="warn" title="Usuarios">
-  No hay API ni pantalla de alta de usuarios todavía. El admin inicial se crea al arrancar el
-  backend desde `ADMIN_EMAIL` y `ADMIN_PASSWORD_HASH`. Asignar Team Managers desde la UI está
-  pendiente.
+El rol **Cliente** (`Role.CLIENT`) existe con acceso limitado y **sin filtro por cuenta**: la
+visibilidad de proyectos (`ProjectService.visible`) es admin = todos los activos; cualquier otro rol
+= los proyectos donde figura en `project_managers`. `users.account_id` no interviene en los permisos.
+El token MCP de un usuario Cliente se rechaza.
+
+<Callout type="info" title="Usuarios">
+  El admin inicial se crea al arrancar el backend desde `ADMIN_EMAIL` y `ADMIN_PASSWORD_HASH`. El
+  resto lo administra el admin desde Configuración → Usuarios: alta, edición y habilitar o
+  deshabilitar (corta sesiones y tokens MCP). Las guardas: contraseña de 12+ caracteres con
+  confirmación, no deshabilitarse ni quitarse el rol admin a uno mismo, y siempre al menos un admin
+  activo. Asignar proyectos desde la UI está fuera de alcance. Guía funcional:
+  [Usuarios](/docs/guia/usuarios).
 </Callout>
 
 ## Seguridad de sesión

@@ -1,0 +1,86 @@
+---
+title: Configuración · Conexiones
+description: Dar de alta, editar y borrar las conexiones a Jira Cloud.
+---
+
+**Quién la ve**: solo **Admin** (Configuración → Conexiones).
+
+## Para qué sirve
+
+Una conexión guarda las credenciales de un sitio de Jira Cloud. Los proyectos del panel se vinculan
+a un board a través de una conexión. El panel usa Jira **solo en lectura**.
+
+## Qué muestra
+
+Una tabla con nombre, sitio, token (solo los últimos 4 caracteres), campo de story points,
+cantidad de proyectos que la usan y la fecha de la última prueba. La conexión **Demo** (datos
+sintéticos) siempre existe, lleva la etiqueta "Demo" y **no se edita ni se borra**.
+
+## Crear una conexión
+
+<Steps>
+<Step>
+
+Tocá **Nueva conexión**.
+
+</Step>
+<Step>
+
+Completá **Nombre** (mínimo 2 caracteres), **Site** (formato `https://<sitio>.atlassian.net`),
+**Email** (el dueño del token) y **API token**. El token se genera en id.atlassian.com → Seguridad →
+API tokens.
+
+</Step>
+<Step>
+
+Tocá **Probar conexión**. Si anda, muestra "Conectado como …" y el campo de story points detectado.
+Si no, muestra el error de Jira.
+
+</Step>
+<Step>
+
+Tocá **Crear conexión**. El botón se habilita solo después de una prueba exitosa. Si cambiás el
+site, el email o el token, hay que probar de nuevo.
+
+</Step>
+</Steps>
+
+## Editar
+
+Tocá el lápiz de la fila. Los datos se precargan y el token queda vacío: **vacío significa
+conservar el guardado**. Hay que volver a probar antes de **Guardar**.
+
+## Borrar
+
+<Steps>
+<Step>
+
+Tocá el tacho de la fila.
+
+</Step>
+<Step>
+
+La confirmación avisa que los proyectos que la usan **quedan sin conexión**. Escribí el nombre
+exacto de la conexión para habilitar el botón **Eliminar**.
+
+</Step>
+</Steps>
+
+<Callout type="warn" title="Qué pasa con los proyectos">
+  Borrar una conexión no borra los proyectos, pero dejan de poder leer Jira hasta que les asignes
+  otra conexión desde [Proyectos](/docs/guia/proyectos).
+</Callout>
+
+## Estados
+
+- **Sin conexiones**: "Todavía no hay conexiones. Creá una conexión a Jira Cloud para traer los
+  boards."
+- **Error**: mensaje con **Reintentar**.
+
+## Seguridad
+
+El token se guarda **cifrado** y la pantalla nunca lo muestra completo.
+
+## Exportar
+
+**Excel** (CSV) y **PDF** de la tabla de conexiones. El export no incluye el token.

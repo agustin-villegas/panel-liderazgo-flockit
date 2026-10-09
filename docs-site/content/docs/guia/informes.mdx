@@ -1,0 +1,97 @@
+---
+title: Informes
+description: Lista de informes, cómo generar uno nuevo con lectura de IA y cómo verlo o exportarlo.
+---
+
+**Quién la ve**: todos los roles. Cada uno trabaja sobre los proyectos que ve
+([roles](/docs/guia/roles)).
+
+## Para qué sirve
+
+Armar un informe de un sprint listo para compartir: números calculados por el motor más una lectura
+redactada por IA que vos revisás y podés editar. Al guardarlo queda como una **foto que no cambia**,
+aunque después cambie Jira.
+
+## Lista de informes
+
+En **Informes** ves el historial: título, audiencia (Equipo, Cliente o Gerencia), cumplimiento, fecha
+y autor. Tocá el título para abrir un informe. Solo aparecen los informes de proyectos que podés ver.
+
+- **Estado vacío**: "Todavía no hay informes. Generá el primero con Nuevo informe".
+- **Exportar**: **Excel** baja el historial como CSV y **PDF** imprime la tabla.
+
+## Generar un informe nuevo
+
+<Steps>
+<Step>
+
+En **Informes**, tocá **Nuevo informe**.
+
+</Step>
+<Step>
+
+Elegí el **proyecto**. Después se cargan sus sprints.
+
+</Step>
+<Step>
+
+Elegí el **sprint**. Los que siguen abiertos figuran como "(en curso)".
+
+</Step>
+<Step>
+
+Elegí la **audiencia**: Equipo, Cliente o Gerencia. La IA ajusta el tono.
+
+</Step>
+<Step>
+
+Tocá **Generar**. Aparece la vista previa con los datos y una lectura redactada.
+
+</Step>
+<Step>
+
+Revisá y editá el **Resumen** y los **Puntos clave** (uno por línea). Con **Regenerar lectura**
+pedís otra versión.
+
+</Step>
+<Step>
+
+Tocá **Guardar informe**. Te lleva al informe guardado.
+
+</Step>
+</Steps>
+
+Si cambiás el proyecto, el sprint o la audiencia, la vista previa se descarta y hay que generar de
+nuevo.
+
+<Callout type="warn" title="Si la IA falla">
+  Si no se puede redactar la lectura, el panel avisa el motivo y los números igual se muestran.
+  Podés escribir la lectura a mano y guardar. Si dejás el resumen vacío, el informe se guarda sin
+  lectura.
+</Callout>
+
+## Qué contiene un informe
+
+Proyecto y cuenta, **objetivo del sprint**, indicadores (cumplimiento con semáforo, planificados,
+quemados y mes), la **lectura** del sprint, la **tendencia** de cumplimiento, los **pendientes**,
+el corte **por tipo de issue** y el detalle **por persona** con lo cerrado y lo que sigue abierto.
+
+Al guardar, el servidor **recalcula los números**: lo que viaja desde tu pantalla no puede
+alterarlos. Solo la lectura es editable.
+
+## Ver un informe
+
+Desde la lista, abrí el informe. Muestra fecha y autor. El informe guardado no se puede editar ni
+borrar desde la pantalla.
+
+## Exportar
+
+- **Exportar PDF** (arriba a la derecha) imprime el documento; elegí "Guardar como PDF" en el
+  diálogo del navegador.
+- La tabla **por persona** dentro del informe tiene además su botón **Excel** (CSV).
+
+## Estados de error
+
+- No se pueden cargar proyectos o sprints: mensaje con **Reintentar**.
+- Error al generar o guardar: aviso emergente con el motivo.
+- Informe de un proyecto que ya no ves: el servidor responde que no tenés acceso.

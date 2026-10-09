@@ -39,16 +39,31 @@ con `pnpm gen:api`.
 | GET    | `/api/conexiones/{cid}/boards`         | Admin  | Boards de Jira                   |
 | GET    | `/api/conexiones/{cid}/campos`         | Admin  | Campos candidatos a story points |
 
+### Usuarios
+
+Solo admin. Los usuarios no se borran: se deshabilitan.
+
+| Método | Ruta                               | Acceso | Descripción                                                                             |
+| ------ | ---------------------------------- | ------ | --------------------------------------------------------------------------------------- |
+| GET    | `/api/usuarios`                    | Admin  | Lista usuarios (nombre, email, rol, activo, último acceso)                              |
+| POST   | `/api/usuarios`                    | Admin  | Alta (`first_name`, `last_name`, `email`, `role`, `password` y `password_confirm`, 12+) |
+| PATCH  | `/api/usuarios/{uid}`              | Admin  | Edita datos y rol; contraseña opcional (si viene, corta sus sesiones)                   |
+| POST   | `/api/usuarios/{uid}/deshabilitar` | Admin  | Deshabilita: corta sesiones y revoca tokens MCP                                         |
+| POST   | `/api/usuarios/{uid}/habilitar`    | Admin  | Vuelve a habilitar                                                                      |
+
+Errores de negocio con `409`: email duplicado (`EMAIL_DUPLICATE`) y guardas (`USER_GUARD`): no
+deshabilitarse a uno mismo, no quitarse el rol admin y que siempre quede al menos un admin activo.
+
 ### Cuentas y proyectos
 
-| Método | Ruta                   | Acceso | Descripción        |
-| ------ | ---------------------- | ------ | ------------------ |
-| GET    | `/api/cuentas`         | Sesión | Lista cuentas      |
-| POST   | `/api/cuentas`         | Admin  | Crea cuenta        |
-| GET    | `/api/proyectos`       | Sesión | Proyectos visibles |
-| POST   | `/api/proyectos`       | Admin  | Crea proyecto      |
-| PATCH  | `/api/proyectos/{pid}` | Admin  | Edita proyecto     |
-| DELETE | `/api/proyectos/{pid}` | Admin  | Archiva proyecto   |
+| Método | Ruta                   | Acceso | Descripción                                                |
+| ------ | ---------------------- | ------ | ---------------------------------------------------------- |
+| GET    | `/api/cuentas`         | Sesión | Lista cuentas                                              |
+| POST   | `/api/cuentas`         | Admin  | Crea cuenta                                                |
+| GET    | `/api/proyectos`       | Sesión | Proyectos visibles                                         |
+| POST   | `/api/proyectos`       | Admin  | Crea proyecto (incluye `managers`, los usuarios asignados) |
+| PATCH  | `/api/proyectos/{pid}` | Admin  | Edita proyecto (reemplaza `managers`)                      |
+| DELETE | `/api/proyectos/{pid}` | Admin  | Archiva proyecto                                           |
 
 ### Cumplimiento y tablero
 
@@ -99,4 +114,4 @@ Estas dos rutas no aparecen en el OpenAPI.
 
 Los errores de negocio salen como JSON tipado (`AppError`) con el código de estado
 correspondiente: 401 sin sesión, 403 sin permiso, 404 si no existe, 422 si la entrada es inválida
-y 502 si Jira falla.
+409 si choca con una regla (email duplicado, último admin) y 502 si Jira falla.

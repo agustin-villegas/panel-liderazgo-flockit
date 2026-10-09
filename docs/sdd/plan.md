@@ -19,7 +19,7 @@
 | MCP | SDK oficial `mcp` (Python), transporte HTTP montado en el mismo backend | Las mismas tools que el asistente, una sola implementación |
 | **Base de datos** | **Supabase Postgres** (`panel-liderazgo`, São Paulo) | Ya creada. Se usa como Postgres puro detrás del backend, con RLS activado y sin políticas públicas |
 | Acceso a datos | SQLAlchemy 2 (async) + asyncpg | Estándar. Las migraciones son **SQL plano versionado** en `backend/db/migrations/` |
-| Auth | Propia: **argon2id** para contraseñas, **sesiones opacas en base** (cookie con token aleatorio y hash guardado) y **passkeys** con `webauthn` (py_webauthn) | Sesión revocable desde el servidor (un JWT no lo es). Sin depender de terceros |
+| Auth | Propia: **argon2id** para contraseñas, **sesiones opacas en base** (cookie con token aleatorio y hash guardado) | Sesión revocable desde el servidor (un JWT no lo es). Sin depender de terceros |
 | **Deploy** | **Vercel** para los dos: un proyecto para `frontend/` y otro para `backend/` (FastAPI corre nativo en Vercel) | Plataforma conocida. El backend pesa ~160 MB, dentro del límite de 250 MB |
 | Tareas periódicas | **`pg_cron` + `pg_net` en Supabase** llaman cada 15 minutos a `POST /internal/jobs/notificaciones` con un secreto | El plan Hobby de Vercel solo permite un cron por día |
 | Tooling | `pnpm` (front) · `uv` + `ruff` + `pytest` (back) | Rápidos y con lockfile |
@@ -49,7 +49,7 @@ Decisiones clave:
 - **El front llama a `/api/*` en su mismo dominio** y Next lo reescribe al backend. La cookie de sesión queda *first-party* (`SameSite=Lax`): sin problemas de cookies de terceros ni CORS abierto.
 - **El front no tiene secretos.** Su única variable es `BACKEND_URL`, del lado del servidor.
 - **Toda la autorización vive en el backend.** El middleware de Next solo redirige a `/login` como comodidad.
-- **Los números salen de `compliance/` y `satisfaction/`**: funciones puras sin acceso a red ni a base. Las usan la API, el asistente, el MCP, los informes y las notificaciones. Hay un solo cálculo.
+- **Los números salen de `compliance/`**: funciones puras sin acceso a red ni a base. Las usan la API, el asistente, el MCP, los informes y las notificaciones. Hay un solo cálculo.
 
 ---
 
@@ -70,8 +70,7 @@ panel-liderazgo-flockit/
 │   │   │   ├── page.tsx          panel de cartera
 │   │   │   ├── proyectos/[id]/
 │   │   │   ├── informes/
-│   │   │   ├── configuracion/    conexiones · proyectos · usuarios · umbrales · auditoria
-│   │   │   └── perfil/           passkeys · tokens MCP
+│   │   │   └── configuracion/    conexiones · proyectos · usuarios
 │   │   └── globals.css           Tailwind + shadcn + @import de flock-brand.css
 │   ├── src/components/ui/        shadcn (generados)
 │   ├── src/components/           brand/ · charts/ · panel/ · ...
@@ -82,14 +81,13 @@ panel-liderazgo-flockit/
     │   ├── main.py               app, routers, headers de seguridad
     │   ├── config.py             settings; falla al arrancar si falta algo
     │   ├── db/                   engine, modelos, migrations/*.sql
-    │   ├── auth/                 contraseñas, sesiones, passkeys, rate limit, permisos
+    │   ├── auth/                 contraseñas, sesiones, rate limit, permisos
     │   ├── jira/                 client.py (real) · demo.py (sintético) · cache.py
     │   ├── compliance/           motor de cumplimiento (puro) ← corazón
-    │   ├── satisfaction/         fórmulas NPS/CSAT (puro)
-    │   ├── connections/ projects/ users/ reports/ notifications/ audit/
+    │   ├── connections/ projects/ users/ reports/ notifications/
     │   ├── ai/                   tools.py · agent.py (ADK) · narrative.py · tracing.py · guard.py
     │   └── mcp/                  server.py (mismas tools que ai/tools.py)
-    ├── tests/                    unit (motor, fórmulas) + API
+    ├── tests/                    unit (motor) + API
     ├── evals/                    golden set del asistente (ADK)
     ├── scripts/generar_hash.py
     └── pyproject.toml
@@ -105,21 +103,15 @@ panel-liderazgo-flockit/
 
 | Tabla | Columnas principales |
 |---|---|
-| `users` | id, email (único), nombre, rol (`admin`/`team_manager`/`cliente`), password_hash, must_change_password, account_id (solo cliente), disabled_at, last_login_at |
+| `users` | id, email (único), nombre, rol (`admin`/`team_manager`/`cliente`), password_hash, disabled_at, last_login_at |
 | `sessions` | id, user_id, **token_hash**, expires_at, last_seen_at, ip, user_agent, revoked_at |
-| `passkeys` | id, user_id, credential_id (único), public_key, sign_count, transports, nombre, last_used_at |
-| `webauthn_challenges` | id, user_id, challenge, tipo, expires_at |
 | `login_attempts` | email, ip, success, created_at (para el rate limit) |
 | `jira_connections` | id, nombre (único), tipo (`jira`/`demo`), site, email, **token_cifrado**, token_last4, story_points_field, exclude_subtasks, status, last_checked_at, last_error |
 | `accounts` | id, nombre, logo_url |
 | `projects` | id, account_id, nombre, connection_id, board_id, board_name, measure_from_sprint_id, archived_at |
 | `project_managers` | project_id, user_id |
-| `sprints` | id, project_id, jira_sprint_id, nombre, estado, start/end/complete_date, objetivo · único (project_id, jira_sprint_id) |
-| `sprint_snapshots` | sprint_id, computed_at, planificados, quemados, **detalle jsonb** (issues y motivos), is_final |
-| `satisfaction_responses` | project_id, tipo (`nps`/`csat`), período (sprint o mes), nps, csat_mes, csat_progreso, csat_gestion, comentario · `CHECK` de rangos 1–10 |
 | `reports` | id, tipo, audiencia, project_id/account_id, sprint_id/mes, **data jsonb**, narrativa, created_by · **inmutable** (un trigger bloquea UPDATE) |
 | `notifications` | user_id, tipo, project_id, sprint_id, issue_key, **dedupe_key**, título, cuerpo, link, read_at · único (user_id, dedupe_key) |
-| `settings` | clave, valor jsonb (umbrales del semáforo, alertas) |
 | `audit_events` | actor_id, acción, entidad, entidad_id, diff jsonb (sin secretos), ip, created_at |
 | `ai_traces` | user_id, conversación, modelo, tools jsonb, tokens in/out, costo_usd, latencia_ms |
 | `mcp_tokens` | user_id, nombre, **token_hash**, last4, last_used_at, revoked_at |
@@ -130,16 +122,15 @@ Todas las tablas tienen **RLS activado sin políticas**. Solo el backend, con su
 
 | Grupo | Endpoints |
 |---|---|
-| Auth | `POST /api/auth/login` · `POST /api/auth/logout` · `GET /api/auth/me` · `POST /api/auth/cambiar-password` · `POST /api/auth/passkeys/registro/{opciones,verificar}` · `POST /api/auth/passkeys/login/{opciones,verificar}` · `GET/DELETE /api/auth/passkeys` |
+| Auth | `POST /api/auth/login` · `POST /api/auth/logout` · `GET /api/auth/me` |
 | Conexiones | `GET/POST /api/conexiones` · `PATCH/DELETE /api/conexiones/{id}` · `POST /api/conexiones/probar` · `GET /api/conexiones/{id}/boards` · `GET /api/conexiones/{id}/campos` |
 | Cuentas y proyectos | CRUD `/api/cuentas` · CRUD `/api/proyectos` · `GET /api/proyectos/{id}/sprints` |
 | Cumplimiento | `GET /api/cartera` · `GET /api/proyectos/{id}/cumplimiento?desde&hasta` · `GET /api/sprints/{id}/detalle` · `POST /api/sprints/{id}/recalcular` · `GET /api/proyectos/{id}/mensual` |
-| Satisfacción | CRUD `/api/proyectos/{id}/satisfaccion` · `GET /api/proyectos/{id}/satisfaccion/resumen` |
 | Informes | `POST /api/informes/preview` · `POST /api/informes` (guarda la foto) · `GET /api/informes` · `GET /api/informes/{id}` |
 | Notificaciones | `GET /api/notificaciones` · `POST /api/notificaciones/{id}/leida` · `POST /api/notificaciones/leer-todas` |
-| Usuarios | CRUD `/api/usuarios` (solo admin) |
+| Usuarios | `GET/POST /api/usuarios` · `PATCH /api/usuarios/{id}` · `POST /api/usuarios/{id}/deshabilitar` · `POST /api/usuarios/{id}/habilitar` · solo admin |
 | Asistente | `POST /api/asistente/mensaje` (streaming SSE) |
-| Otros | `GET/PUT /api/settings/umbrales` · `GET /api/auditoria` · `GET/POST/DELETE /api/perfil/tokens-mcp` |
+| Otros | `GET/POST/DELETE /api/perfil/tokens-mcp` |
 | Interno | `POST /internal/jobs/notificaciones` (header `X-Cron-Secret`) |
 
 ### 4.3 Motor de cumplimiento (`compliance/`)
@@ -147,12 +138,11 @@ Todas las tablas tienen **RLS activado sin políticas**. Solo el backend, con su
 - `agregar_mensual(resultados) -> list[ResultadoMes]`.
 - `fecha_finalizacion(changelog, resolutiondate)`: la última entrada a un estado de categoría Done.
 - **Sin I/O.** Recibe datos ya leídos de Jira y devuelve resultados. Los 12 casos de la spec §7.4 son tests (se escriben **primero**).
-- Un sprint cerrado ya calculado se guarda en `sprint_snapshots` (`is_final = true`) y no se vuelve a leer de Jira.
 
 ### 4.4 Jira (`jira/`)
 - Interfaz `FuenteJira` con dos implementaciones: `JiraCloud` (httpx, Basic con email + token, paginado, reintentos en 429) y `JiraDemo` (datos sintéticos que cubren todos los casos borde del motor, incluida una issue con prompt injection).
 - Endpoints de Jira: `/rest/api/3/myself`, `/rest/api/3/field`, `/rest/agile/1.0/board`, `/board/{id}/sprint`, `/sprint/{id}/issue?expand=changelog` (con `fields` explícitos).
-- Caché stale-while-revalidate en memoria y en `sprint_snapshots` (spec §6).
+- Caché stale-while-revalidate en memoria (spec §6).
 
 ### 4.5 Seguridad
 - **Contraseñas**: argon2id.
@@ -166,7 +156,7 @@ Todas las tablas tienen **RLS activado sin políticas**. Solo el backend, con su
 ### 4.6 IA (`ai/`)
 > **Estado (2026-10-09):** el chat (`agent.py`) corre sobre **ADK**: `LlmAgent` + `Runner`, modelo vía `LiteLlm` (`openai/<AI_MODEL>`), tope de 5 tools con `before_model_callback` y `RunConfig.max_llm_calls`. Las trazas se guardan desde el router en `ai_traces`, sin costo. `narrative.py` todavía usa el SDK de OpenAI directo. No hay vista "Uso de IA" (se descartó).
 
-- **`tools.py`**: las 7 tools de la spec §10.1. Reciben el usuario del contexto y **filtran por sus permisos**. Devuelven datos del motor, con el texto de Jira envuelto por `guard.py`.
+- **`tools.py`**: las 7 tools de la spec §9.1. Reciben el usuario del contexto y **filtran por sus permisos**. Devuelven datos del motor, con el texto de Jira envuelto por `guard.py`.
 - **`agent.py`**: un `LlmAgent` de ADK con esas tools, instrucción en español y límite de **5 llamadas** por turno (`RunConfig.max_llm_calls`). Un solo agente: no hace falta multi-agente para consultas de solo lectura, y sumarlo agregaría costo y latencia sin beneficio.
 - **`narrative.py`**: un agente redactor con `output_schema` (resumen y puntos clave). Recibe solo el JSON de números ya calculados. Si falla, el informe sale sin narrativa.
 - **`tracing.py`**: un callback de ADK (`after_model_callback`) guarda tokens, costo, tools y latencia en `ai_traces`.
@@ -206,8 +196,9 @@ GOOGLE_API_KEY=          # opcional
 AI_MODEL=                # a definir, ej. openai/<modelo>
 CRON_SECRET=
 FRONTEND_ORIGIN=         # https://<front>.vercel.app
-WEBAUTHN_RP_ID=          # dominio del front, ej. <front>.vercel.app
 ```
+
+`WEBAUTHN_RP_ID` figura en `config.py` y en `.env.example` pero no se usa (passkeys fuera de alcance).
 
 **frontend** (`frontend/.env.example`):
 ```
@@ -241,7 +232,7 @@ Son las ~10:30. La subida se habilita a las 12:00 y el día termina a las ~18:00
 | **3. Front P0** | shadcn + marca + claro/oscuro, login flock_modern, layout, panel de cartera, detalle de proyecto, config de conexiones y proyectos | 90 min | Recorrido completo en local: login → panel → detalle → drill-down |
 | **4. Informe de sprint** | Preview, narrativa IA, guardar foto, exportar PDF | 45 min | Informe guardado e inmutable |
 | **5. Deploy** | 2 proyectos en Vercel, variables, smoke test | 30 min | **Link público funcionando** ← entregable mínimo |
-| 6. P1 | En orden: notificaciones → NPS/CSAT → asistente + MCP + evals → usuarios → passkeys | resto | Cada uno con sus criterios de aceptación |
+| 6. P1 | En orden: notificaciones → asistente + MCP + evals | resto | Cada uno con sus criterios de aceptación |
 
 El detalle de tareas de cada fase va en `tasks.md` (se escribe al arrancar cada fase).
 
@@ -276,13 +267,25 @@ El detalle de tareas de cada fase va en `tasks.md` (se escribe al arrancar cada 
 |---|---|
 | No tenemos un Jira real para probar | La conexión Demo cubre los casos y el cliente real se testea con respuestas grabadas. Si conseguís un sitio de prueba, se valida en vivo |
 | El backend en Vercel tarda o pesa demasiado (ADK) | Plan B: el mismo backend en Render con un Dockerfile, sin cambios de código |
-| Las passkeys requieren HTTPS y un dominio fijo | Funcionan en `localhost` y en el dominio de Vercel. Son P1 |
 | No llegamos con todo | El orden de las fases garantiza un entregable P0 desplegado antes de tocar P1 |
-| Los datos del changelog son grandes en sprints con muchas issues | Paginado, `fields` explícitos y fotos de sprints cerrados |
+| Los datos del changelog son grandes en sprints con muchas issues | Paginado, `fields` explícitos y caché en memoria |
 
 ---
 
-## 11. Pendiente de tu lado
+## 11. Fuera de alcance
+
+Decisión de producto: no se agrega más funcionalidad. Queda afuera, y no es "pendiente":
+
+- Passkeys / WebAuthn.
+- Asignar proyectos a un Team Manager desde la UI.
+- Umbrales del semáforo y alertas editables (`settings`).
+- Pestaña de auditoría en la UI (los eventos se guardan en `audit_events`).
+- Portal del cliente y filtro por cuenta (el rol `cliente` existe, sin `account_id` en permisos) y webhooks de Jira.
+- Fotos persistentes de sprints cerrados (`sprint_snapshots`).
+
+---
+
+## 12. Pendiente de tu lado
 
 - [ ] **Connection string de Supabase** (`DATABASE_URL`): Dashboard → `panel-liderazgo` → Connect → Transaction pooler. La pegás vos en `backend/.env`, no en el chat.
 - [ ] **Elegir tu contraseña de admin**: el script genera el hash y vos lo pegás en `.env`.

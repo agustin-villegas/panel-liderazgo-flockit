@@ -1,6 +1,6 @@
 # Panel único de liderazgo
 
-Panel para líderes de Flockit: cumplimiento de sprints (Jira), NPS/CSAT, informes y avisos.
+Panel para líderes de Flockit: cumplimiento de sprints (Jira), informes y avisos.
 Qué y por qué: `docs/sdd/intent.md` · Comportamiento: `docs/sdd/spec.md` · Cómo: `docs/sdd/plan.md`.
 
 ## Reglas de comportamiento
@@ -34,7 +34,7 @@ Español rioplatense, directo, sin relleno. Explicar solo lo necesario.
 
 ## Reglas del proyecto
 
-- **Los números los calcula el motor** (`backend/app/compliance`, `satisfaction`), nunca el LLM.
+- **Los números los calcula el motor** (`backend/app/compliance`), nunca el LLM.
 - **Permisos siempre en el backend.** El front oculta, el back decide.
 - **Cero secretos** en el repo. Solo `.env.example`. Tokens de Jira cifrados.
 - **Repo público**: solo datos sintéticos. Nada de nombres reales de clientes o personas.

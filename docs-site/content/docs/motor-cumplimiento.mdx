@@ -69,16 +69,16 @@ Se aplica al cumplimiento del último sprint cerrado (`compliance/service.py`):
 | Menos de 70 %        | En riesgo (`crit`) |
 | Sin planificados     | Sin datos (`none`) |
 
-<Callout type="warn" title="Umbrales fijos por ahora">
-  La spec prevé umbrales configurables por el admin, pero en el código actual son constantes (`OK =
-  0.85`, `WARN = 0.70`).
+<Callout type="info" title="Umbrales fijos">
+  Los umbrales son constantes (`OK = 0.85`, `WARN = 0.70`). Hacerlos editables está fuera de
+  alcance.
 </Callout>
 
 ## Caché
 
 `ComplianceService` guarda en memoria el resultado por proyecto durante 5 minutos. Se puede forzar
 el recálculo con `POST /api/proyectos/{id}/recalcular`. Las fotos persistentes de sprints cerrados
-(`sprint_snapshots`) todavía no están implementadas.
+(`sprint_snapshots`) están fuera de alcance.
 
 ## Tests
 

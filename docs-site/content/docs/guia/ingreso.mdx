@@ -1,0 +1,69 @@
+---
+title: Ingresar y cambiar la contraseña
+description: Login, cierre de sesión y cambio de contraseña.
+---
+
+**Quién la ve**: todos los roles.
+
+## Ingresar
+
+<Steps>
+<Step>
+
+Abrí el panel. Si no tenés sesión, te lleva a la pantalla de login.
+
+</Step>
+<Step>
+
+Escribí tu **email** y tu **contraseña**. El ojo del campo de contraseña la muestra u oculta.
+
+</Step>
+<Step>
+
+Tocá **Ingresar**. Si venías de un link (por ejemplo un aviso), te devuelve a esa pantalla.
+
+</Step>
+</Steps>
+
+La sesión dura 8 horas por defecto. Pasado ese tiempo hay que volver a ingresar.
+
+### Errores posibles
+
+| Mensaje                               | Qué pasó                                                                                 |
+| ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| "Ingresá un email válido"             | El email no tiene formato de email.                                                      |
+| "Email o contraseña incorrectos"      | Datos incorrectos **o usuario deshabilitado**. El mensaje es el mismo a propósito.       |
+| Mensaje de espera                     | Superaste 5 intentos fallidos en 15 minutos con ese email e IP. Esperá y volvé a probar. |
+| "No pudimos conectar con el servidor" | Problema de red o el backend no responde.                                                |
+
+## Cambiar tu contraseña
+
+<Steps>
+<Step>
+
+Tocá tu avatar (arriba a la derecha) y elegí **Cambiar contraseña**.
+
+</Step>
+<Step>
+
+Completá la **contraseña actual**, la **nueva** (mínimo 12 caracteres) y repetila.
+
+</Step>
+<Step>
+
+Tocá **Guardar**. Se cierran tus **otras** sesiones abiertas; la actual sigue.
+
+</Step>
+</Steps>
+
+Reglas: la nueva tiene que tener al menos 12 caracteres, coincidir con la repetición y ser distinta
+de la actual. Si la actual no es correcta, el error aparece en el primer campo.
+
+## Cerrar sesión
+
+Avatar → **Cerrar sesión**. Es inmediato y el servidor invalida la sesión.
+
+<Callout type="info" title="¿Olvidaste tu contraseña?">
+  No hay recuperación automática. Pedile a un admin que te defina una nueva desde Configuración →
+  Usuarios (editar y completar la contraseña).
+</Callout>

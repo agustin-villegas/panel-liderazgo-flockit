@@ -1,0 +1,62 @@
+---
+title: Informe de sprint (auditoría)
+description: El detalle issue por issue de un sprint, para auditar de dónde sale el cumplimiento.
+---
+
+**Quién la ve**: todos los roles, si el proyecto les corresponde. Se abre desde **Ver detalle** en la
+tabla "Por sprint" del [proyecto](/docs/guia/proyecto).
+
+<Callout type="info" title="No confundir con Informes">
+  Esta pantalla es la **auditoría** del sprint (siempre en vivo). Los
+  [Informes](/docs/guia/informes) son documentos guardados con una lectura redactada.
+</Callout>
+
+## Para qué sirve
+
+Responder "¿por qué este sprint dio ese porcentaje?": cada issue con su estado, su responsable, sus
+puntos y el **motivo** por el que cuenta (o no) como quemada.
+
+## Qué muestra
+
+- **Encabezado**: nombre del sprint, semáforo, fechas, puntos quemados de planificados, porcentaje y
+  el **objetivo del sprint** (si Jira no tiene uno cargado, lo dice).
+- **Tarjetas por estado**: cuántas issues y cuántos SP hay en cada estado de Jira.
+- **Tabla de issues**: issue (con link a Jira si hay sitio), título, estado, responsable, SP, motivo
+  y por qué sprints pasó.
+
+## Acciones
+
+<Steps>
+<Step>
+
+Tocá una tarjeta de estado para filtrar la tabla por ese estado. Volvé a tocarla para quitar el
+filtro.
+
+</Step>
+<Step>
+
+Usá el buscador (clave o título) y los selectores de **responsable** y **motivo**.
+
+</Step>
+<Step>
+
+Paginá con **Anterior** y **Siguiente** (25 issues por página).
+
+</Step>
+<Step>
+
+Tocá la clave de una issue para abrirla en Jira, en otra pestaña.
+
+</Step>
+</Steps>
+
+## Estados
+
+- **Sin coincidencias**: "Sin issues que coincidan con el filtro".
+- **Error**: "No se pudo abrir el sprint" con **Reintentar**.
+- **Volver**: el link "Volver al proyecto" está arriba a la izquierda.
+
+## Exportar
+
+**Excel** baja todas las issues que cumplen el filtro (no solo la página). **PDF** imprime la
+auditoría completa, sin paginar.

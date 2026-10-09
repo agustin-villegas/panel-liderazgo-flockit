@@ -1,0 +1,66 @@
+---
+title: Tableros de Jira
+description: El sprint en curso de cada proyecto, en vivo.
+---
+
+**Quién la ve**: todos los roles, sobre los proyectos que cada uno ve.
+
+## Para qué sirve
+
+Ver cómo viene el sprint **en curso**: avance, bloqueos y quién tiene qué. Es de solo lectura: el
+panel nunca modifica Jira.
+
+## Lista de tableros
+
+En **Tableros de Jira** hay una card por proyecto con el sprint activo, el día del sprint (por
+ejemplo "día 4 de 10"), el tiempo transcurrido vs. las tarjetas finalizadas, el conteo por carril
+(Por hacer, En curso, Bloqueadas, Finalizadas) y una etiqueta de ritmo. Tocá una card para abrir el
+tablero.
+
+## Detalle del tablero
+
+- **Encabezado del sprint**: nombre, fechas, día hábil, ritmo, barras y medidores de tiempo vs.
+  finalizadas.
+- **Resumen**: total de issues y cantidad por carril.
+- **Issues del sprint** en dos vistas, **Kanban** (columnas por carril) y **Tabla**.
+- **Distribución**: gráfico de dona con la proporción por carril (respeta los filtros).
+
+### Filtrar y mirar una issue
+
+<Steps>
+<Step>
+
+Escribí en **Buscar** para filtrar por clave o título.
+
+</Step>
+<Step>
+
+Elegí un **responsable** o un **tipo** de issue en los selectores.
+
+</Step>
+<Step>
+
+Tocá una issue (en Kanban o en la tabla) para ver su detalle: estado, responsable, story points,
+prioridad, tipo, última actualización y etiquetas.
+
+</Step>
+</Steps>
+
+También podés ir a **Ver cumplimiento** para saltar al [proyecto](/docs/guia/proyecto).
+
+## Actualización
+
+El tablero se actualiza solo **cada minuto**; no hay botón de refrescar.
+
+## Estados
+
+- **Sin proyectos**: "No tenés proyectos asignados todavía".
+- **Sin sprint activo**: se muestra el último sprint cerrado con un aviso. Si el board no tiene
+  sprints iniciados, el aviso lo dice.
+- **Error**: mensaje con **Reintentar**. Si el proyecto no tiene conexión o board configurado, lo
+  indica.
+
+## Exportar
+
+En **Issues del sprint**, **Excel** baja un CSV con las issues filtradas (issue, título, carril,
+estado, responsable, tipo, prioridad y SP) y **PDF** imprime la sección.

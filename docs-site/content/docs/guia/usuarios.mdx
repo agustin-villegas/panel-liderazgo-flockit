@@ -1,0 +1,125 @@
+---
+title: Configuración · Usuarios
+description: Alta, edición y deshabilitado de usuarios, con sus reglas de seguridad.
+---
+
+**Quién la ve**: solo **Admin** (Configuración → Usuarios).
+
+## Para qué sirve
+
+Definir quién puede ingresar al panel y con qué rol. Los usuarios **no se borran**: se
+**deshabilitan**, y se pueden volver a habilitar.
+
+## Qué muestra
+
+Una tabla con nombre, email, rol (Admin, Team Manager o Cliente), estado (Activo o Deshabilitado) y
+último acceso ("Nunca" si todavía no ingresó). Cada fila tiene **Editar** y **Deshabilitar** (o
+**Habilitar** si ya está deshabilitado).
+
+## Dar de alta un usuario
+
+<Steps>
+<Step>
+
+Tocá **Nuevo usuario**.
+
+</Step>
+<Step>
+
+Completá **Nombre**, **Apellido** y **Email**. El nombre se guarda como "Nombre Apellido".
+
+</Step>
+<Step>
+
+Elegí el **rol**. Por defecto viene Team Manager.
+
+</Step>
+<Step>
+
+Definí la **contraseña** (mínimo 12 caracteres) y repetila en **Confirmar contraseña**.
+
+</Step>
+<Step>
+
+Tocá **Crear usuario**. La persona ingresa con su email y esa contraseña.
+
+</Step>
+</Steps>
+
+Si el email ya existe, el alta falla con "Ya existe un usuario con ese email".
+
+<Callout type="info" title="Permisos del rol">
+  Crear a alguien como Team Manager o Cliente no le da proyectos: hay que asignárselos. Ver [Roles y
+  permisos](/docs/guia/roles).
+</Callout>
+
+## Editar un usuario
+
+<Steps>
+<Step>
+
+Tocá el lápiz de la fila.
+
+</Step>
+<Step>
+
+Cambiá nombre, apellido, email o rol. Para **no** cambiar la contraseña, dejá los dos campos de
+contraseña vacíos.
+
+</Step>
+<Step>
+
+Si querés cambiarla, completá la nueva (mínimo 12 caracteres) y su confirmación. Al guardarla se
+**cierran todas las sesiones** de esa persona.
+
+</Step>
+<Step>
+
+Tocá **Guardar**.
+
+</Step>
+</Steps>
+
+## Deshabilitar y habilitar
+
+<Steps>
+<Step>
+
+Tocá **Deshabilitar** en la fila del usuario.
+
+</Step>
+<Step>
+
+Escribí el nombre exacto y confirmá.
+
+</Step>
+</Steps>
+
+Al deshabilitar, la persona **no puede ingresar**, se **cortan sus sesiones abiertas** y se
+**revocan sus tokens MCP**. No se borra nada: su historial, sus informes y sus datos quedan.
+
+Para revertirlo, tocá **Habilitar** en su fila. Vuelve a poder ingresar, pero sus sesiones y tokens
+MCP anteriores **no** se recuperan: tiene que ingresar de nuevo y crear tokens nuevos.
+
+## Reglas que el sistema hace cumplir
+
+| Regla                                                 | Qué pasa si no se cumple                     |
+| ----------------------------------------------------- | -------------------------------------------- |
+| La contraseña tiene al menos **12 caracteres**        | El formulario no deja guardar.               |
+| La contraseña y su confirmación coinciden             | "Las contraseñas no coinciden".              |
+| El email no puede estar repetido                      | "Ya existe un usuario con ese email".        |
+| **No podés deshabilitarte a vos mismo**               | "No podés deshabilitarte a vos mismo".       |
+| **No podés quitarte el rol de admin** a vos mismo     | "No podés quitarte el rol de admin".         |
+| **Siempre tiene que quedar al menos un admin activo** | "Tiene que quedar al menos un admin activo". |
+
+Las dos últimas reglas aplican también por API: no dependen de lo que muestre la pantalla.
+
+## Estados
+
+- **Sin usuarios**: "Todavía no hay usuarios. Creá el primero para darle acceso al panel."
+- **Error**: mensaje con **Reintentar**; los errores de las reglas aparecen como aviso emergente.
+
+## Exportar
+
+**Excel** (CSV con nombre, email, rol, estado y último acceso) y **PDF** de la tabla. Nunca incluye
+contraseñas.

@@ -21,7 +21,10 @@ Este panel lo calcula solo, con reglas explícitas y tests que las garantizan. D
 - **Avisos**: cierre e inicio de sprint, issues sin story points, sprint sin iniciar y issues sin
   movimiento. Corren con `pg_cron` cada 15 minutos.
 - **Asistente IA** (Google ADK) y **servidor MCP** con tokens personales, ambos de solo lectura.
-- **Configuración**: conexiones a Jira (token cifrado), cuentas, proyectos y roles.
+- **Configuración** (solo admin): conexiones a Jira (token cifrado), cuentas, proyectos y **usuarios**
+  (alta, edición, deshabilitar y habilitar).
+- **Roles**: Admin, Team Manager y Cliente. El Cliente ve solo los proyectos asignados y no tiene
+  asistente ni MCP.
 - Toda tabla se exporta a Excel y PDF.
 
 > Los números los calcula el motor (`backend/app/compliance`), nunca el LLM.
@@ -110,9 +113,17 @@ El front necesita `BACKEND_URL` apuntando al backend. Las variables del backend 
 [`backend/.env.example`](backend/.env.example). El cron de avisos se configura en Supabase
 (ver la página "Avisos" de la documentación).
 
+## Fuera de alcance
+
+Passkeys, asignar proyectos desde la UI, umbrales y alertas editables, pestaña de auditoría,
+portal del cliente y filtro por cuenta (el rol Cliente existe, sin filtro por cuenta), webhooks de
+Jira y fotos persistentes de sprints.
+
 ## Documentación
 
-- **Sitio de docs**: [`docs-site/`](docs-site) (arquitectura, motor, funcionalidades, API, desarrollo).
+- **Guía de uso** (para quien usa el panel): [`docs-site/content/docs/guia`](docs-site/content/docs/guia),
+  publicada en `/docs/guia` del sitio de docs.
+- **Sitio de docs**: [`docs-site/`](docs-site) (guía de uso, arquitectura, motor, funcionalidades, API, desarrollo).
 - **SDD**: [`intent`](docs/sdd/intent.md) → [`spec`](docs/sdd/spec.md) →
   [`plan`](docs/sdd/plan.md) → [`tasks`](docs/sdd/tasks.md), con aprobación entre etapas.
 - **Reglas para la IA**: [`CLAUDE.md`](CLAUDE.md) y skills en [`.claude/skills`](.claude/skills).

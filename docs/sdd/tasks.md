@@ -41,7 +41,7 @@
 - [x] API: `/api/cartera`, `/api/proyectos/{id}/cumplimiento`, detalle auditable por sprint, recalcular
 - [x] Migración `0002` aplicada en Supabase + smoke test contra la base real
 - [x] 48 tests verdes
-- [ ] Pendiente: fotos persistentes de sprints cerrados (`sprint_snapshots`); hoy la caché es en memoria (5 min)
+- Fuera de alcance: fotos persistentes de sprints cerrados (`sprint_snapshots`); la caché es en memoria (5 min)
 - [ ] Pendiente: validar `JiraCloud` contra un sitio real (hoy probado con fakes)
 
 ## Fase 3 · Frontend P0 ✅
@@ -56,7 +56,7 @@
 - [x] Export Excel (CSV con BOM) y PDF (impresión por sección) en todas las tablas
 - [x] Tipos de la API generados desde OpenAPI (`pnpm gen:api`)
 - [x] Probado de punta a punta con navegador real (Playwright): login, cartera, detalle, auditoría, dark, mobile
-- [ ] Pendiente: asignar Team Managers desde la UI (falta ABM de usuarios, P1)
+- [x] Usuarios (Configuración → Usuarios: alta, edición, habilitar/deshabilitar): hecho. Guardas: contraseña 12+ con confirmación, no auto-deshabilitarse ni quitarse admin, siempre un admin activo. Fuera de alcance: asignar proyectos desde la UI, passkeys, umbrales y alertas editables, pestaña de auditoría, portal del cliente y filtro por cuenta (el rol `cliente` existe sin filtro por cuenta).
 
 ## Fase 5 · Deploy (en curso)
 
@@ -65,7 +65,7 @@
 - [ ] `vercel deploy --prod` backend y frontend (lo corre el usuario: requiere su aprobación)
 - [ ] Smoke test en producción
 
-## Tablero de Jira (spec §9.5.b) ✅
+## Tablero de Jira (spec §8.5.b) ✅
 
 - [x] Carriles por categoría de Jira + bloqueado por nombre de estado o flag
 - [x] Día X de Y hábiles; % de tiempo vs % de tarjetas finalizadas
@@ -74,7 +74,6 @@
 - [x] Ficha de issue; refresco automático cada 60 s (caché de 60 s en el backend)
 - [x] Fuente Demo con prioridades, tipos, etiquetas y bloqueos
 - [x] Tests: carriles, días hábiles, totales y permisos (57 verdes)
-- [ ] Después: portal del cliente y resumen semanal con IA
 
 ## Fase 4 · Informe de sprint con IA ✅
 

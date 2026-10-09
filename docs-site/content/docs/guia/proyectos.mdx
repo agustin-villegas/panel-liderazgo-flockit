@@ -1,0 +1,91 @@
+---
+title: Configuración · Proyectos
+description: Crear, editar y archivar proyectos vinculados a un board de Jira.
+---
+
+**Quién la ve**: solo **Admin** (Configuración → Proyectos).
+
+## Para qué sirve
+
+Un proyecto del panel se mide contra **un board de Jira**. Acá definís qué proyectos existen, a qué
+cuenta (cliente) pertenecen y de qué conexión y board leen.
+
+## Qué muestra
+
+La tabla **Proyectos activos** con proyecto (link a su detalle), cuenta, conexión y board. Los
+proyectos archivados no aparecen.
+
+## Crear un proyecto
+
+<Steps>
+<Step>
+
+Tocá **Nuevo proyecto**.
+
+</Step>
+<Step>
+
+Elegí la **cuenta (cliente)**. Si no existe, elegí "+ Nueva cuenta" y escribí el nombre (mínimo 2
+caracteres).
+
+</Step>
+<Step>
+
+Elegí la **conexión de Jira**. Se cargan los boards de esa conexión.
+
+</Step>
+<Step>
+
+Elegí el **board**. Si dejaste el nombre vacío, se completa solo con el del board.
+
+</Step>
+<Step>
+
+Revisá el **nombre del proyecto** (mínimo 2 caracteres) y tocá **Crear proyecto**.
+
+</Step>
+</Steps>
+
+Para ver el panel funcionando sin Jira, usá la conexión **Demo**.
+
+## Editar un proyecto
+
+Tocá el lápiz de la fila. Podés cambiar cuenta, conexión, board y nombre. Si cambiás la conexión,
+hay que elegir de nuevo el board. Al guardar se conservan los **responsables asignados** y el sprint
+de inicio de medición que ya tuviera.
+
+## Archivar un proyecto
+
+<Steps>
+<Step>
+
+Tocá el ícono de archivo de la fila.
+
+</Step>
+<Step>
+
+Escribí el nombre exacto del proyecto y tocá **Archivar**.
+
+</Step>
+</Steps>
+
+Archivar **no borra datos**: el proyecto deja de aparecer en la cartera, los tableros, los
+informes nuevos y el asistente. **No toca nada en Jira.**
+
+<Callout type="warn" title="Quién ve el proyecto">
+  Un admin ve todos los proyectos. Un Team Manager o un Cliente solo ve los que tiene asignados, y
+  esa asignación **no se hace desde esta pantalla** sino por API (campo `managers`). Ver [Roles y
+  permisos](/docs/guia/roles).
+</Callout>
+
+## Estados
+
+- **Sin proyectos**: "No hay proyectos. Creá el primero con la conexión Demo para ver el panel
+  funcionando."
+- **Error**: mensaje con **Reintentar**; al fallar el alta o la edición, aviso emergente con el motivo
+  (por ejemplo, la cuenta o la conexión ya no existe).
+- **Boards que no cargan**: aparece el error de Jira debajo del selector de board.
+
+## Exportar
+
+**Excel** (CSV) y **PDF** de la tabla de proyectos.
