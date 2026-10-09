@@ -1,2 +1,4 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Finales de línea LF en todo el repo (evita ruido CRLF en Windows)
+* text=auto eol=lf
+*.png binary
+*.ico binary

@@ -44,3 +44,17 @@ evaluar en fase 5 (plan B: Render).
 - [x] 48 tests verdes
 - [ ] Pendiente: fotos persistentes de sprints cerrados (`sprint_snapshots`); hoy la caché es en memoria (5 min)
 - [ ] Pendiente: validar `JiraCloud` contra un sitio real (hoy probado con fakes)
+
+## Fase 3 · Frontend P0 ✅
+
+- [x] Login `flock_modern` (panel de marca animado + formulario con validación en vivo)
+- [x] `proxy.ts` (Next 16): sin sesión → `/login`
+- [x] Layout con sidebar shadcn, modo claro/oscuro, menú de usuario y logout
+- [x] Panel de cartera: KPIs, cards con semáforo, tendencia de 6 sprints, sprint activo
+- [x] Detalle de proyecto: gráfico plan vs quemado + % · tablas por sprint, persona y mes
+- [x] Auditoría por sprint (sheet): cada issue con motivo y sprints por los que pasó
+- [x] Configuración: ABM de conexiones (prueba obligatoria) y proyectos (desplegables, sin ids)
+- [x] Export Excel (CSV con BOM) y PDF (impresión por sección) en todas las tablas
+- [x] Tipos de la API generados desde OpenAPI (`pnpm gen:api`)
+- [x] Probado de punta a punta con navegador real (Playwright): login, cartera, detalle, auditoría, dark, mobile
+- [ ] Pendiente: asignar Team Managers desde la UI (falta ABM de usuarios, P1)

@@ -30,18 +30,36 @@ Spec-Driven Development: [intent](docs/sdd/intent.md) → [spec](docs/sdd/spec.m
 
 ## Correr en local
 
-```bash
-# backend
-cd backend
-cp .env.example .env        # completar valores
-uv sync
-uv run uvicorn app.main:app --reload    # http://localhost:8000/api/health
+Requisitos: Python 3.12 con [uv](https://docs.astral.sh/uv/), Node 24 con pnpm.
 
-# frontend
+**Terminal 1 — backend** (http://localhost:8000)
+
+```bash
+cd backend
+cp .env.example .env          # completar las 2 líneas de arriba (DB_PASSWORD, OPENAI_API_KEY)
+uv sync
+uv run uvicorn app.main:app --reload --port 8000
+```
+
+**Terminal 2 — frontend** (http://localhost:3000)
+
+```bash
 cd frontend
 cp .env.example .env.local
 pnpm install
-pnpm dev                    # http://localhost:3000
+pnpm dev
+```
+
+Entrá a http://localhost:3000 con el admin del `.env`. Para ver datos al instante:
+**Configuración → Proyectos → Nuevo proyecto** con la conexión **Demo**.
+
+**Útiles**
+
+```bash
+cd backend && uv run pytest                       # tests del backend
+cd backend && uv run python scripts/generar_hash.py   # nueva contraseña de admin
+cd backend && uv run python scripts/openapi.py    # exporta el contrato de la API
+cd frontend && pnpm gen:api                       # regenera los tipos TS desde ese contrato
 ```
 
 ## Datos

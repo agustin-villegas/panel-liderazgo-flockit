@@ -34,9 +34,9 @@
   --color-crit: var(--crit);
   --color-crit-bg: var(--crit-bg);
   --color-crit-fg: var(--crit-fg);
-  --color-none: var(--none);
-  --color-none-bg: var(--none-bg);
-  --color-none-fg: var(--none-fg);
+  --color-idle: var(--idle);
+  --color-idle-bg: var(--idle-bg);
+  --color-idle-fg: var(--idle-fg);
   --color-todo: var(--todo);
   --color-doing: var(--doing);
   --color-blocked: var(--blocked);

@@ -68,9 +68,9 @@
   --crit: #dc2626;
   --crit-bg: #fef2f2;
   --crit-fg: #b91c1c;
-  --none: #94a3b8;
-  --none-bg: #f1f5f9;
-  --none-fg: #64748b;
+  --idle: #94a3b8;
+  --idle-bg: #f1f5f9;
+  --idle-fg: #64748b;
 
   /* Estado de issue (apto daltonismo) */
   --todo: #94a3b8;
@@ -122,8 +122,8 @@
   --warn-fg: #fdba74;
   --crit-bg: color-mix(in srgb, #dc2626 22%, black);
   --crit-fg: #fca5a5;
-  --none-bg: color-mix(in srgb, #94a3b8 18%, black);
-  --none-fg: #cbd5e1;
+  --idle-bg: color-mix(in srgb, #94a3b8 18%, black);
+  --idle-fg: #cbd5e1;
 }
 
 /* ─── Utilidades de marca ─── */
@@ -222,5 +222,26 @@
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* PDF por sección: al imprimir solo queda la sección pedida */
+@media print {
+  body[data-print] [data-section]:not([data-printing]) {
+    display: none;
+  }
+
+  body[data-print] [data-slot="sidebar"],
+  body[data-print] header {
+    display: none;
   }
 }
