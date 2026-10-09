@@ -1,14 +1,22 @@
 import json
+from collections.abc import AsyncGenerator
+from dataclasses import dataclass, field
 from typing import Any
 from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
+from google.adk.models.base_llm import BaseLlm
+from google.adk.models.llm_request import LlmRequest
+from google.adk.models.llm_response import LlmResponse
+from google.genai import types
+from pydantic import Field
 from sqlalchemy import select
 
-from app.ai.agent import MAX_CALLS, Reply, ToolCall
+from app.ai.agent import MAX_CALLS
 from app.ai.factory import make_box
 from app.ai.models import AiTrace, McpToken
+from app.ai.tools import dumps
 from app.auth.models import Role, User
 from app.auth.tokens import digest
 from tests.conftest import PWD
@@ -17,20 +25,66 @@ from tests.test_projects_api import TM, add_user, new_project, run
 ACCEPT = {"Accept": "application/json, text/event-stream"}
 
 
-class FakeChat:
-    """Modelo falso: devuelve respuestas guiadas. Sin red."""
+@dataclass
+class ToolCall:
+    id: str
+    name: str
+    args: dict[str, Any]
 
-    model = "fake-model"
+
+@dataclass
+class Reply:
+    """Una respuesta guionada del modelo: texto y/o pedidos de tools."""
+
+    content: str | None
+    calls: list[ToolCall] = field(default_factory=list)
+    input_tokens: int = 0
+    output_tokens: int = 0
+
+
+class FakeChat(BaseLlm):
+    """Modelo ADK falso: devuelve respuestas guiadas. Sin red."""
+
+    script: list[Reply] = Field(default_factory=list)
+    seen: list[list[dict[str, Any]]] = Field(default_factory=list)
+    tools_offered: list[bool] = Field(default_factory=list)
 
     def __init__(self, script: list[Reply]) -> None:
-        self.script = list(script)
-        self.seen: list[list[dict[str, Any]]] = []
-        self.tools_offered: list[bool] = []
+        super().__init__(model="fake-model", script=list(script))
 
-    async def complete(self, messages, tools) -> Reply:
-        self.seen.append(json.loads(json.dumps(messages)))
-        self.tools_offered.append(bool(tools))
-        return self.script.pop(0)
+    async def generate_content_async(
+        self, llm_request: LlmRequest, stream: bool = False
+    ) -> AsyncGenerator[LlmResponse, None]:
+        self.seen.append(as_msgs(llm_request))
+        self.tools_offered.append(bool(llm_request.config and llm_request.config.tools))
+        r = self.script.pop(0)
+        parts = [types.Part(text=r.content)] if r.content else []
+        parts += [
+            types.Part(function_call=types.FunctionCall(id=c.id, name=c.name, args=c.args))
+            for c in r.calls
+        ]
+        use = types.GenerateContentResponseUsageMetadata(
+            prompt_token_count=r.input_tokens, candidates_token_count=r.output_tokens
+        )
+        yield LlmResponse(content=types.Content(role="model", parts=parts), usage_metadata=use)
+
+
+def as_msgs(req: LlmRequest) -> list[dict[str, Any]]:
+    """El request de ADK como mensajes estilo chat (system/user/assistant/tool)."""
+    out: list[dict[str, Any]] = [{"role": "system", "content": str(req.config.system_instruction)}]
+    for c in req.contents:
+        parts = c.parts or []
+        resps = [p.function_response for p in parts if p.function_response]
+        if resps:
+            out += [{"role": "tool", "content": dumps(r.response or {})} for r in resps]
+            continue
+        text = "".join(p.text or "" for p in parts)
+        if c.role == "model":
+            calls = [p.function_call.name for p in parts if p.function_call]
+            out.append({"role": "assistant", "content": text, "tool_calls": calls})
+        else:
+            out.append({"role": "user", "content": text})
+    return out
 
 
 def call(name: str, i: int = 1, **args: Any) -> ToolCall:

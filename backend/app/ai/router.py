@@ -3,8 +3,9 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request
+from google.adk.models.base_llm import BaseLlm
 
-from app.ai.agent import Assistant, AssistantError, ChatClient, OpenAIChat
+from app.ai.agent import Assistant, AssistantError, make_model
 from app.ai.factory import make_box
 from app.ai.models import AiTrace
 from app.ai.schemas import ChatIn, ChatOut, TokenIn, TokenNew, TokenOut
@@ -18,14 +19,14 @@ router = APIRouter(tags=["asistente"])
 AiUser = Annotated[User, Depends(require_role(Role.ADMIN, Role.MANAGER))]
 
 
-def get_chat(req: Request, cfg: Cfg) -> ChatClient:
-    # en tests se inyecta un cliente falso en app.state.chat
+def get_chat(req: Request, cfg: Cfg) -> BaseLlm:
+    # en tests se inyecta un modelo falso en app.state.chat
     fake = getattr(req.app.state, "chat", None)
     if fake:
         return fake
     if not cfg.openai_api_key:
         raise AssistantError("IA no configurada (falta OPENAI_API_KEY)")
-    return OpenAIChat(cfg.openai_api_key, cfg.model)
+    return make_model(cfg.openai_api_key, cfg.model)
 
 
 @router.post("/asistente/mensaje")
@@ -34,7 +35,7 @@ async def message(
     req: Request,
     user: AiUser,
     db: Db,
-    chat: Annotated[ChatClient, Depends(get_chat)],
+    chat: Annotated[BaseLlm, Depends(get_chat)],
 ) -> ChatOut:
     """Un turno del chat: el modelo llama tools de solo lectura con tus permisos."""
     t0 = time.perf_counter()

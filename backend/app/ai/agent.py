@@ -1,17 +1,32 @@
-"""Asistente: loop de tool-calling sobre chat-completions de OpenAI. El cliente es inyectable."""
+"""Asistente con Google ADK: un LlmAgent con las tools de solo lectura del panel."""
 
-import json
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Protocol
+from typing import Any
+from uuid import uuid4
 
-from openai import AsyncOpenAI, OpenAIError
+from google.adk.agents import LlmAgent, RunConfig
+from google.adk.agents.callback_context import CallbackContext
+from google.adk.agents.invocation_context import LlmCallsLimitExceededError
+from google.adk.events import Event
+from google.adk.models.base_llm import BaseLlm
+from google.adk.models.lite_llm import LiteLlm
+from google.adk.models.llm_request import LlmRequest
+from google.adk.models.llm_response import LlmResponse
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.adk.tools import BaseTool
+from google.adk.tools.tool_context import ToolContext
+from google.genai import types
+from openai import OpenAIError
 
-from app.ai.tools import SPECS, Toolbox, dumps, json_schema
+from app.ai.tools import SPECS, Toolbox, json_schema
 from app.core.errors import AppError
 
 log = logging.getLogger(__name__)
 
+APP = "panel"
+NAME = "asistente"
 MAX_CALLS = 5  # tool calls por turno (spec §10.2)
 
 SYSTEM = """Sos el asistente del Panel de liderazgo de Flockit. Respondés en español rioplatense,
@@ -32,74 +47,10 @@ Reglas:
 LIMIT_MSG = "Límite de consultas por turno alcanzado: respondé con lo que ya tenés."
 
 
-@dataclass
-class ToolCall:
-    id: str
-    name: str
-    args: dict[str, Any]
-
-
-@dataclass
-class Reply:
-    """Una respuesta del modelo: texto y/o pedidos de tools."""
-
-    content: str | None
-    calls: list[ToolCall] = field(default_factory=list)
-    input_tokens: int = 0
-    output_tokens: int = 0
-
-
-class ChatClient(Protocol):
-    model: str
-
-    async def complete(
-        self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None
-    ) -> Reply: ...
-
-
-class OpenAIChat:
-    """Cliente real contra OpenAI."""
-
-    def __init__(self, api_key: str, model: str) -> None:
-        self.model = model
-        self.client = AsyncOpenAI(api_key=api_key, timeout=45)
-
-    async def complete(
-        self, messages: list[dict[str, Any]], tools: list[dict[str, Any]] | None
-    ) -> Reply:
-        kw: dict[str, Any] = {"tools": tools} if tools else {}
-        res = await self.client.chat.completions.create(
-            model=self.model, messages=messages, max_completion_tokens=1500, **kw
-        )
-        msg = res.choices[0].message
-        calls = [
-            ToolCall(c.id, c.function.name, _args(c.function.arguments))
-            for c in (msg.tool_calls or [])
-            if c.type == "function"
-        ]
-        use = res.usage
-        return Reply(
-            msg.content, calls, use.prompt_tokens if use else 0, use.completion_tokens if use else 0
-        )
-
-
-def _args(raw: str) -> dict[str, Any]:
-    try:
-        val = json.loads(raw or "{}")
-    except json.JSONDecodeError:
-        return {}
-    return val if isinstance(val, dict) else {}
-
-
-def tool_defs() -> list[dict[str, Any]]:
-    """Las tools en formato OpenAI."""
-    return [
-        {
-            "type": "function",
-            "function": {"name": n, "description": s["desc"], "parameters": json_schema(n)},
-        }
-        for n, s in SPECS.items()
-    ]
+def make_model(api_key: str, model: str) -> BaseLlm:
+    """Modelo vía LiteLLM. Sin prefijo de proveedor se asume OpenAI."""
+    name = model if "/" in model else f"openai/{model}"
+    return LiteLlm(model=name, api_key=api_key, timeout=45, max_completion_tokens=1500)
 
 
 @dataclass
@@ -116,58 +67,103 @@ class AssistantError(AppError):
     code = "AI_ERROR"
 
 
+@dataclass
+class Turn:
+    """Estado de un turno: tools usadas y tokens."""
+
+    used: list[dict[str, Any]] = field(default_factory=list)
+    tin: int = 0
+    tout: int = 0
+
+    @property
+    def capped(self) -> bool:
+        return len(self.used) >= MAX_CALLS
+
+
+class PanelTool(BaseTool):
+    """Una tool del Toolbox expuesta a ADK. Respeta el tope de llamadas del turno."""
+
+    def __init__(self, name: str, box: Toolbox, turn: Turn) -> None:
+        super().__init__(name=name, description=SPECS[name]["desc"])
+        self.box, self.turn = box, turn
+
+    def _get_declaration(self) -> types.FunctionDeclaration:
+        return types.FunctionDeclaration(
+            name=self.name,
+            description=self.description,
+            parameters_json_schema=json_schema(self.name),
+        )
+
+    async def run_async(self, *, args: dict[str, Any], tool_context: ToolContext) -> Any:
+        if self.turn.capped:
+            return {"error": LIMIT_MSG}
+        self.turn.used.append({"name": self.name, "args": args})
+        return await self.box.run(self.name, args)
+
+
 class Assistant:
     """Un turno de chat: el modelo decide qué tools llamar (máx. 5) y redacta con sus datos."""
 
-    def __init__(self, client: ChatClient, box: Toolbox) -> None:
-        self.client = client
+    def __init__(self, model: BaseLlm, box: Toolbox) -> None:
+        self.model = model
         self.box = box
 
     async def reply(self, history: list[dict[str, str]]) -> Answer:
-        """Responde al último mensaje.
+        """Responde al último mensaje del historial.
 
         Raises:
-            AssistantError: Si el modelo falla.
+            AssistantError: Si el modelo falla o se pasa del límite de llamadas.
         """
-        msgs: list[dict[str, Any]] = [{"role": "system", "content": SYSTEM}, *history]
-        used: list[dict[str, Any]] = []
-        tin = tout = 0
-        defs = tool_defs()
+        turn = Turn()
+        agent = self._agent(turn)
+        sessions = InMemorySessionService()
+        uid = str(self.box.user.id)
+        session = await sessions.create_session(app_name=APP, user_id=uid)
+        for m in history[:-1]:
+            await sessions.append_event(session, _event(m))
+        runner = Runner(app_name=APP, agent=agent, session_service=sessions)
+        text = ""
         try:
-            while True:
-                capped = len(used) >= MAX_CALLS
-                rep = await self.client.complete(msgs, None if capped else defs)
-                tin += rep.input_tokens
-                tout += rep.output_tokens
-                if not rep.calls or capped:
-                    text = rep.content or "No tengo ese dato."
-                    return Answer(text, used, self.client.model, tin, tout)
-                msgs.append(self._assistant_msg(rep))
-                for call in rep.calls:
-                    msgs.append(await self._exec(call, used))
-        except OpenAIError as e:
+            async for ev in runner.run_async(
+                user_id=uid,
+                session_id=session.id,
+                new_message=_content(history[-1]),
+                run_config=RunConfig(max_llm_calls=MAX_CALLS + 1),
+            ):
+                if ev.usage_metadata:
+                    turn.tin += ev.usage_metadata.prompt_token_count or 0
+                    turn.tout += ev.usage_metadata.candidates_token_count or 0
+                if ev.is_final_response() and ev.content and ev.content.parts:
+                    text = "".join(p.text or "" for p in ev.content.parts if not p.thought)
+        except (OpenAIError, LlmCallsLimitExceededError) as e:
             log.warning("Asistente falló: %s", type(e).__name__)
             raise AssistantError("El asistente no pudo responder. Probá de nuevo.") from e
+        return Answer(
+            text or "No tengo ese dato.", turn.used, self.model.model, turn.tin, turn.tout
+        )
 
-    async def _exec(self, call: ToolCall, used: list[dict[str, Any]]) -> dict[str, Any]:
-        if len(used) >= MAX_CALLS:
-            out = {"error": LIMIT_MSG}
-        else:
-            used.append({"name": call.name, "args": call.args})
-            out = await self.box.run(call.name, call.args)
-        return {"role": "tool", "tool_call_id": call.id, "content": dumps(out)}
+    def _agent(self, turn: Turn) -> LlmAgent:
+        def cap(ctx: CallbackContext, req: LlmRequest) -> LlmResponse | None:
+            # con el tope alcanzado, el modelo tiene que responder sin más tools
+            if turn.capped:
+                req.config.tools = None
+                req.tools_dict.clear()
+            return None
 
-    @staticmethod
-    def _assistant_msg(rep: Reply) -> dict[str, Any]:
-        return {
-            "role": "assistant",
-            "content": rep.content,
-            "tool_calls": [
-                {
-                    "id": c.id,
-                    "type": "function",
-                    "function": {"name": c.name, "arguments": json.dumps(c.args)},
-                }
-                for c in rep.calls
-            ],
-        }
+        return LlmAgent(
+            name=NAME,
+            model=self.model,
+            instruction=SYSTEM,
+            tools=[PanelTool(n, self.box, turn) for n in SPECS],
+            before_model_callback=cap,
+        )
+
+
+def _content(m: dict[str, str]) -> types.Content:
+    role = "user" if m["role"] == "user" else "model"
+    return types.Content(role=role, parts=[types.Part(text=m["content"])])
+
+
+def _event(m: dict[str, str]) -> Event:
+    author = "user" if m["role"] == "user" else NAME
+    return Event(invocation_id=f"hist-{uuid4()}", author=author, content=_content(m))

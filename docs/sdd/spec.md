@@ -333,7 +333,6 @@ Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo
 
 ### 10.4 Observabilidad
 - Cada turno del asistente registra modelo, tools llamadas con sus argumentos, tokens de entrada y salida, costo estimado y latencia.
-- Hay una vista "Uso de IA" en Auditoría.
 
 ### 10.5 Evals
 - Golden set de **al menos 15 preguntas** con respuesta esperada: qué tools se llaman y qué números aparecen.
