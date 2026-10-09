@@ -94,6 +94,39 @@
         }
       }
     },
+    "/api/auth/password": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Change Password",
+        "description": "Cambia la contraseña del usuario logueado.",
+        "operationId": "change_password_api_auth_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/conexiones": {
       "get": {
         "tags": ["conexiones"],
@@ -1399,6 +1432,25 @@
         "type": "object",
         "required": ["month", "planned", "burned", "pct", "light", "sprints"],
         "title": "MonthOut"
+      },
+      "PasswordIn": {
+        "properties": {
+          "current": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Current"
+          },
+          "new": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 12,
+            "title": "New"
+          }
+        },
+        "type": "object",
+        "required": ["current", "new"],
+        "title": "PasswordIn"
       },
       "PersonOut": {
         "properties": {

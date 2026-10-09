@@ -98,3 +98,28 @@ def test_db_url_codifica_la_password(monkeypatch):
     monkeypatch.delenv("DATABASE_URL")
     cfg = Settings(_env_file=None, db_password="a@b/c#d", db_host="h", db_user="u")  # type: ignore[call-arg]
     assert cfg.db_url == "postgresql+asyncpg://u:a%40b%2Fc%23d@h:6543/postgres"
+
+
+def test_cambiar_password_y_entrar_con_la_nueva(client, login):
+    login()
+    res = client.post("/api/auth/password", json={"current": PWD, "new": "Otra-clave-segura-456"})
+    assert res.status_code == 204
+    client.post("/api/auth/logout")
+    assert login(ADMIN, PWD).status_code == 401
+    assert login(ADMIN, "Otra-clave-segura-456").status_code == 200
+
+
+def test_cambiar_password_con_actual_mala_es_422(client, login):
+    login()
+    res = client.post(
+        "/api/auth/password", json={"current": "mala", "new": "Otra-clave-segura-456"}
+    )
+    assert res.status_code == 422
+    assert res.json()["message"] == "La contraseña actual no es correcta"
+
+
+def test_cambiar_password_exige_12_caracteres(client, login):
+    login()
+    assert (
+        client.post("/api/auth/password", json={"current": PWD, "new": "corta"}).status_code == 422
+    )

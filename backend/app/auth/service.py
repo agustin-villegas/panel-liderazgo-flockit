@@ -7,9 +7,14 @@ from app.auth.passwords import Passwords
 from app.auth.ratelimit import LoginLimiter
 from app.auth.sessions import SessionService
 from app.core.clock import now
-from app.core.errors import AuthError, RateLimitError
+from app.core.errors import AppError, AuthError, RateLimitError
 
 BAD_LOGIN = "Email o contraseña incorrectos"
+
+
+class PasswordError(AppError):
+    status = 422  # no 401: el usuario sigue logueado
+    code = "PASSWORD_INVALID"
 
 
 class AuthService:
@@ -58,3 +63,20 @@ class AuthService:
         """Revoca la sesión en el servidor."""
         await self.sessions.revoke(token)
         await self.audit.log("auth.logout", actor=user.id, ip=ip)
+
+    async def change_password(
+        self, user: User, current: str, new: str, token: str, ip: str
+    ) -> None:
+        """Cambia la contraseña y corta las otras sesiones abiertas.
+
+        Raises:
+            PasswordError: Si la actual no coincide o la nueva no es válida.
+        """
+        if not self.pwds.verify(user.pwd_hash, current):
+            raise PasswordError("La contraseña actual no es correcta")
+        if new == current:
+            raise PasswordError("La nueva contraseña tiene que ser distinta de la actual")
+        user.pwd_hash = self.pwds.hash(new)
+        user.must_change_pwd = False
+        await self.sessions.revoke_others(user.id, token)
+        await self.audit.log("auth.password_cambiada", actor=user.id, ip=ip)

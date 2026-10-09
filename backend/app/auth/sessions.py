@@ -68,3 +68,16 @@ class SessionService:
             .values(revoked_at=now())
         )
         await self.db.commit()
+
+    async def revoke_others(self, user_id, keep: str) -> None:
+        """Corta todas las sesiones del usuario menos la actual."""
+        await self.db.execute(
+            update(UserSession)
+            .where(
+                UserSession.user_id == user_id,
+                UserSession.revoked_at.is_(None),
+                UserSession.token_hash != digest(keep),
+            )
+            .values(revoked_at=now())
+        )
+        await self.db.commit()
