@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMe } from "@/hooks/use-me";
 import { api, type Card as CardData } from "@/lib/api/client";
+import { cn } from "@/lib/utils";
 
 export default function PortfolioPage() {
   const { data: me } = useMe();
@@ -20,10 +21,15 @@ export default function PortfolioPage() {
 
   const count = (l: string) => data?.filter((c) => c.light === l).length ?? 0;
   const kpis = [
-    { label: "Proyectos", value: data?.length ?? 0, cls: "" },
-    { label: "En riesgo", value: count("crit"), cls: "text-crit-fg" },
-    { label: "Atención", value: count("warn"), cls: "text-warn-fg" },
-    { label: "En margen", value: count("ok"), cls: "text-ok-fg" },
+    {
+      label: "Proyectos",
+      value: data?.length ?? 0,
+      num: "text-foreground",
+      bar: "bg-foreground/20",
+    },
+    { label: "En riesgo", value: count("crit"), num: "text-crit-fg", bar: "bg-crit" },
+    { label: "Atención", value: count("warn"), num: "text-warn-fg", bar: "bg-warn" },
+    { label: "En margen", value: count("ok"), num: "text-ok-fg", bar: "bg-ok" },
   ];
 
   return (
@@ -37,13 +43,14 @@ export default function PortfolioPage() {
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Indicadores">
         {kpis.map((k) => (
-          <Card key={k.label} className="py-4">
-            <CardContent>
+          <Card key={k.label} className="gap-0 overflow-hidden bg-card py-0">
+            <span className={cn("h-0.5", k.bar)} aria-hidden />
+            <CardContent className="py-4">
               <p className="text-xs font-medium text-muted-foreground">{k.label}</p>
               {isLoading ? (
                 <Skeleton className="mt-2 h-8 w-12" />
               ) : (
-                <p className={`text-3xl leading-none font-bold ${k.cls}`}>{k.value}</p>
+                <p className={cn("text-3xl leading-none font-bold", k.num)}>{k.value}</p>
               )}
             </CardContent>
           </Card>

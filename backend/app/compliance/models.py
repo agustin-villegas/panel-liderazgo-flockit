@@ -25,6 +25,7 @@ class Sprint:
     end: datetime  # fin planificado
     closed_at: datetime | None = None  # cierre real
     state: State = State.CLOSED
+    goal: str | None = None  # objetivo del sprint en Jira
 
     @property
     def until(self) -> datetime:

@@ -530,6 +530,8 @@ export interface components {
       sprint: components["schemas"]["SprintOut"];
       /** Lines */
       lines: components["schemas"]["LineOut"][];
+      /** Site */
+      site?: string | null;
     };
     /** FieldOut */
     FieldOut: {
@@ -869,6 +871,8 @@ export interface components {
       unestimated: number;
       /** Provisional */
       provisional: boolean;
+      /** Goal */
+      goal?: string | null;
       /** People */
       people: components["schemas"]["PersonOut"][];
     };

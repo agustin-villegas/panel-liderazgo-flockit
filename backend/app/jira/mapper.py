@@ -26,6 +26,7 @@ def to_sprint(raw: Raw) -> Sprint:
     end = parse_dt(raw.get("endDate")) or start
     if start is None or end is None:
         raise ValueError(f"Sprint {raw.get('id')} sin fechas")
+    goal = (raw.get("goal") or "").strip() or None
     return Sprint(
         id=str(raw["id"]),
         name=raw.get("name", ""),
@@ -33,6 +34,7 @@ def to_sprint(raw: Raw) -> Sprint:
         end=end,
         closed_at=parse_dt(raw.get("completeDate")),
         state=State(raw.get("state", "closed")),
+        goal=goal,
     )
 
 

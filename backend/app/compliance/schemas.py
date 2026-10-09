@@ -23,6 +23,7 @@ class SprintOut(BaseModel):
     light: str  # ok | warn | crit | none
     unestimated: int
     provisional: bool
+    goal: str | None = None
     people: list[PersonOut]
 
 
@@ -52,6 +53,7 @@ class LineOut(BaseModel):
 class DetailOut(BaseModel):
     sprint: SprintOut
     lines: list[LineOut]
+    site: str | None = None
 
 
 class ComplianceOut(BaseModel):

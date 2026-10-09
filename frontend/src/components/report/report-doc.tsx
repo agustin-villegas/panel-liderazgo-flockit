@@ -39,7 +39,7 @@ export function ReportDoc({ data, audience, date, author, story }: Props) {
   return (
     <article
       data-section="informe"
-      className="overflow-hidden rounded-2xl border bg-card shadow-sm"
+      className="overflow-hidden rounded-2xl border bg-card shadow-sm print:overflow-visible print:rounded-none print:border-0 print:shadow-none"
     >
       <header className="bg-brand flex flex-wrap items-end justify-between gap-4 px-8 py-6 text-white">
         <div>
@@ -60,7 +60,7 @@ export function ReportDoc({ data, audience, date, author, story }: Props) {
       </header>
 
       <div className="grid gap-8 p-8">
-        <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <section className="grid grid-cols-2 gap-3 md:grid-cols-4 print:grid-cols-4">
           <Kpi label="Cumplimiento" value={pct(s.pct)} extra={<LightBadge light={s.light} />} />
           <Kpi label="Planificados" value={`${pts(s.planned)} SP`} />
           <Kpi label="Quemados" value={`${pts(s.burned)} SP`} />
@@ -75,7 +75,7 @@ export function ReportDoc({ data, audience, date, author, story }: Props) {
           {story}
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-2">
+        <section className="grid gap-6 lg:grid-cols-2 print:grid-cols-2">
           <div className="grid gap-2">
             <h3 className="font-semibold">Tendencia de cumplimiento</h3>
             <ChartContainer config={{ pct: { label: "Cumplimiento %" } }} className="h-56 w-full">
@@ -159,7 +159,7 @@ export function ReportDoc({ data, audience, date, author, story }: Props) {
 
 function Kpi({ label, value, extra }: { label: string; value: string; extra?: React.ReactNode }) {
   return (
-    <div className="grid gap-1 rounded-xl border p-4">
+    <div className="grid gap-1 rounded-xl border p-4 print:break-inside-avoid">
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
       <p className="text-2xl leading-none font-bold">{value}</p>
       {extra}
@@ -171,7 +171,7 @@ export function StoryView({ story }: { story: Story | null | undefined }) {
   if (!story)
     return <p className="text-sm text-muted-foreground">Este informe no tiene lectura.</p>;
   return (
-    <div className="grid gap-2 rounded-xl bg-secondary/60 p-4">
+    <div className="report-story grid gap-2 rounded-xl bg-secondary/60 p-4">
       <p className="leading-relaxed">{story.resumen}</p>
       {(story.puntos ?? []).length > 0 && (
         <ul className="list-disc pl-5 text-sm">

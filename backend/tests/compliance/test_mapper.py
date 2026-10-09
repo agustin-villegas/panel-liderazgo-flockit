@@ -73,5 +73,19 @@ def test_sprint_cerrado():
             "completeDate": "2026-09-12T19:00:00.000Z",
         }
     )
-    assert (s.id, s.state) == ("7", State.CLOSED)
+    assert (s.id, s.state, s.goal) == ("7", State.CLOSED, None)
     assert s.until == datetime(2026, 9, 12, 19, tzinfo=UTC)
+
+
+def test_sprint_guarda_el_objetivo():
+    s = to_sprint(
+        {
+            "id": 8,
+            "name": "S8",
+            "state": "closed",
+            "startDate": "2026-09-01T09:00:00.000Z",
+            "endDate": "2026-09-12T18:00:00.000Z",
+            "goal": "  Cerrar el alta de clientes  ",
+        }
+    )
+    assert s.goal == "Cerrar el alta de clientes"

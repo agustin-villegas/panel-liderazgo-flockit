@@ -116,7 +116,7 @@ Prioridad de cada módulo: **P0** = imprescindible para la demo · **P1** = dese
 ## 5. Cuentas y proyectos (P0)
 
 - **Cuenta**: nombre y logo (opcional).
-- **Proyecto**: nombre, cuenta, conexión y **board** (desplegable con los boards scrum del sitio, vía `/rest/agile/1.0/board`), y Team Managers asignados.
+- **Proyecto**: nombre, cuenta, conexión y **board** (desplegable con todos los boards que el usuario de la conexión puede ver — scrum, kanban y team-managed — vía `/rest/agile/1.0/board`, sin filtrar por tipo), y Team Managers asignados. Un board que no usa sprints deja la medición vacía.
 - Al vincular un board se traen sus sprints. Se puede elegir **desde qué sprint** se mide, para ignorar sprints viejos o de prueba.
 
 **Criterios de aceptación**
@@ -162,7 +162,7 @@ Para cada sprint **S** de un proyecto:
 - **Sprint activo**: se muestra como **provisorio** (badge "En curso") y no entra en el mes hasta cerrar.
 
 ### 7.3 Auditoría
-- Todo número tiene un **"ver detalle"** que lista las issues que lo componen: clave (con link a Jira), título, tipo, SP, estado, responsable, sprints por los que pasó, fecha de finalización, sprint de quemado y **motivo** ("terminada dentro del sprint", "terminada después del último sprint", "no terminada", "sin estimar").
+- Todo número tiene un **"ver detalle"** que abre una página del sprint (no un panel lateral). Arriba, tarjetas por estado y el objetivo del sprint si Jira lo trae. Abajo, una tabla paginada con filtros (texto, estado, responsable, motivo) y export. Cada fila trae: clave (con link a Jira), título, tipo, SP, estado, responsable, sprints por los que pasó, fecha de finalización, sprint de quemado y **motivo** ("terminada dentro del sprint", "terminada después del último sprint", "no terminada", "sin estimar").
 - Se avisa de: issues sin estimar, issues con SP cambiado durante el sprint (si el changelog lo muestra) y sprints sin issues.
 
 ### 7.4 Casos de prueba obligatorios (tests unitarios del motor)

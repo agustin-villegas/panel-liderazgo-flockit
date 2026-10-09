@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,13 +27,7 @@ export const sprintCols: Col<SprintRow>[] = [
   { label: "Sin estimar", value: (s) => s.unestimated },
 ];
 
-export function SprintTable({
-  rows,
-  onOpen,
-}: {
-  rows: SprintRow[];
-  onOpen: (s: SprintRow) => void;
-}) {
+export function SprintTable({ project, rows }: { project: string; rows: SprintRow[] }) {
   return (
     <Table>
       <TableHeader>
@@ -71,7 +67,12 @@ export function SprintTable({
               <LightBadge light={s.light} />
             </TableCell>
             <TableCell className="text-right print:hidden">
-              <Button variant="ghost" size="sm" onClick={() => onOpen(s)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                nativeButton={false}
+                render={<Link href={`/proyectos/${project}/sprints/${s.id}`} />}
+              >
                 Ver detalle
               </Button>
             </TableCell>

@@ -10,7 +10,6 @@ import { BoardView } from "@/components/board/board-view";
 import { ExportButtons } from "@/components/panel/export-buttons";
 import { LightBadge } from "@/components/panel/light-badge";
 import { ComplianceChart } from "@/components/project/compliance-chart";
-import { SprintSheet } from "@/components/project/sprint-sheet";
 import {
   MonthTable,
   PeopleTable,
@@ -23,13 +22,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { api, post, type Compliance, type Project, type SprintRow } from "@/lib/api/client";
+import { api, post, type Compliance, type Project } from "@/lib/api/client";
 import { pct, pts } from "@/lib/format";
 
 export default function ProjectPage({ params }: PageProps<"/proyectos/[id]">) {
   const { id } = use(params);
   const qc = useQueryClient();
-  const [open, setOpen] = useState<SprintRow | null>(null);
   const [personSprint, setPersonSprint] = useState<string | null>(null);
 
   const projects = useQuery({
@@ -132,7 +130,7 @@ export default function ProjectPage({ params }: PageProps<"/proyectos/[id]">) {
                       />
                     </CardHeader>
                     <CardContent>
-                      <SprintTable rows={sprints} onOpen={setOpen} />
+                      <SprintTable project={id} rows={sprints} />
                     </CardContent>
                   </Card>
                 </TabsContent>
@@ -194,8 +192,6 @@ export default function ProjectPage({ params }: PageProps<"/proyectos/[id]">) {
           )}
         </TabsContent>
       </Tabs>
-
-      <SprintSheet project={id} sprint={open} onClose={() => setOpen(null)} />
     </>
   );
 }

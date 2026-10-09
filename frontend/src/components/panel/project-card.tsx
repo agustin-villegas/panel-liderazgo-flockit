@@ -4,19 +4,36 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { BrandBar } from "@/components/viz/brand-bar";
 import type { Card as CardData } from "@/lib/api/client";
-import { month, pct, pts } from "@/lib/format";
+import { month, pct, pts, type Light } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 import { LightBadge } from "./light-badge";
 import { TrendBars } from "./trend-bars";
 
+const RAIL: Record<Light, string> = {
+  ok: "bg-ok",
+  warn: "bg-warn",
+  crit: "bg-crit",
+  none: "bg-border",
+};
+
+const NUM: Record<Light, string> = {
+  ok: "text-ok-fg",
+  warn: "text-warn-fg",
+  crit: "text-crit-fg",
+  none: "text-foreground",
+};
+
 export function ProjectCard({ card }: { card: CardData }) {
   const { last, active } = card;
+  const light = (card.light in RAIL ? card.light : "none") as Light;
   return (
     <Link
       href={`/proyectos/${card.id}`}
       className="group rounded-xl focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
     >
-      <Card className="h-full transition-shadow group-hover:shadow-md">
+      <Card className="relative h-full overflow-hidden bg-card transition-shadow group-hover:shadow-md">
+        <span className={cn("absolute inset-y-0 left-0 w-1", RAIL[light])} aria-hidden />
         <CardHeader className="flex flex-row items-start justify-between gap-2">
           <div className="min-w-0">
             <p className="truncate text-xs font-medium text-muted-foreground">{card.account}</p>
@@ -35,7 +52,9 @@ export function ProjectCard({ card }: { card: CardData }) {
             <>
               <div className="flex items-end justify-between gap-4">
                 <div>
-                  <p className="text-3xl leading-none font-bold">{pct(last?.pct)}</p>
+                  <p className={cn("text-3xl leading-none font-bold", NUM[light])}>
+                    {pct(last?.pct)}
+                  </p>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {last
                       ? `${last.name} · ${pts(last.burned)}/${pts(last.planned)} pts`

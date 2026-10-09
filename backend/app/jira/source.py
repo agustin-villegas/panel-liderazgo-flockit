@@ -21,6 +21,10 @@ class Field:
 class JiraError(Exception):
     """Error de Jira con mensaje apto para el usuario."""
 
+    def __init__(self, message: str, status: int | None = None) -> None:
+        super().__init__(message)
+        self.status = status
+
 
 class JiraSource(Protocol):
     """Lo que el panel necesita de Jira. Implementaciones: JiraCloud y JiraDemo."""

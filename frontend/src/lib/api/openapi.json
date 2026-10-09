@@ -1344,6 +1344,10 @@
             },
             "type": "array",
             "title": "Lines"
+          },
+          "site": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Site"
           }
         },
         "type": "object",
@@ -2194,6 +2198,10 @@
           "provisional": {
             "type": "boolean",
             "title": "Provisional"
+          },
+          "goal": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Goal"
           },
           "people": {
             "items": {

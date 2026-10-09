@@ -234,15 +234,73 @@
   }
 }
 
-/* PDF por sección: al imprimir solo queda la sección pedida */
+/* PDF por sección: la hoja es el documento, sin el shell de la app. */
 @media print {
-  body[data-print] [data-section]:not([data-printing]) {
-    display: none;
+  @page {
+    margin: 12mm;
+  }
+
+  body[data-print] {
+    background: #fff !important;
+    color: #171717 !important;
+    color-scheme: light;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 
   body[data-print] [data-slot="sidebar"],
-  body[data-print] header {
-    display: none;
+  body[data-print] [data-slot="sidebar-gap"],
+  body[data-print] [data-slot="sidebar-container"],
+  body[data-print] [data-slot="sidebar-inset"] > header,
+  body[data-print] [data-section]:not([data-printing]) {
+    display: none !important;
+  }
+
+  body[data-print] [data-slot="sidebar-wrapper"],
+  body[data-print] [data-slot="sidebar-inset"],
+  body[data-print] [data-slot="sidebar-inset"] > div {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  body[data-print] [data-printing] {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #171717 !important;
+    box-shadow: none !important;
+  }
+
+  body[data-print] [data-printing] header {
+    display: flex !important;
+    color: #fff !important;
+    background: var(--brand-gradient) !important;
+  }
+
+  body[data-print] [data-printing] .report-story {
+    background: #f5f3ff !important;
+    color: #171717 !important;
+  }
+
+  body[data-print] [data-printing] [data-slot="table-container"] {
+    overflow: visible !important;
+  }
+
+  body[data-print] [data-printing] table {
+    width: 100% !important;
+  }
+
+  body[data-print] [data-printing] .recharts-cartesian-axis-tick text {
+    fill: #404040 !important;
   }
 }
 
