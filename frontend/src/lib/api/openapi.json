@@ -942,6 +942,72 @@
           }
         }
       }
+    },
+    "/api/notificaciones": {
+      "get": {
+        "tags": ["notificaciones"],
+        "summary": "Mine",
+        "description": "Avisos del usuario; antes revisa sus proyectos si la última corrida fue hace >15 min.",
+        "operationId": "mine_api_notificaciones_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationsOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notificaciones/leer-todas": {
+      "post": {
+        "tags": ["notificaciones"],
+        "summary": "Read All",
+        "operationId": "read_all_api_notificaciones_leer_todas_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/api/notificaciones/{nid}/leida": {
+      "post": {
+        "tags": ["notificaciones"],
+        "summary": "Read One",
+        "operationId": "read_one_api_notificaciones__nid__leida_post",
+        "parameters": [
+          {
+            "name": "nid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Nid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1346,7 +1412,14 @@
             "title": "Lines"
           },
           "site": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Site"
           }
         },
@@ -1576,6 +1649,74 @@
         "type": "object",
         "required": ["month", "planned", "burned", "pct", "light", "sprints"],
         "title": "MonthOut"
+      },
+      "NotificationOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "link": {
+            "type": "string",
+            "title": "Link"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          }
+        },
+        "type": "object",
+        "required": ["id", "project_id", "kind", "title", "body", "link", "created_at", "read_at"],
+        "title": "NotificationOut"
+      },
+      "NotificationsOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "unread": {
+            "type": "integer",
+            "title": "Unread"
+          }
+        },
+        "type": "object",
+        "required": ["items", "unread"],
+        "title": "NotificationsOut"
       },
       "PasswordIn": {
         "properties": {
@@ -2200,7 +2341,14 @@
             "title": "Provisional"
           },
           "goal": {
-            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Goal"
           },
           "people": {

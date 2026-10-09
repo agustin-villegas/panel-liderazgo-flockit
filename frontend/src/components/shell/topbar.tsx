@@ -21,6 +21,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useMe } from "@/hooks/use-me";
 import { post } from "@/lib/api/client";
 
+import { NotificationBell } from "./notification-bell";
 import { PasswordDialog } from "./password-dialog";
 
 const ROLES: Record<string, string> = {
@@ -45,6 +46,7 @@ export function Topbar() {
     <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur">
       <SidebarTrigger />
       <div className="flex-1" />
+      <NotificationBell />
       <ThemeToggle />
       <DropdownMenu>
         <DropdownMenuTrigger

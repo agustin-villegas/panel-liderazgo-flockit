@@ -376,6 +376,60 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/notificaciones": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Mine
+     * @description Avisos del usuario; antes revisa sus proyectos si la última corrida fue hace >15 min.
+     */
+    get: operations["mine_api_notificaciones_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/notificaciones/leer-todas": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Read All */
+    post: operations["read_all_api_notificaciones_leer_todas_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/notificaciones/{nid}/leida": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Read One */
+    post: operations["read_one_api_notificaciones__nid__leida_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -614,6 +668,41 @@ export interface components {
       light: string;
       /** Sprints */
       sprints: number;
+    };
+    /** NotificationOut */
+    NotificationOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Project Id
+       * Format: uuid
+       */
+      project_id: string;
+      /** Kind */
+      kind: string;
+      /** Title */
+      title: string;
+      /** Body */
+      body: string;
+      /** Link */
+      link: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Read At */
+      read_at: string | null;
+    };
+    /** NotificationsOut */
+    NotificationsOut: {
+      /** Items */
+      items: components["schemas"]["NotificationOut"][];
+      /** Unread */
+      unread: number;
     };
     /** PasswordIn */
     PasswordIn: {
@@ -1718,6 +1807,73 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["ReportOut"];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  mine_api_notificaciones_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["NotificationsOut"];
+        };
+      };
+    };
+  };
+  read_all_api_notificaciones_leer_todas_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  read_one_api_notificaciones__nid__leida_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        nid: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Validation Error */
       422: {

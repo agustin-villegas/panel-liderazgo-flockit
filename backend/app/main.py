@@ -16,6 +16,8 @@ from app.core.errors import AppError, app_error_handler
 from app.core.security import security_headers
 from app.db.database import Database
 from app.health import router as health_router
+from app.notifications.router import internal as internal_router
+from app.notifications.router import router as notif_router
 from app.projects.router import router as projects_router
 from app.reports.router import router as reports_router
 
@@ -34,6 +36,7 @@ def create_app(cfg: Settings | None = None, db: Database | None = None) -> FastA
         app.state.factory = SourceFactory(app.state.cipher)
         app.state.cache = Cache()
         app.state.boards = {}  # caché del tablero (60 s)
+        app.state.notif_runs = {}  # última detección de avisos por proyecto
         async with app.state.db.maker() as s:
             await ensure_admin(s, cfg)
             await ensure_demo(s)
@@ -43,8 +46,11 @@ def create_app(cfg: Settings | None = None, db: Database | None = None) -> FastA
     app = FastAPI(title=cfg.app_name, version="0.1.0", lifespan=lifespan)
     app.middleware("http")(security_headers)
     app.add_exception_handler(AppError, app_error_handler)
-    for r in (health_router, auth_router, conn_router, projects_router, reports_router):
+    for r in (
+        health_router, auth_router, conn_router, projects_router, reports_router, notif_router,
+    ):  # fmt: skip
         app.include_router(r, prefix="/api")
+    app.include_router(internal_router)
     return app
 
 

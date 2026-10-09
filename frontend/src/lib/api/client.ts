@@ -22,6 +22,8 @@ export type Report = S["ReportOut"];
 export type ReportRow = S["ReportRow"];
 export type ReportData = S["ReportData"];
 export type Story = S["StoryIn"];
+export type Notif = S["NotificationOut"];
+export type Notifs = S["NotificationsOut"];
 export type Audience = S["ReportIn"]["audience"];
 
 export class ApiError extends Error {

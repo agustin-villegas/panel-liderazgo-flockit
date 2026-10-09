@@ -19,5 +19,15 @@ export const month = (ym: string) => {
   return `${MONTHS[Number(m) - 1]} ${y}`;
 };
 
+/** "hace 5 min" / "hace 3 h" / "hace 2 d" (fechas sin zona se toman como UTC). */
+export const ago = (iso: string) => {
+  const t = new Date(/(Z|[+-]\d\d:?\d\d)$/.test(iso) ? iso : `${iso}Z`).getTime();
+  const min = Math.max(0, Math.round((Date.now() - t) / 60000));
+  if (min < 1) return "ahora";
+  if (min < 60) return `hace ${min} min`;
+  if (min < 1440) return `hace ${Math.round(min / 60)} h`;
+  return `hace ${Math.round(min / 1440)} d`;
+};
+
 export const day = (iso: string | null | undefined) =>
   iso ? new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "short" }) : "—";
