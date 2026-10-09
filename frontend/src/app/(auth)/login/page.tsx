@@ -13,7 +13,7 @@ export default function LoginPage() {
         <div className="mx-auto w-full max-w-sm">
           <h1 className="text-2xl font-bold tracking-tight">Ingresá al panel</h1>
           <p className="mt-1 mb-8 text-sm text-muted-foreground">
-            Cumplimiento de sprints, satisfacción e informes en un solo lugar.
+            Seguí el estado de tus proyectos: sprints, tableros de Jira, satisfacción e informes.
           </p>
           <Suspense>
             <LoginForm />

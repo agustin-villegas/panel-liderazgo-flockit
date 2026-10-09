@@ -1,6 +1,6 @@
 "use client";
 
-import { FolderKanban, LayoutDashboard, PlugZap } from "lucide-react";
+import { FolderKanban, KanbanSquare, LayoutDashboard, PlugZap } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -17,7 +17,10 @@ import {
 } from "@/components/ui/sidebar";
 import { useMe } from "@/hooks/use-me";
 
-const MAIN = [{ href: "/", label: "Panel de cartera", icon: LayoutDashboard }];
+const MAIN = [
+  { href: "/", label: "Panel de cartera", icon: LayoutDashboard },
+  { href: "/tableros", label: "Tableros de Jira", icon: KanbanSquare },
+];
 const CONFIG = [
   { href: "/configuracion/conexiones", label: "Conexiones", icon: PlugZap },
   { href: "/configuracion/proyectos", label: "Proyectos", icon: FolderKanban },
