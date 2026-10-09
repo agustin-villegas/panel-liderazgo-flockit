@@ -23,7 +23,6 @@ export function ProjectCard({ card }: { card: CardData }) {
       <Card className="lift h-full group-hover:ring-primary/30">
         <CardHeader className="flex flex-row items-start justify-between gap-2">
           <div className="min-w-0">
-            <p className="truncate text-xs font-medium text-muted-foreground">{card.account}</p>
             <h3 className="truncate font-semibold">{card.name}</h3>
           </div>
           <LightBadge light={card.light} />

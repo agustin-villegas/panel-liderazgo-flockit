@@ -2,16 +2,20 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { cn } from "@/lib/utils";
+
 type Props = {
   title: string;
   description?: ReactNode;
   eyebrow?: string;
   back?: { href: string; label: string };
   actions?: ReactNode;
+  /** banner con menos padding */
+  compact?: boolean;
 };
 
 /** Encabezado de pantalla: banner de marca con título, bajada y acciones. */
-export function PageHeader({ title, description, eyebrow, back, actions }: Props) {
+export function PageHeader({ title, description, eyebrow, back, actions, compact }: Props) {
   return (
     <>
       {back && (
@@ -22,7 +26,12 @@ export function PageHeader({ title, description, eyebrow, back, actions }: Props
           <ArrowLeft className="size-4" aria-hidden /> {back.label}
         </Link>
       )}
-      <section className="banner flex flex-wrap items-end justify-between gap-4">
+      <section
+        className={cn(
+          "banner flex flex-wrap items-end justify-between gap-3",
+          compact && "px-5! py-3.5!",
+        )}
+      >
         <div className="min-w-0">
           {eyebrow && <p className="text-sm text-white/80">{eyebrow}</p>}
           <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
