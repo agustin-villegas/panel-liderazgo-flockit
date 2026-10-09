@@ -13,6 +13,7 @@ from app.connections.factory import SourceFactory
 from app.connections.router import router as conn_router
 from app.connections.service import ensure_demo
 from app.core.crypto import Cipher
+from app.core.docs import docs_router
 from app.core.errors import AppError, app_error_handler
 from app.core.security import security_headers
 from app.db.database import Database
@@ -51,7 +52,15 @@ def create_app(cfg: Settings | None = None, db: Database | None = None) -> FastA
             yield
         await app.state.db.close()
 
-    app = FastAPI(title=cfg.app_name, version="0.1.0", lifespan=lifespan)
+    app = FastAPI(
+        title=cfg.app_name,
+        version="0.1.0",
+        lifespan=lifespan,
+        docs_url=None,
+        redoc_url=None,
+        openapi_url=None,
+    )
+    app.include_router(docs_router(app, cfg))
     mcp.state = app.state
     app.middleware("http")(security_headers)
     app.add_exception_handler(AppError, app_error_handler)
