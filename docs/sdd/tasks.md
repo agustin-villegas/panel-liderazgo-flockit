@@ -16,14 +16,16 @@
 **Nota:** el backend con dependencias pesa ~288 MB (litellm). Supera los 250 MB de Vercel →
 evaluar en fase 5 (plan B: Render).
 
-## Fase 1 · Base y auth
+## Fase 1 · Base y auth ✅
 
-- [ ] Settings completos con validación al arrancar
-- [ ] Migración `0001`: users, sessions, login_attempts, audit_events (RLS on)
-- [ ] `PasswordService` (argon2id) + `scripts/generar_hash.py`
-- [ ] Bootstrap del admin desde `.env`
-- [ ] `SessionService`: crear / validar / revocar, cookie segura
-- [ ] Rate limit de login (5 / 15 min por email+IP)
-- [ ] Endpoints: login, logout, me
-- [ ] Headers de seguridad
-- [ ] Tests: login ok, credenciales malas (mensaje genérico), bloqueo, 401 sin sesión
+- [x] Settings con validación al arrancar (hash argon2id obligatorio, secretos con largo mínimo)
+- [x] Migración `0001_auth`: users, sessions, login_attempts, audit_events (RLS on) — aplicada en Supabase
+- [x] `Passwords` (argon2id, tiempo constante si el usuario no existe) + `scripts/generar_hash.py`
+- [x] Bootstrap del admin desde `.env`
+- [x] `SessionService`: sesiones opacas, hash en base, deslizantes, revocables
+- [x] `LoginLimiter`: 5 fallos / 15 min por email+IP; un login OK resetea
+- [x] Endpoints: `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`
+- [x] Errores tipados (`AppError` → JSON) y headers de seguridad
+- [x] Auditoría: login, login fallido, bloqueo, logout (sin secretos)
+- [x] 14 tests verdes
+- [x] Smoke test contra Supabase: login, me, logout y auditoría OK

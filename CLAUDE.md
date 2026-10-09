@@ -18,7 +18,8 @@ Español rioplatense, directo, sin relleno. Explicar solo lo necesario.
 ## Convenciones de código
 
 - **Nombres cortos y simples**: `user`, `sprint`, `pts`, `cfg`. Nada de `user_data_object_list`.
-- **Comentarios cortos**, solo donde el código no se explica solo. Sin docstrings largos.
+- **Comentarios cortos**, solo donde el código no se explica solo. Docstring de **una línea** en
+  funciones públicas (`Raises:` solo si aplica). Python: skill `python` de Flock.
 - **Orientado a objetos** en el dominio: servicios y repositorios como clases con dependencias
   inyectadas; el cálculo puro (motor, fórmulas) como clases sin I/O.
 - Tipado estricto: type hints en Python, `strict` en TS. Sin `any`.
