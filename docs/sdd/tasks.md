@@ -75,3 +75,13 @@
 - [x] Fuente Demo con prioridades, tipos, etiquetas y bloqueos
 - [x] Tests: carriles, días hábiles, totales y permisos (57 verdes)
 - [ ] Después: portal del cliente y resumen semanal con IA
+
+## Fase 4 · Informe de sprint con IA ✅
+
+- [x] `POST /api/informes/preview`: números del motor + narrativa (OpenAI `gpt-5.4-mini`, configurable con `AI_MODEL`)
+- [x] La IA recibe valores ya calculados y formateados; títulos de Jira marcados como dato externo
+- [x] Probado contra OpenAI real: ignora el intento de prompt injection y no recalcula números
+- [x] Sin key o si la IA falla, el informe sale igual (aviso + lectura manual)
+- [x] Narrativa editable antes de guardar; audiencia equipo / cliente / gerencia
+- [x] Guardado = foto inmutable (trigger en Postgres bloquea UPDATE); historial y PDF
+- [x] Migración `0003_informes` aplicada; 67 tests verdes

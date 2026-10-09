@@ -4,6 +4,8 @@ from urllib.parse import quote
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+DEFAULT_MODEL = "gpt-5.4-mini"
+
 
 class Settings(BaseSettings):
     """Config desde variables de entorno. Si falta una obligatoria, la app no arranca."""
@@ -36,7 +38,7 @@ class Settings(BaseSettings):
     frontend_origin: str = "http://localhost:3000"
     webauthn_rp_id: str = "localhost"
 
-    ai_model: str = ""
+    ai_model: str = ""  # vacío = DEFAULT_MODEL
     openai_api_key: str = ""
     google_api_key: str = ""
 
@@ -45,6 +47,11 @@ class Settings(BaseSettings):
         if not self.database_url and not self.db_password:
             raise ValueError("Falta DB_PASSWORD (o DATABASE_URL) en el .env")
         return self
+
+    @property
+    def model(self) -> str:
+        """Modelo de IA a usar (AI_MODEL o el default)."""
+        return self.ai_model or DEFAULT_MODEL
 
     @property
     def db_url(self) -> str:

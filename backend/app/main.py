@@ -17,6 +17,7 @@ from app.core.security import security_headers
 from app.db.database import Database
 from app.health import router as health_router
 from app.projects.router import router as projects_router
+from app.reports.router import router as reports_router
 
 LOG_FMT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 logging.basicConfig(level=logging.INFO, format=LOG_FMT)
@@ -42,7 +43,7 @@ def create_app(cfg: Settings | None = None, db: Database | None = None) -> FastA
     app = FastAPI(title=cfg.app_name, version="0.1.0", lifespan=lifespan)
     app.middleware("http")(security_headers)
     app.add_exception_handler(AppError, app_error_handler)
-    for r in (health_router, auth_router, conn_router, projects_router):
+    for r in (health_router, auth_router, conn_router, projects_router, reports_router):
         app.include_router(r, prefix="/api")
     return app
 

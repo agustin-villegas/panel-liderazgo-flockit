@@ -1,6 +1,6 @@
 "use client";
 
-import { FolderKanban, KanbanSquare, LayoutDashboard, PlugZap } from "lucide-react";
+import { FileBarChart, FolderKanban, KanbanSquare, LayoutDashboard, PlugZap } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -20,6 +20,7 @@ import { useMe } from "@/hooks/use-me";
 const MAIN = [
   { href: "/", label: "Panel de cartera", icon: LayoutDashboard },
   { href: "/tableros", label: "Tableros de Jira", icon: KanbanSquare },
+  { href: "/informes", label: "Informes", icon: FileBarChart },
 ];
 const CONFIG = [
   { href: "/configuracion/conexiones", label: "Conexiones", icon: PlugZap },

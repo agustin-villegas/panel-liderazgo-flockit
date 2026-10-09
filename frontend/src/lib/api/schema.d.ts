@@ -324,6 +324,58 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/informes/preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Preview */
+    post: operations["preview_api_informes_preview_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/informes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List All */
+    get: operations["list_all_api_informes_get"];
+    put?: never;
+    /** Save */
+    post: operations["save_api_informes_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/informes/{rid}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get */
+    get: operations["get_api_informes__rid__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -568,6 +620,19 @@ export interface components {
       /** New */
       new: string;
     };
+    /** Pending */
+    Pending: {
+      /** Key */
+      key: string;
+      /** Title */
+      title: string;
+      /** Status */
+      status: string;
+      /** Assignee */
+      assignee: string | null;
+      /** Sp */
+      sp: number | null;
+    };
     /** PersonOut */
     PersonOut: {
       /** Name */
@@ -578,6 +643,15 @@ export interface components {
       burned: number;
       /** Pct */
       pct: number | null;
+    };
+    /** PreviewOut */
+    PreviewOut: {
+      data: components["schemas"]["ReportData"];
+      story: components["schemas"]["StoryIn"] | null;
+      /** Model */
+      model: string;
+      /** Ai Error */
+      ai_error?: string | null;
     };
     /** ProjectIn */
     ProjectIn: {
@@ -628,6 +702,106 @@ export interface components {
       from_sprint: string | null;
       /** Managers */
       managers: string[];
+    };
+    /**
+     * ReportData
+     * @description Los números del informe: salen del motor, no de la IA.
+     */
+    ReportData: {
+      /** Project */
+      project: string;
+      /** Account */
+      account: string;
+      sprint: components["schemas"]["SprintOut"];
+      /** Trend */
+      trend: components["schemas"]["TrendPoint"][];
+      /** Pending */
+      pending: components["schemas"]["Pending"][];
+      month: components["schemas"]["MonthOut"] | null;
+    };
+    /** ReportIn */
+    ReportIn: {
+      /**
+       * Project Id
+       * Format: uuid
+       */
+      project_id: string;
+      /** Sprint Id */
+      sprint_id: string;
+      /**
+       * Audience
+       * @default equipo
+       * @enum {string}
+       */
+      audience: "equipo" | "cliente" | "gerencia";
+    };
+    /** ReportOut */
+    ReportOut: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Title */
+      title: string;
+      /** Audience */
+      audience: string;
+      /**
+       * Project Id
+       * Format: uuid
+       */
+      project_id: string;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Author */
+      author: string;
+      data: components["schemas"]["ReportData"];
+      story: components["schemas"]["StoryIn"] | null;
+      /** Model */
+      model: string | null;
+    };
+    /** ReportRow */
+    ReportRow: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Title */
+      title: string;
+      /** Audience */
+      audience: string;
+      /** Project */
+      project: string;
+      /** Pct */
+      pct: number | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Author */
+      author: string;
+    };
+    /** SaveIn */
+    SaveIn: {
+      /**
+       * Project Id
+       * Format: uuid
+       */
+      project_id: string;
+      /** Sprint Id */
+      sprint_id: string;
+      /**
+       * Audience
+       * @default equipo
+       * @enum {string}
+       */
+      audience: "equipo" | "cliente" | "gerencia";
+      story?: components["schemas"]["StoryIn"] | null;
     };
     /** SprintBoardOut */
     SprintBoardOut: {
@@ -698,6 +872,13 @@ export interface components {
       /** People */
       people: components["schemas"]["PersonOut"][];
     };
+    /** StoryIn */
+    StoryIn: {
+      /** Resumen */
+      resumen: string;
+      /** Puntos */
+      puntos?: string[];
+    };
     /** TestIn */
     TestIn: {
       /**
@@ -745,6 +926,17 @@ export interface components {
       labels: string[];
       /** Updated */
       updated: string | null;
+    };
+    /** TrendPoint */
+    TrendPoint: {
+      /** Name */
+      name: string;
+      /** Planned */
+      planned: number;
+      /** Burned */
+      burned: number;
+      /** Pct */
+      pct: number | null;
     };
     /** ValidationError */
     ValidationError: {
@@ -1404,6 +1596,123 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["SprintBoardOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  preview_api_informes_preview_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ReportIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PreviewOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_all_api_informes_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ReportRow"][];
+        };
+      };
+    };
+  };
+  save_api_informes_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SaveIn"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ReportOut"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_api_informes__rid__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        rid: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ReportOut"];
         };
       };
       /** @description Validation Error */

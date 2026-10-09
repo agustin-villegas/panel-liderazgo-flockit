@@ -73,7 +73,9 @@ export default function PortfolioPage() {
                 : "Pedile a un admin que te asigne proyectos."}
             </p>
             {me?.role === "admin" && (
-              <Button render={<Link href="/configuracion/proyectos" />}>Crear proyecto</Button>
+              <Button nativeButton={false} render={<Link href="/configuracion/proyectos" />}>
+                Crear proyecto
+              </Button>
             )}
           </CardContent>
         </Card>

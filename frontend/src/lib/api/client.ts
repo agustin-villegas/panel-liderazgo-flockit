@@ -17,6 +17,12 @@ export type Project = S["ProjectOut"];
 export type ProjectIn = S["ProjectIn"];
 export type SprintBoard = S["SprintBoardOut"];
 export type Ticket = S["TicketOut"];
+export type Preview = S["PreviewOut"];
+export type Report = S["ReportOut"];
+export type ReportRow = S["ReportRow"];
+export type ReportData = S["ReportData"];
+export type Story = S["StoryIn"];
+export type Audience = S["ReportIn"]["audience"];
 
 export class ApiError extends Error {
   constructor(
