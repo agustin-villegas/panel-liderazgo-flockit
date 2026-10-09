@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BookOpen,
   FileBarChart,
   FolderKanban,
   KanbanSquare,
@@ -33,6 +34,7 @@ const CONFIG = [
   { href: "/configuracion/conexiones", label: "Conexiones", icon: PlugZap },
   { href: "/configuracion/proyectos", label: "Proyectos", icon: FolderKanban },
   { href: "/configuracion/usuarios", label: "Usuarios", icon: Users },
+  { href: "/configuracion/documentacion", label: "Documentación", icon: BookOpen },
 ];
 
 export function AppSidebar() {

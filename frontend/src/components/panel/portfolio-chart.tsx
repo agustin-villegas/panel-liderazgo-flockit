@@ -18,7 +18,13 @@ const DASH = [undefined, "6 3", "2 3"];
 const lbl = (i: number) => (i === N - 1 ? "Último" : `−${N - 1 - i}`);
 
 /** Cumplimiento de los últimos 6 sprints cerrados, una línea por proyecto. */
-export function PortfolioChart({ cards }: { cards: CardData[] }) {
+export function PortfolioChart({
+  cards,
+  className = "h-64",
+}: {
+  cards: CardData[];
+  className?: string;
+}) {
   const list = cards.filter((c) => !c.error && c.trend.length > 0);
   const config: ChartConfig = {};
   list.forEach((c, i) => {
@@ -38,7 +44,7 @@ export function PortfolioChart({ cards }: { cards: CardData[] }) {
   return (
     <ChartContainer
       config={config}
-      className="aspect-auto h-64 w-full"
+      className={`aspect-auto w-full ${className}`}
       role="img"
       aria-label="Cumplimiento de los últimos sprints por proyecto"
     >

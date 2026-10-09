@@ -1,0 +1,3294 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Panel de liderazgo",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": ["health"],
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Login",
+        "operationId": "login_api_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Me"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Logout",
+        "operationId": "logout_api_auth_logout_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Me",
+        "operationId": "me_api_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Me"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/password": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Change Password",
+        "description": "Cambia la contraseña del usuario logueado.",
+        "operationId": "change_password_api_auth_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/conexiones": {
+      "get": {
+        "tags": ["conexiones"],
+        "summary": "List All",
+        "operationId": "list_all_api_conexiones_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConnOut"
+                  },
+                  "type": "array",
+                  "title": "Response List All Api Conexiones Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["conexiones"],
+        "summary": "Create",
+        "operationId": "create_api_conexiones_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/conexiones/probar": {
+      "post": {
+        "tags": ["conexiones"],
+        "summary": "Test",
+        "operationId": "test_api_conexiones_probar_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/conexiones/{cid}": {
+      "patch": {
+        "tags": ["conexiones"],
+        "summary": "Edit",
+        "operationId": "edit_api_conexiones__cid__patch",
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Cid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["conexiones"],
+        "summary": "Remove",
+        "operationId": "remove_api_conexiones__cid__delete",
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Cid"
+            }
+          },
+          {
+            "name": "confirm",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Confirm"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/conexiones/{cid}/boards": {
+      "get": {
+        "tags": ["conexiones"],
+        "summary": "Boards",
+        "operationId": "boards_api_conexiones__cid__boards_get",
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Cid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BoardOut"
+                  },
+                  "title": "Response Boards Api Conexiones  Cid  Boards Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/conexiones/{cid}/campos": {
+      "get": {
+        "tags": ["conexiones"],
+        "summary": "Fields",
+        "operationId": "fields_api_conexiones__cid__campos_get",
+        "parameters": [
+          {
+            "name": "cid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Cid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FieldOut"
+                  },
+                  "title": "Response Fields Api Conexiones  Cid  Campos Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cuentas": {
+      "get": {
+        "tags": ["proyectos"],
+        "summary": "Accounts",
+        "operationId": "accounts_api_cuentas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AccountOut"
+                  },
+                  "type": "array",
+                  "title": "Response Accounts Api Cuentas Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["proyectos"],
+        "summary": "Add Account",
+        "operationId": "add_account_api_cuentas_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/proyectos": {
+      "get": {
+        "tags": ["proyectos"],
+        "summary": "Projects",
+        "operationId": "projects_api_proyectos_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectOut"
+                  },
+                  "type": "array",
+                  "title": "Response Projects Api Proyectos Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["proyectos"],
+        "summary": "Create",
+        "operationId": "create_api_proyectos_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/proyectos/{pid}": {
+      "patch": {
+        "tags": ["proyectos"],
+        "summary": "Edit",
+        "operationId": "edit_api_proyectos__pid__patch",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Pid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["proyectos"],
+        "summary": "Archive",
+        "operationId": "archive_api_proyectos__pid__delete",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Pid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/cartera": {
+      "get": {
+        "tags": ["proyectos"],
+        "summary": "Portfolio",
+        "description": "Una card por proyecto visible, ordenadas por riesgo.",
+        "operationId": "portfolio_api_cartera_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CardOut"
+                  },
+                  "type": "array",
+                  "title": "Response Portfolio Api Cartera Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/proyectos/{pid}/cumplimiento": {
+      "get": {
+        "tags": ["proyectos"],
+        "summary": "Compliance",
+        "operationId": "compliance_api_proyectos__pid__cumplimiento_get",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Pid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComplianceOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/proyectos/{pid}/sprints/{sid}": {
+      "get": {
+        "tags": ["proyectos"],
+        "summary": "Sprint Detail",
+        "operationId": "sprint_detail_api_proyectos__pid__sprints__sid__get",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Pid"
+            }
+          },
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetailOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/proyectos/{pid}/recalcular": {
+      "post": {
+        "tags": ["proyectos"],
+        "summary": "Refresh",
+        "operationId": "refresh_api_proyectos__pid__recalcular_post",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Pid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/proyectos/{pid}/tablero": {
+      "get": {
+        "tags": ["proyectos"],
+        "summary": "Board",
+        "description": "Tablero de Jira del sprint activo (solo lectura).",
+        "operationId": "board_api_proyectos__pid__tablero_get",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Pid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SprintBoardOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/informes/preview": {
+      "post": {
+        "tags": ["informes"],
+        "summary": "Preview",
+        "operationId": "preview_api_informes_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/informes": {
+      "get": {
+        "tags": ["informes"],
+        "summary": "List All",
+        "operationId": "list_all_api_informes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ReportRow"
+                  },
+                  "type": "array",
+                  "title": "Response List All Api Informes Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["informes"],
+        "summary": "Save",
+        "operationId": "save_api_informes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/informes/{rid}": {
+      "get": {
+        "tags": ["informes"],
+        "summary": "Get",
+        "operationId": "get_api_informes__rid__get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notificaciones": {
+      "get": {
+        "tags": ["notificaciones"],
+        "summary": "Mine",
+        "description": "Avisos del usuario; antes revisa sus proyectos si la última corrida fue hace >15 min.",
+        "operationId": "mine_api_notificaciones_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationsOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notificaciones/leer-todas": {
+      "post": {
+        "tags": ["notificaciones"],
+        "summary": "Read All",
+        "operationId": "read_all_api_notificaciones_leer_todas_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/api/notificaciones/{nid}/leida": {
+      "post": {
+        "tags": ["notificaciones"],
+        "summary": "Read One",
+        "operationId": "read_one_api_notificaciones__nid__leida_post",
+        "parameters": [
+          {
+            "name": "nid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Nid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/asistente/mensaje": {
+      "post": {
+        "tags": ["asistente"],
+        "summary": "Message",
+        "description": "Un turno del chat: el modelo llama tools de solo lectura con tus permisos.",
+        "operationId": "message_api_asistente_mensaje_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/perfil/tokens-mcp": {
+      "get": {
+        "tags": ["asistente"],
+        "summary": "List Tokens",
+        "operationId": "list_tokens_api_perfil_tokens_mcp_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/TokenOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Tokens Api Perfil Tokens Mcp Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["asistente"],
+        "summary": "Create Token",
+        "description": "Crea un token. El valor crudo se devuelve una sola vez.",
+        "operationId": "create_token_api_perfil_tokens_mcp_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenNew"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/perfil/tokens-mcp/{tid}": {
+      "delete": {
+        "tags": ["asistente"],
+        "summary": "Revoke Token",
+        "operationId": "revoke_token_api_perfil_tokens_mcp__tid__delete",
+        "parameters": [
+          {
+            "name": "tid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": ["name"],
+        "title": "AccountIn"
+      },
+      "AccountOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name"],
+        "title": "AccountOut"
+      },
+      "ActiveOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "day": {
+            "type": "integer",
+            "title": "Day"
+          },
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "planned": {
+            "type": "number",
+            "title": "Planned"
+          },
+          "burned": {
+            "type": "number",
+            "title": "Burned"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          }
+        },
+        "type": "object",
+        "required": ["name", "day", "days", "planned", "burned", "pct"],
+        "title": "ActiveOut"
+      },
+      "BoardCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "tablero",
+            "title": "Kind",
+            "default": "tablero"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sprint"
+          },
+          "todo": {
+            "type": "integer",
+            "title": "Todo"
+          },
+          "doing": {
+            "type": "integer",
+            "title": "Doing"
+          },
+          "blocked": {
+            "type": "integer",
+            "title": "Blocked"
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          },
+          "done_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done Pct"
+          },
+          "time_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Pct"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project",
+          "sprint",
+          "todo",
+          "doing",
+          "blocked",
+          "done",
+          "done_pct",
+          "time_pct"
+        ],
+        "title": "BoardCard"
+      },
+      "BoardOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "key"],
+        "title": "BoardOut"
+      },
+      "CardOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "account": {
+            "type": "string",
+            "title": "Account"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          },
+          "last": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SprintOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "active": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActiveOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trend": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Trend"
+          },
+          "month": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MonthOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "account", "light", "last", "active", "trend", "month"],
+        "title": "CardOut",
+        "description": "Una card del panel de cartera."
+      },
+      "ChatIn": {
+        "properties": {
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/MsgIn"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Messages"
+          }
+        },
+        "type": "object",
+        "required": ["messages"],
+        "title": "ChatIn"
+      },
+      "ChatOut": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "title": "Answer"
+          },
+          "tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tools"
+          },
+          "cards": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SprintCard"
+                },
+                {
+                  "$ref": "#/components/schemas/RiskCard"
+                },
+                {
+                  "$ref": "#/components/schemas/TrendCard"
+                },
+                {
+                  "$ref": "#/components/schemas/BoardCard"
+                },
+                {
+                  "$ref": "#/components/schemas/IssuesCard"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "kind",
+                "mapping": {
+                  "issues": "#/components/schemas/IssuesCard",
+                  "riesgo": "#/components/schemas/RiskCard",
+                  "sprint": "#/components/schemas/SprintCard",
+                  "tablero": "#/components/schemas/BoardCard",
+                  "tendencia": "#/components/schemas/TrendCard"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Cards"
+          },
+          "trace_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Trace Id"
+          }
+        },
+        "type": "object",
+        "required": ["answer", "tools", "trace_id"],
+        "title": "ChatOut"
+      },
+      "ComplianceOut": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Id"
+          },
+          "sprints": {
+            "items": {
+              "$ref": "#/components/schemas/SprintOut"
+            },
+            "type": "array",
+            "title": "Sprints"
+          },
+          "months": {
+            "items": {
+              "$ref": "#/components/schemas/MonthOut"
+            },
+            "type": "array",
+            "title": "Months"
+          }
+        },
+        "type": "object",
+        "required": ["project_id", "sprints", "months"],
+        "title": "ComplianceOut"
+      },
+      "ConnIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "site": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Site"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 3,
+            "title": "Email"
+          },
+          "token": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token"
+          },
+          "sp_field": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp Field"
+          },
+          "skip_subtasks": {
+            "type": "boolean",
+            "title": "Skip Subtasks",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": ["name", "site", "email"],
+        "title": "ConnIn"
+      },
+      "ConnOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "site": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "token_last4": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Last4"
+          },
+          "sp_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp Field"
+          },
+          "skip_subtasks": {
+            "type": "boolean",
+            "title": "Skip Subtasks"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "checked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked At"
+          },
+          "projects": {
+            "type": "integer",
+            "title": "Projects",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "site",
+          "email",
+          "token_last4",
+          "sp_field",
+          "skip_subtasks",
+          "status",
+          "last_error",
+          "checked_at"
+        ],
+        "title": "ConnOut",
+        "description": "Nunca incluye el token: solo sus últimos 4 caracteres."
+      },
+      "Counts": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "todo": {
+            "type": "integer",
+            "title": "Todo"
+          },
+          "doing": {
+            "type": "integer",
+            "title": "Doing"
+          },
+          "blocked": {
+            "type": "integer",
+            "title": "Blocked"
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          }
+        },
+        "type": "object",
+        "required": ["total", "todo", "doing", "blocked", "done"],
+        "title": "Counts"
+      },
+      "DetailOut": {
+        "properties": {
+          "sprint": {
+            "$ref": "#/components/schemas/SprintOut"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/LineOut"
+            },
+            "type": "array",
+            "title": "Lines"
+          },
+          "site": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site"
+          }
+        },
+        "type": "object",
+        "required": ["sprint", "lines"],
+        "title": "DetailOut"
+      },
+      "FieldOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name"],
+        "title": "FieldOut"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "Health": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": ["status", "version"],
+        "title": "Health"
+      },
+      "IssueItem": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "assignee": {
+            "type": "string",
+            "title": "Assignee"
+          },
+          "sp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp"
+          }
+        },
+        "type": "object",
+        "required": ["key", "title", "status", "assignee", "sp"],
+        "title": "IssueItem"
+      },
+      "IssuesCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "issues",
+            "title": "Kind",
+            "default": "issues"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "type": "string",
+            "title": "Sprint"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IssueItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": ["project", "sprint", "total", "items"],
+        "title": "IssuesCard"
+      },
+      "LineOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee"
+          },
+          "sp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp"
+          },
+          "done": {
+            "type": "boolean",
+            "title": "Done"
+          },
+          "done_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done At"
+          },
+          "sprints": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sprints"
+          },
+          "burned": {
+            "type": "boolean",
+            "title": "Burned"
+          },
+          "burn_sprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Burn Sprint"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "title",
+          "status",
+          "assignee",
+          "sp",
+          "done",
+          "done_at",
+          "sprints",
+          "burned",
+          "burn_sprint",
+          "reason"
+        ],
+        "title": "LineOut"
+      },
+      "LoginIn": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 3,
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": ["email", "password"],
+        "title": "LoginIn"
+      },
+      "Me": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "must_change_pwd": {
+            "type": "boolean",
+            "title": "Must Change Pwd"
+          }
+        },
+        "type": "object",
+        "required": ["id", "email", "name", "role", "must_change_pwd"],
+        "title": "Me"
+      },
+      "MonthOut": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "title": "Month"
+          },
+          "planned": {
+            "type": "number",
+            "title": "Planned"
+          },
+          "burned": {
+            "type": "number",
+            "title": "Burned"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          },
+          "sprints": {
+            "type": "integer",
+            "title": "Sprints"
+          }
+        },
+        "type": "object",
+        "required": ["month", "planned", "burned", "pct", "light", "sprints"],
+        "title": "MonthOut"
+      },
+      "MsgIn": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": ["user", "assistant"],
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": ["role", "content"],
+        "title": "MsgIn"
+      },
+      "NotificationOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "link": {
+            "type": "string",
+            "title": "Link"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          }
+        },
+        "type": "object",
+        "required": ["id", "project_id", "kind", "title", "body", "link", "created_at", "read_at"],
+        "title": "NotificationOut"
+      },
+      "NotificationsOut": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/NotificationOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "unread": {
+            "type": "integer",
+            "title": "Unread"
+          }
+        },
+        "type": "object",
+        "required": ["items", "unread"],
+        "title": "NotificationsOut"
+      },
+      "PasswordIn": {
+        "properties": {
+          "current": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Current"
+          },
+          "new": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 12,
+            "title": "New"
+          }
+        },
+        "type": "object",
+        "required": ["current", "new"],
+        "title": "PasswordIn"
+      },
+      "Pending": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee"
+          },
+          "sp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp"
+          }
+        },
+        "type": "object",
+        "required": ["key", "title", "status", "assignee", "sp"],
+        "title": "Pending"
+      },
+      "PersonOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "planned": {
+            "type": "number",
+            "title": "Planned"
+          },
+          "burned": {
+            "type": "number",
+            "title": "Burned"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          }
+        },
+        "type": "object",
+        "required": ["name", "planned", "burned", "pct"],
+        "title": "PersonOut"
+      },
+      "Point": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          },
+          "planned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned"
+          },
+          "burned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Burned"
+          }
+        },
+        "type": "object",
+        "required": ["label", "pct", "light"],
+        "title": "Point"
+      },
+      "PreviewOut": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReportData"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "ai_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Error"
+          }
+        },
+        "type": "object",
+        "required": ["data", "story", "model"],
+        "title": "PreviewOut"
+      },
+      "ProjectIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "account_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Account Id"
+          },
+          "conn_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Conn Id"
+          },
+          "board_id": {
+            "type": "integer",
+            "title": "Board Id"
+          },
+          "board_name": {
+            "type": "string",
+            "maxLength": 160,
+            "title": "Board Name"
+          },
+          "from_sprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Sprint"
+          },
+          "managers": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Managers"
+          }
+        },
+        "type": "object",
+        "required": ["name", "account_id", "conn_id", "board_id", "board_name"],
+        "title": "ProjectIn"
+      },
+      "ProjectOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "account_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Account Id"
+          },
+          "account": {
+            "type": "string",
+            "title": "Account"
+          },
+          "conn_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conn Id"
+          },
+          "board_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Board Id"
+          },
+          "board_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Board Name"
+          },
+          "from_sprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Sprint"
+          },
+          "managers": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Managers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "account_id",
+          "account",
+          "conn_id",
+          "board_id",
+          "board_name",
+          "from_sprint",
+          "managers"
+        ],
+        "title": "ProjectOut"
+      },
+      "ReportData": {
+        "properties": {
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "account": {
+            "type": "string",
+            "title": "Account"
+          },
+          "sprint": {
+            "$ref": "#/components/schemas/SprintOut"
+          },
+          "trend": {
+            "items": {
+              "$ref": "#/components/schemas/TrendPoint"
+            },
+            "type": "array",
+            "title": "Trend"
+          },
+          "pending": {
+            "items": {
+              "$ref": "#/components/schemas/Pending"
+            },
+            "type": "array",
+            "title": "Pending"
+          },
+          "month": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MonthOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": ["project", "account", "sprint", "trend", "pending", "month"],
+        "title": "ReportData",
+        "description": "Los números del informe: salen del motor, no de la IA."
+      },
+      "ReportIn": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Id"
+          },
+          "sprint_id": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Sprint Id"
+          },
+          "audience": {
+            "type": "string",
+            "enum": ["equipo", "cliente", "gerencia"],
+            "title": "Audience",
+            "default": "equipo"
+          }
+        },
+        "type": "object",
+        "required": ["project_id", "sprint_id"],
+        "title": "ReportIn"
+      },
+      "ReportOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "audience": {
+            "type": "string",
+            "title": "Audience"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "author": {
+            "type": "string",
+            "title": "Author"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportData"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "audience",
+          "project_id",
+          "created_at",
+          "author",
+          "data",
+          "story",
+          "model"
+        ],
+        "title": "ReportOut"
+      },
+      "ReportRow": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "audience": {
+            "type": "string",
+            "title": "Audience"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "author": {
+            "type": "string",
+            "title": "Author"
+          }
+        },
+        "type": "object",
+        "required": ["id", "title", "audience", "project", "pct", "created_at", "author"],
+        "title": "ReportRow"
+      },
+      "RiskCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "riesgo",
+            "title": "Kind",
+            "default": "riesgo"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RiskItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "no_data": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "No Data"
+          }
+        },
+        "type": "object",
+        "required": ["items", "no_data"],
+        "title": "RiskCard"
+      },
+      "RiskItem": {
+        "properties": {
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "type": "string",
+            "title": "Sprint"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          }
+        },
+        "type": "object",
+        "required": ["project", "sprint", "pct", "light"],
+        "title": "RiskItem"
+      },
+      "SaveIn": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Id"
+          },
+          "sprint_id": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Sprint Id"
+          },
+          "audience": {
+            "type": "string",
+            "enum": ["equipo", "cliente", "gerencia"],
+            "title": "Audience",
+            "default": "equipo"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": ["project_id", "sprint_id"],
+        "title": "SaveIn"
+      },
+      "SprintBoardOut": {
+        "properties": {
+          "sprint": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SprintInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "counts": {
+            "$ref": "#/components/schemas/Counts"
+          },
+          "done_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done Pct"
+          },
+          "cards": {
+            "items": {
+              "$ref": "#/components/schemas/TicketOut"
+            },
+            "type": "array",
+            "title": "Cards"
+          },
+          "notice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notice"
+          }
+        },
+        "type": "object",
+        "required": ["sprint", "counts", "done_pct", "cards"],
+        "title": "SprintBoardOut"
+      },
+      "SprintCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "sprint",
+            "title": "Kind",
+            "default": "sprint"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "type": "string",
+            "title": "Sprint"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          },
+          "planned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned"
+          },
+          "burned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Burned"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            },
+            "type": "array",
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": ["project", "sprint", "state", "pct", "light", "planned", "burned", "people"],
+        "title": "SprintCard"
+      },
+      "SprintInfo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End"
+          },
+          "day": {
+            "type": "integer",
+            "title": "Day"
+          },
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "time_pct": {
+            "type": "number",
+            "title": "Time Pct"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "state", "start", "end", "day", "days", "time_pct"],
+        "title": "SprintInfo"
+      },
+      "SprintOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "planned": {
+            "type": "number",
+            "title": "Planned"
+          },
+          "burned": {
+            "type": "number",
+            "title": "Burned"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          },
+          "unestimated": {
+            "type": "integer",
+            "title": "Unestimated"
+          },
+          "provisional": {
+            "type": "boolean",
+            "title": "Provisional"
+          },
+          "goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/PersonOut"
+            },
+            "type": "array",
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "start",
+          "end",
+          "state",
+          "planned",
+          "burned",
+          "pct",
+          "light",
+          "unestimated",
+          "provisional",
+          "people"
+        ],
+        "title": "SprintOut"
+      },
+      "StoryIn": {
+        "properties": {
+          "resumen": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "Resumen"
+          },
+          "puntos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 6,
+            "title": "Puntos"
+          }
+        },
+        "type": "object",
+        "required": ["resumen"],
+        "title": "StoryIn"
+      },
+      "TestIn": {
+        "properties": {
+          "site": {
+            "type": "string",
+            "maxLength": 2083,
+            "minLength": 1,
+            "format": "uri",
+            "title": "Site"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token"
+          },
+          "conn_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conn Id"
+          }
+        },
+        "type": "object",
+        "required": ["site", "email"],
+        "title": "TestIn"
+      },
+      "TestOut": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "user": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User"
+          },
+          "sp_field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp Field"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": ["ok"],
+        "title": "TestOut"
+      },
+      "TicketOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "lane": {
+            "type": "string",
+            "title": "Lane"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "priority": {
+            "type": "string",
+            "title": "Priority"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee"
+          },
+          "sp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Labels"
+          },
+          "updated": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "title",
+          "status",
+          "lane",
+          "type",
+          "priority",
+          "assignee",
+          "sp",
+          "labels",
+          "updated"
+        ],
+        "title": "TicketOut"
+      },
+      "TokenIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": ["name"],
+        "title": "TokenIn"
+      },
+      "TokenNew": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "last4": {
+            "type": "string",
+            "title": "Last4"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "last4", "created_at", "last_used_at", "token"],
+        "title": "TokenNew"
+      },
+      "TokenOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "last4": {
+            "type": "string",
+            "title": "Last4"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_used_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Used At"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "last4", "created_at", "last_used_at"],
+        "title": "TokenOut"
+      },
+      "TrendCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "tendencia",
+            "title": "Kind",
+            "default": "tendencia"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": ["project", "title", "points"],
+        "title": "TrendCard"
+      },
+      "TrendPoint": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "planned": {
+            "type": "number",
+            "title": "Planned"
+          },
+          "burned": {
+            "type": "number",
+            "title": "Burned"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          }
+        },
+        "type": "object",
+        "required": ["name", "planned", "burned", "pct"],
+        "title": "TrendPoint"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

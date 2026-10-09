@@ -1,0 +1,353 @@
+/* Marca Flock — tokens únicos de la app.
+   Fuente: Configuración → Marca de Flock Platform (leído 2026-10-09):
+   tema classic · header banner · sidebar light · charts/modal/toast flock · login flock_modern.
+   Los componentes shadcn leen estas variables. No hardcodear colores. */
+
+/* ─── Claro ─── */
+:root {
+  /* Marca */
+  --primary: oklch(0.491 0.274 293.3); /* #7c3aed */
+  --primary-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.705 0.191 38.2); /* #f97316 */
+  --accent-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.491 0.274 293.3);
+  --secondary: oklch(0.96 0.005 293);
+  --secondary-foreground: oklch(0.491 0.274 293.3);
+
+  /* Gradiente */
+  --brand-from: #7c3aed;
+  --brand-to: #f97316;
+  --brand-angle: 135deg;
+  --brand-gradient: linear-gradient(var(--brand-angle), var(--brand-from), var(--brand-to));
+  --home-gradient: linear-gradient(
+    135deg,
+    oklch(0.98 0.01 293) 0%,
+    oklch(0.97 0.02 38) 50%,
+    oklch(0.96 0.02 293) 100%
+  );
+
+  /* Neutrales */
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.15 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --radius: 0.625rem;
+
+  /* Sidebar "light" */
+  --sidebar: oklch(0.995 0 0);
+  --sidebar-foreground: oklch(0.28 0.02 293);
+  --sidebar-primary: oklch(0.491 0.274 293.3);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.96 0.005 293);
+  --sidebar-accent-foreground: oklch(0.491 0.274 293.3);
+  --sidebar-border: oklch(0.92 0 0);
+  --sidebar-ring: oklch(0.491 0.274 293.3);
+
+  /* Gráficos "flock" */
+  --chart-1: #7c3aed;
+  --chart-2: #f97316;
+  --chart-3: #9333ea;
+  --chart-4: #fb923c;
+  --chart-5: #a78bfa;
+  --chart-6: #fdba74;
+
+  /* Semáforo: siempre color + texto + número */
+  --ok: #7c3aed;
+  --ok-bg: #ede9fe;
+  --ok-fg: #6d28d9;
+  --warn: #f97316;
+  --warn-bg: #ffedd5;
+  --warn-fg: #c2410c;
+  --crit: #dc2626;
+  --crit-bg: #fef2f2;
+  --crit-fg: #b91c1c;
+  --idle: #94a3b8;
+  --idle-bg: #f1f5f9;
+  --idle-fg: #64748b;
+
+  /* Estado de issue (apto daltonismo) */
+  --todo: #94a3b8;
+  --doing: #2563eb;
+  --blocked: #dc2626;
+  --done: #0d9488;
+  --doing-bg: #dbeafe;
+  --doing-fg: #1d4ed8;
+  --ink: #1c1033; /* texto sobre colores claros de la paleta */
+}
+
+/* ─── Oscuro ─── */
+.dark {
+  --primary: oklch(0.627 0.265 293.3);
+  --accent: oklch(0.757 0.163 38.2);
+  --accent-foreground: oklch(0.145 0 0);
+  --ring: oklch(0.627 0.265 293.3);
+  --secondary: oklch(0.269 0.02 293);
+  --secondary-foreground: oklch(0.985 0 0);
+
+  --home-gradient: linear-gradient(
+    135deg,
+    oklch(0.18 0.03 293) 0%,
+    oklch(0.16 0.02 38) 50%,
+    oklch(0.15 0.02 293) 100%
+  );
+
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --destructive: oklch(0.704 0.191 22.216);
+
+  /* Sidebar púrpura oscuro (el claro encandila en dark) */
+  --sidebar: oklch(0.17 0.04 293.3);
+  --sidebar-foreground: oklch(0.92 0.01 293);
+  --sidebar-primary: oklch(0.627 0.265 293.3);
+  --sidebar-accent: oklch(0.28 0.06 293.3);
+  --sidebar-accent-foreground: oklch(0.92 0.01 293);
+  --sidebar-border: oklch(0.28 0.06 293.3);
+  --sidebar-ring: oklch(0.627 0.265 293.3);
+
+  --ok-bg: color-mix(in srgb, #7c3aed 22%, black);
+  --ok-fg: #c4b5fd;
+  --warn-bg: color-mix(in srgb, #f97316 22%, black);
+  --warn-fg: #fdba74;
+  --crit-bg: color-mix(in srgb, #dc2626 22%, black);
+  --crit-fg: #fca5a5;
+  --idle-bg: color-mix(in srgb, #94a3b8 18%, black);
+  --idle-fg: #cbd5e1;
+  --doing-bg: color-mix(in srgb, #2563eb 24%, black);
+  --doing-fg: #93c5fd;
+}
+
+/* ─── Utilidades de marca ─── */
+.bg-brand {
+  background: var(--brand-gradient);
+}
+
+.text-brand {
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-home {
+  background: var(--home-gradient);
+}
+
+/* Header de módulo estilo "banner" */
+.banner {
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem 1.75rem;
+  border-radius: calc(var(--radius) * 1.8);
+  background: var(--brand-gradient);
+  color: #fff;
+}
+
+.banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(120% 140% at 100% 0%, rgb(255 255 255 / 0.18), transparent 55%);
+}
+
+/* Login "flock_modern": panel de marca + formulario en sheet curvo */
+.login-shell {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  min-height: 100svh;
+  background: var(--brand-gradient);
+}
+
+.login-brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: max(1.5rem, env(safe-area-inset-top, 0px)) 3rem;
+  color: #fff;
+  overflow: hidden;
+}
+
+.login-ghost {
+  margin: 0;
+  font-size: clamp(2.25rem, 8vw, 5.5rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.22);
+  user-select: none;
+}
+
+.login-sheet {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 3rem clamp(1.5rem, 5vw, 4.5rem);
+  background: var(--card);
+  color: var(--card-foreground);
+  border-radius: 2.5rem 0 0 2.5rem;
+  box-shadow: -24px 0 60px -24px rgb(15 23 42 / 0.35);
+}
+
+@media (max-width: 767px) {
+  .login-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(9rem, 30vh) 1fr;
+  }
+
+  .login-brand {
+    padding-inline: 1.5rem;
+  }
+
+  .login-sheet {
+    border-radius: 2rem 2rem 0 0;
+    padding-top: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* PDF por sección: la hoja es el documento, sin el shell de la app. */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  body[data-print] {
+    background: #fff !important;
+    color: #171717 !important;
+    color-scheme: light;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  body[data-print] [data-slot="sidebar"],
+  body[data-print] [data-slot="sidebar-gap"],
+  body[data-print] [data-slot="sidebar-container"],
+  body[data-print] [data-slot="sidebar-inset"] > header,
+  body[data-print] [data-section]:not([data-printing]) {
+    display: none !important;
+  }
+
+  body[data-print] [data-slot="sidebar-wrapper"],
+  body[data-print] [data-slot="sidebar-inset"],
+  body[data-print] [data-slot="sidebar-inset"] > div {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  body[data-print] [data-printing] {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #171717 !important;
+    box-shadow: none !important;
+  }
+
+  body[data-print] [data-printing] header {
+    display: flex !important;
+    color: #fff !important;
+    background: var(--brand-gradient) !important;
+  }
+
+  body[data-print] [data-printing] .report-story {
+    background: #f5f3ff !important;
+    color: #171717 !important;
+  }
+
+  body[data-print] [data-printing] [data-slot="table-container"] {
+    overflow: visible !important;
+  }
+
+  body[data-print] [data-printing] table {
+    width: 100% !important;
+  }
+
+  body[data-print] [data-printing] .recharts-cartesian-axis-tick text {
+    fill: #404040 !important;
+  }
+}
+
+/* Barra de marca: brillo que recorre la barra */
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+.bar-shine {
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.45), transparent);
+  animation: shimmer 2.4s ease-in-out infinite;
+}
+
+/* Card interactiva: sube un poco al pasar el mouse o enfocar */
+.lift {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.lift:hover,
+.lift:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px rgb(124 58 237 / 0.35);
+}
+
+/* Tabla larga: encabezado fijo + cebra suave */
+.table-zebra thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--card);
+}
+
+.table-zebra tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
+}

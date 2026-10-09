@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangle,
   Bell,
@@ -17,7 +17,8 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { api, post, type Notif, type Notifs } from "@/lib/api/client";
+import { NOTIFS_KEY, useNotifs } from "@/hooks/use-notifs";
+import { post, type Notif } from "@/lib/api/client";
 import { ago } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -29,18 +30,12 @@ const ICONS: Record<string, LucideIcon> = {
   sinmov: Timer,
 };
 
-const KEY = ["notificaciones"];
-
 export function NotificationBell() {
   const router = useRouter();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const { data, isError } = useQuery({
-    queryKey: KEY,
-    queryFn: () => api<Notifs>("/notificaciones"),
-    refetchInterval: 60_000,
-  });
-  const refresh = () => qc.invalidateQueries({ queryKey: KEY });
+  const { data, isError } = useNotifs();
+  const refresh = () => qc.invalidateQueries({ queryKey: NOTIFS_KEY });
   const readOne = useMutation({
     mutationFn: (id: string) => post(`/notificaciones/${id}/leida`),
     onSuccess: refresh,

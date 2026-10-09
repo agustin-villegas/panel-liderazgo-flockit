@@ -8,17 +8,23 @@ description: La pantalla de inicio, con todos tus proyectos ordenados por riesgo
 
 ## Para qué sirve
 
-Detectar de un vistazo qué proyectos vienen mal. Muestra el cumplimiento del **último sprint
-cerrado** de cada proyecto, calculado desde Jira.
+Ver qué sprints están en curso y cómo vienen, y detectar qué proyectos van mal. El cumplimiento se
+calcula sobre el **último sprint cerrado** de cada proyecto, desde Jira.
 
 ## Qué muestra
 
-- **Indicadores**: cantidad de proyectos y cuántos están **En riesgo**, en **Atención** y **En
-  margen**.
-- **Gráfico de cartera**: cumplimiento de los últimos 6 sprints cerrados de cada proyecto.
-- **Una card por proyecto**, ordenadas de más a menos riesgoso: cuenta, nombre, semáforo, medidor
-  de cumplimiento del último sprint, puntos quemados y planificados, tendencia, avance del sprint
-  activo (si hay) y cumplimiento del mes.
+- **Encabezado**: saludo y, si no sos Cliente, el botón **Nuevo informe**.
+- **Indicadores**: **Sprints activos**, proyectos **En riesgo**, en **Atención** y **Avisos sin
+  leer**.
+- **Sprints en curso**: una card compacta por proyecto con sprint activo. Trae el nombre, la
+  cuenta, el semáforo, "sprint · día X/Y" con el ritmo (en línea, adelantado o atrasado), las barras
+  de **Avance** y **Tiempo** y un mini tablero (Por hacer, En curso, Bloqueadas si hay, Hechas).
+  Tocar la card abre el tablero; el link **Ver cumplimiento** abre el detalle del proyecto. Si no
+  hay ninguno: "No hay sprints en curso".
+- **Sin sprint en curso**: solo aparece si hay proyectos sin sprint activo (o con error). Los lista
+  por cuenta con el último cumplimiento y el semáforo.
+- **Cumplimiento histórico**: con un solo proyecto, barras de sus últimos sprints cerrados con la
+  meta del 85 %; con dos o más, un gráfico de líneas con todos.
 
 El semáforo sale de umbrales fijos: **85 % o más** En margen, **70 % a 84 %** Atención, **menos de
 70 %** En riesgo, y "Sin datos" si no hay sprint cerrado.
@@ -28,25 +34,27 @@ El semáforo sale de umbrales fijos: **85 % o más** En margen, **70 % a 84 %** 
 <Steps>
 <Step>
 
-Mirá los indicadores y el gráfico para ubicar los proyectos en riesgo.
+Mirá los indicadores y los sprints en curso para ubicar los proyectos en riesgo.
 
 </Step>
 <Step>
 
-Tocá una card para abrir el [detalle del proyecto](/docs/guia/proyecto).
+Tocá una card de sprint para abrir su tablero, o una fila de "Sin sprint en curso" para abrir el
+[detalle del proyecto](/docs/guia/proyecto).
 
 </Step>
 </Steps>
 
 ## Estados
 
-| Situación                       | Qué ves                                                                     |
-| ------------------------------- | --------------------------------------------------------------------------- |
-| Cargando                        | Placeholders grises.                                                        |
-| Sin proyectos (admin)           | "Todavía no hay proyectos" con botón **Crear proyecto**.                    |
-| Sin proyectos (otros roles)     | "Todavía no hay proyectos" y el pedido de que un admin te asigne proyectos. |
-| Error general                   | Mensaje con botón **Reintentar**.                                           |
-| Error de un proyecto (ej. Jira) | La card muestra el error en rojo; el resto de la cartera sigue andando.     |
+| Situación                       | Qué ves                                                                        |
+| ------------------------------- | ------------------------------------------------------------------------------ |
+| Cargando                        | Placeholders grises.                                                           |
+| Tablero no disponible           | La card del sprint sigue y avisa "No se pudo leer el tablero".                 |
+| Sin proyectos (admin)           | "Todavía no hay proyectos" con botón **Crear proyecto**.                       |
+| Sin proyectos (otros roles)     | "Todavía no hay proyectos" y el pedido de que un admin te asigne proyectos.    |
+| Error general                   | Mensaje con botón **Reintentar**.                                              |
+| Error de un proyecto (ej. Jira) | La fila aparece en "Sin sprint en curso" con el error; el resto sigue andando. |
 
 ## Exportar
 
