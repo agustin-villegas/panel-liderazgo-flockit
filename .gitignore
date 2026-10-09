@@ -19,3 +19,6 @@ dist/
 logs/
 *.db
 coverage/
+
+# worktrees locales de Claude Code
+.claude/worktrees/
