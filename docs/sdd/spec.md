@@ -253,6 +253,32 @@ Para cada sprint **S** de un proyecto:
 - Todo vive en **un único CSS**: `frontend/src/styles/flock-brand.css`. Incluye tokens de modo claro y oscuro, menú lateral claro, banner con gradiente, botones de marca, semáforo, estados de issue, modal Flock Card, toasts, notificaciones y login `flock_modern`.
 - Ningún componente hardcodea colores: todos usan las variables de ese archivo.
 
+### 9.5.b Tablero de Jira (P0) — inspirado en el portal de Flock Platform
+
+Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo y de solo lectura.
+
+- **Encabezado:** nombre del sprint, "día X de Y hábiles" (lunes a viernes) y el **% de tiempo transcurrido** contra el **% de tarjetas finalizadas**.
+- **Carriles** según la categoría de estado de Jira:
+  - **No iniciado** = categoría *To Do*.
+  - **En curso** = categoría *In Progress*.
+  - **Finalizado** = categoría *Done*.
+  - **Bloqueado** = estado cuyo nombre habla de bloqueo o espera ("bloque", "blocked", "imped", "espera", "on hold"), o issue con flag en Jira. Tiene prioridad sobre los otros carriles, salvo Finalizado.
+- **5 tarjetas de resumen:** Total · No iniciadas · En curso · Bloqueadas · Finalizadas.
+- **Torta** con selector: estado (los 4 carriles), prioridad o tipo.
+- **Kanban** de 4 columnas y **vista tabla** con filtros (responsable, tipo, texto) y export Excel/PDF.
+- **Ficha de issue:** clave, título, estado, carril, responsable, SP, prioridad, tipo, etiquetas y última actualización.
+- **Refresco automático** cada 60 s (caché de 60 s en el backend).
+- Colores de carril: los tokens de estado aptos para daltonismo (`--todo`, `--doing`, `--blocked`, `--done`), siempre con nombre y número.
+- Sin sprint activo: se muestra el último sprint cerrado, con un aviso.
+
+**Criterios de aceptación**
+- [ ] Con la conexión Demo, el tablero muestra las 4 columnas y los totales coinciden con la suma de cada carril.
+- [ ] Una issue en estado "Bloqueado" o con flag cae en el carril Bloqueado.
+- [ ] "Día X de Y" cuenta solo días hábiles.
+- [ ] Un Team Manager no ve el tablero de un proyecto ajeno (403).
+
+**Después:** portal del cliente (rol cliente que ve solo su cuenta) y resumen semanal con IA.
+
 ### 9.6 Notificaciones (P1)
 
 **Eventos que generan un aviso:**

@@ -6,14 +6,16 @@ from typing import Any
 
 import httpx
 
+from app.board.models import BoardIssue
 from app.compliance.models import Issue, Sprint
-from app.jira.mapper import to_issue, to_sprint
+from app.jira.mapper import FLAG_FIELD, to_board_issue, to_issue, to_sprint
 from app.jira.source import Board, Field, JiraError
 
 log = logging.getLogger(__name__)
 
 PAGE = 50
 RETRIES = 3
+BOARD_FIELDS = "summary,status,issuetype,assignee,priority,labels,updated"
 ISSUE_FIELDS = "summary,status,issuetype,assignee,resolutiondate,sprint,closedSprints"
 ERRORS = {
     401: "Credenciales inválidas: revisá el email y el API token",
@@ -96,6 +98,18 @@ class JiraCloud:
             expand="changelog",
         )
         return [to_issue(r, sp_field, done) for r in rows]
+
+    async def board_issues(self, sprint: str, sp_field: str) -> list[BoardIssue]:
+        rows = await self._paged(
+            f"/rest/agile/1.0/sprint/{sprint}/issue",
+            "issues",
+            fields=f"{BOARD_FIELDS},{FLAG_FIELD},{sp_field}",
+        )
+        return [
+            to_board_issue(r, sp_field)
+            for r in rows
+            if not r["fields"].get("issuetype", {}).get("subtask")
+        ]
 
     async def _done_ids(self) -> set[str]:
         if self._done is None:

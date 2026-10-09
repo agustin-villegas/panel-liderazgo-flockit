@@ -64,3 +64,14 @@
 - [x] Variables de entorno de producción cargadas (sin exponer valores)
 - [ ] `vercel deploy --prod` backend y frontend (lo corre el usuario: requiere su aprobación)
 - [ ] Smoke test en producción
+
+## Tablero de Jira (spec §9.5.b) ✅
+
+- [x] Carriles por categoría de Jira + bloqueado por nombre de estado o flag
+- [x] Día X de Y hábiles; % de tiempo vs % de tarjetas finalizadas
+- [x] Tarjetas de resumen, torta con selector (estado / prioridad / tipo)
+- [x] Kanban de 4 columnas y tabla con filtros (responsable, tipo, texto) + export
+- [x] Ficha de issue; refresco automático cada 60 s (caché de 60 s en el backend)
+- [x] Fuente Demo con prioridades, tipos, etiquetas y bloqueos
+- [x] Tests: carriles, días hábiles, totales y permisos (57 verdes)
+- [ ] Después: portal del cliente y resumen semanal con IA

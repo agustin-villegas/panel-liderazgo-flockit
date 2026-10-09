@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, Request
 
 from app.audit.service import AuditService
 from app.auth.deps import AdminUser, CurrentUser, Db, client_ip
+from app.board.schemas import SprintBoardOut
+from app.board.service import BoardService
 from app.compliance.schemas import CardOut, ComplianceOut, DetailOut
 from app.compliance.service import ComplianceService, JiraReadError
 from app.connections.models import Connection
@@ -112,3 +114,13 @@ async def sprint_detail(
 @router.post("/proyectos/{pid}/recalcular", status_code=204)
 async def refresh(pid: UUID, user: CurrentUser, db: Db, svc: Projects, comp: Compliance) -> None:
     await _load(pid, user, db, svc, comp, fresh=True)
+
+
+@router.get("/proyectos/{pid}/tablero")
+async def board(
+    pid: UUID, req: Request, user: CurrentUser, db: Db, svc: Projects
+) -> SprintBoardOut:
+    """Tablero de Jira del sprint activo (solo lectura)."""
+    proj = await svc.get(pid, user)
+    conn = await db.get(Connection, proj.conn_id) if proj.conn_id else None
+    return await BoardService(req.app.state.factory, req.app.state.boards).board(proj, conn)

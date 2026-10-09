@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Protocol
 
+from app.board.models import BoardIssue
 from app.compliance.models import Issue, Sprint
 
 
@@ -33,6 +34,8 @@ class JiraSource(Protocol):
     async def sprints(self, board: int) -> list[Sprint]: ...
 
     async def issues(self, sprint: str, sp_field: str) -> list[Issue]: ...
+
+    async def board_issues(self, sprint: str, sp_field: str) -> list[BoardIssue]: ...
 
 
 SP_NAMES = ("story points", "story point estimate", "puntos de historia")

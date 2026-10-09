@@ -161,3 +161,19 @@ def test_conexion_que_falla_la_prueba_no_se_guarda(admin, monkeypatch):
 
 def test_sin_sesion_401(client):
     assert client.get("/api/cartera").status_code == 401
+
+
+def test_tablero_demo_cuadra_y_respeta_permisos(admin: TestClient, login):
+    pid = new_project(admin)
+    b = admin.get(f"/api/proyectos/{pid}/tablero").json()
+    c = b["counts"]
+    assert b["sprint"]["state"] == "active"
+    assert 1 <= b["sprint"]["day"] <= b["sprint"]["days"] <= 10
+    assert c["total"] == len(b["cards"]) == c["todo"] + c["doing"] + c["blocked"] + c["done"]
+    assert c["blocked"] > 0
+    assert all(x["lane"] == "blocked" for x in b["cards"] if x["status"] == "Bloqueado")
+
+    add_user(admin, TM)
+    admin.post("/api/auth/logout")
+    login(TM, PWD)
+    assert admin.get(f"/api/proyectos/{pid}/tablero").status_code == 403

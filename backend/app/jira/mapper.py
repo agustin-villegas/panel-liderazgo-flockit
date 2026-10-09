@@ -3,9 +3,11 @@
 from datetime import datetime
 from typing import Any
 
+from app.board.models import BoardIssue, lane_of
 from app.compliance.models import Issue, Sprint, State
 
 Raw = dict[str, Any]
+FLAG_FIELD = "customfield_10021"  # "Flagged" en Jira Cloud
 
 
 def parse_dt(value: str | None) -> datetime | None:
@@ -67,4 +69,24 @@ def to_issue(raw: Raw, sp_field: str, done_ids: set[str]) -> Issue:
         title=f.get("summary", ""),
         status=status.get("name", ""),
         subtask=bool((f.get("issuetype") or {}).get("subtask")),
+    )
+
+
+def to_board_issue(raw: Raw, sp_field: str) -> BoardIssue:
+    """Tarjeta del tablero (sin changelog)."""
+    f = raw["fields"]
+    status = f.get("status") or {}
+    cat = (status.get("statusCategory") or {}).get("key")
+    sp = f.get(sp_field)
+    return BoardIssue(
+        key=raw["key"],
+        title=f.get("summary", ""),
+        status=status.get("name", ""),
+        lane=lane_of(cat, status.get("name", ""), bool(f.get(FLAG_FIELD))),
+        type=(f.get("issuetype") or {}).get("name", ""),
+        priority=(f.get("priority") or {}).get("name", "Sin prioridad"),
+        assignee=(f.get("assignee") or {}).get("displayName"),
+        sp=float(sp) if sp is not None else None,
+        labels=tuple(f.get("labels") or ()),
+        updated=parse_dt(f.get("updated")),
     )

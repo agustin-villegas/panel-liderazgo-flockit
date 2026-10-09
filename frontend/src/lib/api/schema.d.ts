@@ -284,6 +284,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/proyectos/{pid}/tablero": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Board
+     * @description Tablero de Jira del sprint activo (solo lectura).
+     */
+    get: operations["board_api_proyectos__pid__tablero_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -419,6 +439,19 @@ export interface components {
        * @default 0
        */
       projects: number;
+    };
+    /** Counts */
+    Counts: {
+      /** Total */
+      total: number;
+      /** Todo */
+      todo: number;
+      /** Doing */
+      doing: number;
+      /** Blocked */
+      blocked: number;
+      /** Done */
+      done: number;
     };
     /** DetailOut */
     DetailOut: {
@@ -569,6 +602,42 @@ export interface components {
       /** Managers */
       managers: string[];
     };
+    /** SprintBoardOut */
+    SprintBoardOut: {
+      sprint: components["schemas"]["SprintInfo"] | null;
+      counts: components["schemas"]["Counts"];
+      /** Done Pct */
+      done_pct: number | null;
+      /** Cards */
+      cards: components["schemas"]["TicketOut"][];
+      /** Notice */
+      notice?: string | null;
+    };
+    /** SprintInfo */
+    SprintInfo: {
+      /** Id */
+      id: string;
+      /** Name */
+      name: string;
+      /** State */
+      state: string;
+      /**
+       * Start
+       * Format: date-time
+       */
+      start: string;
+      /**
+       * End
+       * Format: date-time
+       */
+      end: string;
+      /** Day */
+      day: number;
+      /** Days */
+      days: number;
+      /** Time Pct */
+      time_pct: number;
+    };
     /** SprintOut */
     SprintOut: {
       /** Id */
@@ -626,6 +695,29 @@ export interface components {
       sp_field?: string | null;
       /** Error */
       error?: string | null;
+    };
+    /** TicketOut */
+    TicketOut: {
+      /** Key */
+      key: string;
+      /** Title */
+      title: string;
+      /** Status */
+      status: string;
+      /** Lane */
+      lane: string;
+      /** Type */
+      type: string;
+      /** Priority */
+      priority: string;
+      /** Assignee */
+      assignee: string | null;
+      /** Sp */
+      sp: number | null;
+      /** Labels */
+      labels: string[];
+      /** Updated */
+      updated: string | null;
     };
     /** ValidationError */
     ValidationError: {
@@ -1224,6 +1316,37 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  board_api_proyectos__pid__tablero_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        pid: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SprintBoardOut"];
+        };
       };
       /** @description Validation Error */
       422: {
