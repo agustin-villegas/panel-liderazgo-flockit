@@ -23,6 +23,7 @@ from app.notifications.router import internal as internal_router
 from app.notifications.router import router as notif_router
 from app.projects.router import router as projects_router
 from app.reports.router import router as reports_router
+from app.users.router import router as users_router
 
 LOG_FMT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 logging.basicConfig(level=logging.INFO, format=LOG_FMT)
@@ -66,7 +67,7 @@ def create_app(cfg: Settings | None = None, db: Database | None = None) -> FastA
     app.add_exception_handler(AppError, app_error_handler)
     for r in (
         health_router, auth_router, conn_router, projects_router, reports_router, notif_router,
-        ai_router,
+        ai_router, users_router,
     ):  # fmt: skip
         app.include_router(r, prefix="/api")
     app.include_router(internal_router)

@@ -2,6 +2,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+PWD_MIN = 12  # largo mínimo de contraseña (alta y cambio)
+
 
 class LoginIn(BaseModel):
     email: str = Field(min_length=3, max_length=254)
@@ -20,4 +22,4 @@ class Me(BaseModel):
 
 class PasswordIn(BaseModel):
     current: str = Field(min_length=1, max_length=200)
-    new: str = Field(min_length=12, max_length=200)
+    new: str = Field(min_length=PWD_MIN, max_length=200)
