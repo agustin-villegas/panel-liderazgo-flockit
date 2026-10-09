@@ -1,0 +1,73 @@
+---
+title: Avisos
+description: La campanita de notificaciones y qué eventos avisa.
+---
+
+**Quién la ve**: todos los roles. La campanita está en la barra superior.
+
+## Para qué sirve
+
+Enterarte sin tener que mirar el panel todo el día: cuando arranca o cierra un sprint, cuando hay
+issues sin estimar, cuando un proyecto se quedó sin sprint nuevo o cuando una issue lleva días sin
+moverse.
+
+## Quién recibe qué
+
+- Cada aviso es **tuyo**: lo ves vos, no el resto.
+- Los **admins** reciben los avisos de todos los proyectos.
+- Los **Team Managers** y **Clientes** reciben los de los proyectos que tienen asignados.
+
+## Qué avisa
+
+| Aviso                   | Cuándo                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------ |
+| Arrancó un sprint       | Hay un sprint activo nuevo. Dice fechas, planificados y cuántas issues no tienen SP.       |
+| Cerró un sprint         | Cerró hace 14 días o menos. Dice planificados, quemados y cumplimiento.                    |
+| Issues sin story points | Hay issues del sprint activo sin SP. Se repite una vez al segundo día hábil si siguen así. |
+| Sprint sin iniciar      | Pasaron 2 días hábiles del cierre y no hay sprint activo.                                  |
+| Issue sin movimiento    | Una issue no finalizada lleva 3 días hábiles o más sin actualizarse.                       |
+
+Un mismo aviso no se repite aunque el panel revise muchas veces.
+
+## Usar la campanita
+
+<Steps>
+<Step>
+
+Mirá el número rojo sobre la campana: son los avisos **sin leer** (muestra "9+" si hay más de 9).
+
+</Step>
+<Step>
+
+Tocá la campana para abrir la lista. Los no leídos están resaltados y con un punto.
+
+</Step>
+<Step>
+
+Tocá un aviso: se marca como leído y te lleva a la pantalla relacionada (el proyecto o el
+tablero).
+
+</Step>
+<Step>
+
+Tocá **Marcar todas como leídas** para limpiar el contador de una vez.
+
+</Step>
+</Steps>
+
+La lista muestra los últimos 50 avisos y se actualiza sola cada minuto.
+
+## Cada cuánto llegan
+
+El sistema revisa los proyectos **cada 15 minutos** (un cron automático) y también al abrir la
+campanita si la última revisión fue hace más de 15 minutos. Un aviso puede tardar hasta ese tiempo
+en aparecer.
+
+## Estados
+
+- **"Estás al día"**: no hay avisos.
+- **"No se pudieron cargar los avisos"**: error de conexión; se reintenta solo.
+
+## Exportar
+
+Los avisos no se exportan.

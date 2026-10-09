@@ -1,6 +1,13 @@
 "use client";
 
-import { FileBarChart, FolderKanban, KanbanSquare, LayoutDashboard, PlugZap } from "lucide-react";
+import {
+  FileBarChart,
+  FolderKanban,
+  KanbanSquare,
+  LayoutDashboard,
+  PlugZap,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -25,6 +32,7 @@ const MAIN = [
 const CONFIG = [
   { href: "/configuracion/conexiones", label: "Conexiones", icon: PlugZap },
   { href: "/configuracion/proyectos", label: "Proyectos", icon: FolderKanban },
+  { href: "/configuracion/usuarios", label: "Usuarios", icon: Users },
 ];
 
 export function AppSidebar() {

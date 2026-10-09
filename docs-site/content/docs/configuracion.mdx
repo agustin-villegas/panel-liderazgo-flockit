@@ -1,0 +1,68 @@
+---
+title: Configuración
+description: Conexiones a Jira, cuentas y proyectos, roles y permisos.
+---
+
+## Conexiones a Jira
+
+Solo el **admin** las administra (`/api/conexiones`, desde Configuración → Conexiones).
+
+| Campo                 | Para qué                                                                       |
+| --------------------- | ------------------------------------------------------------------------------ |
+| Nombre                | Único; se usa para confirmar el borrado                                        |
+| Sitio                 | URL de Jira Cloud                                                              |
+| Email                 | Usuario dueño del API token                                                    |
+| API token             | Se guarda **cifrado** (AES-256-GCM); solo se muestran los últimos 4 caracteres |
+| Campo de story points | Se detecta solo al probar la conexión; se puede fijar a mano                   |
+| Excluir sub-tareas    | Si está activo, las sub-tareas no suman al cálculo                             |
+
+Reglas:
+
+- La **prueba es obligatoria** antes de guardar: si Jira rechaza las credenciales, no se crea ni se edita.
+- La API **nunca devuelve el token**. Al editar, dejar el token vacío conserva el guardado.
+- Borrar una conexión exige escribir su nombre exacto; los proyectos que la usaban quedan sin conexión.
+- Existe una conexión **Demo** (datos sintéticos, 4 boards) que no se edita ni se borra. Sirve para ver
+  el panel sin Jira.
+- Jira se usa **solo en lectura**.
+
+## Cuentas y proyectos
+
+- Una **cuenta** agrupa proyectos (`/api/cuentas`; alta solo admin).
+- Un **proyecto** (`/api/proyectos`) tiene cuenta, conexión, board de Jira y, opcionalmente, un
+  **sprint de inicio de medición**: los sprints anteriores se ignoran.
+- Archivar un proyecto lo oculta; no se borra.
+- Cada proyecto tiene **usuarios asignados** (`managers`), que son los que lo ven además de los
+  admins. Se asignan por API; la pantalla de proyectos aún no los edita y los conserva al guardar.
+
+## Roles y permisos
+
+Los permisos los decide siempre el backend (el front solo oculta opciones).
+
+| Acción                                                 | Admin |  Team Manager  |    Cliente     |
+| ------------------------------------------------------ | :---: | :------------: | :------------: |
+| Ver cartera, proyectos, sprints y tablero              | Todos | Solo asignados | Solo asignados |
+| Informes (vista previa, guardar, listar)               | Todos | Solo asignados | Solo asignados |
+| Avisos propios                                         |  Sí   |       Sí       |       Sí       |
+| Asistente IA y tokens MCP                              |  Sí   |       Sí       |       No       |
+| Conexiones, cuentas, alta/edición/archivo de proyectos |  Sí   |       No       |       No       |
+| Usuarios (alta, edición, deshabilitar y habilitar)     |  Sí   |       No       |       No       |
+
+El rol **Cliente** (`Role.CLIENT`) existe con acceso limitado y **sin filtro por cuenta**: la
+visibilidad de proyectos (`ProjectService.visible`) es admin = todos los activos; cualquier otro rol
+= los proyectos donde figura en `project_managers`. `users.account_id` no interviene en los permisos.
+El token MCP de un usuario Cliente se rechaza.
+
+<Callout type="info" title="Usuarios">
+  El admin inicial se crea al arrancar el backend desde `ADMIN_EMAIL` y `ADMIN_PASSWORD_HASH`. El
+  resto lo administra el admin desde Configuración → Usuarios: alta, edición y habilitar o
+  deshabilitar (corta sesiones y tokens MCP). Las guardas: contraseña de 12+ caracteres con
+  confirmación, no deshabilitarse ni quitarse el rol admin a uno mismo, y siempre al menos un admin
+  activo. Asignar proyectos desde la UI está fuera de alcance. Guía funcional:
+  [Usuarios](/docs/guia/usuarios).
+</Callout>
+
+## Seguridad de sesión
+
+- Cookie `panel_session` (`HttpOnly`, `Secure`, `SameSite=Lax`), duración de 8 horas por defecto.
+- Hasta 5 intentos fallidos por email e IP en una ventana de 15 minutos.
+- Cambio de contraseña: `POST /api/auth/password`.

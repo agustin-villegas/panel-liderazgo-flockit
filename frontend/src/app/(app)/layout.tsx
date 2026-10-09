@@ -8,7 +8,9 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
       <AppSidebar />
       <SidebarInset className="bg-home min-h-svh">
         <Topbar />
-        <div className="flex flex-1 flex-col p-4 md:p-6">{children}</div>
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col p-4 pb-24 md:p-6 md:pb-24">
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

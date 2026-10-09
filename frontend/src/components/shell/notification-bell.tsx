@@ -68,6 +68,7 @@ export function NotificationBell() {
             size="icon"
             className="relative"
             aria-label={unread ? `Notificaciones (${unread} sin leer)` : "Notificaciones"}
+            title="Notificaciones"
           />
         }
       >

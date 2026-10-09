@@ -153,7 +153,7 @@ export function ConnDialog({ open, onClose, edit }: Props) {
             disabled={!test?.ok || save.isPending}
           >
             {save.isPending && <Loader2 className="size-4 animate-spin" />}
-            Guardar
+            {edit ? "Guardar" : "Crear conexión"}
           </Button>
         </DialogFooter>
       </DialogContent>

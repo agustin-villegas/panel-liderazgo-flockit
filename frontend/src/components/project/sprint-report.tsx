@@ -5,11 +5,14 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import { ErrorState } from "@/components/panel/error-state";
 import { ExportButtons } from "@/components/panel/export-buttons";
 import { LightBadge } from "@/components/panel/light-badge";
+import { PageHeader } from "@/components/panel/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -25,7 +28,6 @@ import { day, pct, pts, type Light } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const PAGE = 25;
-const sel = "h-8 rounded-lg border bg-background px-2 text-sm";
 
 const cols: Col<Line>[] = [
   { label: "Issue", value: (l) => l.key },
@@ -49,7 +51,7 @@ export function SprintReport({ project, sprint }: Props) {
   const [reason, setReason] = useState("");
   const [page, setPage] = useState(0);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["sprint", project, sprint],
     queryFn: () => api<Detail>(`/proyectos/${project}/sprints/${sprint}`),
   });
@@ -88,28 +90,37 @@ export function SprintReport({ project, sprint }: Props) {
         <ArrowLeft className="size-4" /> Volver al proyecto
       </Link>
 
-      {error && <p className="text-sm text-crit-fg">No se pudo abrir el sprint: {error.message}</p>}
+      {error && (
+        <Card>
+          <ErrorState
+            message={`No se pudo abrir el sprint: ${error.message}`}
+            onRetry={() => refetch()}
+          />
+        </Card>
+      )}
       {isLoading && <Skeleton className="h-96 rounded-xl" />}
 
       {data && (
         <>
-          <header className="banner">
-            <div className="relative flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-bold tracking-tight">{data.sprint.name}</h1>
-              <LightBadge
-                light={data.sprint.light as Light}
-                className="border-white/30 bg-white/15 text-white"
-              />
-            </div>
-            <p className="relative mt-1 text-sm text-white/85">
-              {day(data.sprint.start)} – {day(data.sprint.end)} · {pts(data.sprint.burned)} de{" "}
-              {pts(data.sprint.planned)} puntos quemados · {pct(data.sprint.pct)}
-            </p>
-            <p className="relative mt-3 max-w-3xl text-sm text-white/90">
-              <span className="font-semibold">Objetivo del sprint. </span>
-              {data.sprint.goal || "Jira no tiene un objetivo cargado para este sprint."}
-            </p>
-          </header>
+          <PageHeader
+            title={data.sprint.name}
+            description={
+              <div className="grid gap-2">
+                <p className="flex flex-wrap items-center gap-2 text-sm">
+                  <LightBadge
+                    light={data.sprint.light as Light}
+                    className="border-white/30 bg-white/15 text-white"
+                  />
+                  {day(data.sprint.start)} – {day(data.sprint.end)} · {pts(data.sprint.burned)} de{" "}
+                  {pts(data.sprint.planned)} puntos quemados · {pct(data.sprint.pct)}
+                </p>
+                <p className="max-w-3xl text-sm text-white/90">
+                  <span className="font-semibold">Objetivo del sprint. </span>
+                  {data.sprint.goal || "Jira no tiene un objetivo cargado para este sprint."}
+                </p>
+              </div>
+            }
+          />
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {statuses.map(([name, g]) => {
@@ -149,10 +160,10 @@ export function SprintReport({ project, sprint }: Props) {
                   }}
                   placeholder="Buscar clave o título"
                   aria-label="Buscar issue"
-                  className="w-56"
+                  className="w-full sm:w-56"
                 />
-                <select
-                  className={sel}
+                <NativeSelect
+                  className="w-full sm:w-auto"
                   value={who}
                   aria-label="Responsable"
                   onChange={(e) => {
@@ -166,9 +177,9 @@ export function SprintReport({ project, sprint }: Props) {
                       {p}
                     </option>
                   ))}
-                </select>
-                <select
-                  className={sel}
+                </NativeSelect>
+                <NativeSelect
+                  className="w-full sm:w-auto"
                   value={reason}
                   aria-label="Motivo"
                   onChange={(e) => {
@@ -182,7 +193,7 @@ export function SprintReport({ project, sprint }: Props) {
                       {r}
                     </option>
                   ))}
-                </select>
+                </NativeSelect>
                 <div className="ml-auto">
                   <ExportButtons
                     name={`auditoria-${data.sprint.name}`}
@@ -215,7 +226,7 @@ export function SprintReport({ project, sprint }: Props) {
 
               {filtered.length === 0 && (
                 <p className="text-sm text-muted-foreground">
-                  Ninguna issue coincide con el filtro.
+                  Sin issues que coincidan con el filtro.
                 </p>
               )}
 
@@ -274,7 +285,9 @@ function Rows({ lines, site }: { lines: Line[]; site?: string | null }) {
         {l.status}
       </TableCell>
       <TableCell className="whitespace-nowrap">{l.assignee ?? "Sin asignar"}</TableCell>
-      <TableCell className="text-right">{l.sp === null ? "sin estimar" : pts(l.sp)}</TableCell>
+      <TableCell className="text-right tabular-nums">
+        {l.sp === null ? "sin estimar" : pts(l.sp)}
+      </TableCell>
       <TableCell className="whitespace-normal">{l.reason}</TableCell>
       <TableCell className="max-w-xs whitespace-normal text-muted-foreground">
         {l.sprints.join(" → ")}

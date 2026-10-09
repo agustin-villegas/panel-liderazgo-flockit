@@ -4,9 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Info, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { ErrorState } from "@/components/panel/error-state";
 import { ExportButtons } from "@/components/panel/export-buttons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -30,7 +32,6 @@ import { LANES, LANE_ORDER, type LaneKey } from "./lanes";
 import { TicketDialog } from "./ticket-dialog";
 
 const ALL = "";
-const sel = "h-9 rounded-md border bg-background px-2 text-sm";
 
 const cols: Col<Ticket>[] = [
   { label: "Issue", value: (t) => t.key },
@@ -49,7 +50,7 @@ export function BoardView({ project }: { project: string }) {
   const [type, setType] = useState(ALL);
   const [text, setText] = useState("");
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["tablero", project],
     queryFn: () => api<SprintBoard>(`/proyectos/${project}/tablero`),
     refetchInterval: 60_000, // sin botón de actualizar
@@ -70,7 +71,14 @@ export function BoardView({ project }: { project: string }) {
 
   if (isLoading) return <Skeleton className="h-96 rounded-xl" />;
   if (error)
-    return <p className="text-sm text-crit-fg">No se pudo cargar el tablero: {error.message}</p>;
+    return (
+      <Card>
+        <ErrorState
+          message={`No se pudo cargar el tablero: ${error.message}`}
+          onRetry={() => refetch()}
+        />
+      </Card>
+    );
   if (!data) return null;
 
   const { sprint, counts } = data;
@@ -96,7 +104,7 @@ export function BoardView({ project }: { project: string }) {
               <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                 <span className={cn("size-2 rounded-full", t.dot)} aria-hidden /> {t.label}
               </p>
-              <p className="text-3xl leading-none font-bold">{t.value}</p>
+              <p className="text-3xl leading-none font-bold tabular-nums">{t.value}</p>
             </CardContent>
           </Card>
         ))}
@@ -106,18 +114,18 @@ export function BoardView({ project }: { project: string }) {
         <Card data-section="tablero">
           <CardHeader className="flex flex-row flex-wrap items-center gap-2">
             <CardTitle className="mr-auto">Issues del sprint</CardTitle>
-            <div className="relative print:hidden">
+            <div className="relative w-full sm:w-auto print:hidden">
               <Search className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
               <Input
-                className="w-44 pl-8"
+                className="w-full pl-8 sm:w-44"
                 placeholder="Buscar…"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 aria-label="Buscar issue"
               />
             </div>
-            <select
-              className={sel}
+            <NativeSelect
+              className="w-full sm:w-auto"
               value={who}
               onChange={(e) => setWho(e.target.value)}
               aria-label="Responsable"
@@ -126,9 +134,9 @@ export function BoardView({ project }: { project: string }) {
               {people.map((p) => (
                 <option key={p}>{p}</option>
               ))}
-            </select>
-            <select
-              className={sel}
+            </NativeSelect>
+            <NativeSelect
+              className="w-full sm:w-auto"
               value={type}
               onChange={(e) => setType(e.target.value)}
               aria-label="Tipo"
@@ -137,7 +145,7 @@ export function BoardView({ project }: { project: string }) {
               {types.map((t) => (
                 <option key={t}>{t}</option>
               ))}
-            </select>
+            </NativeSelect>
             <ExportButtons
               name={`tablero-${sprint?.name}`}
               section="tablero"
@@ -173,6 +181,7 @@ export function BoardView({ project }: { project: string }) {
                         {lane.map((c) => (
                           <button
                             key={c.key}
+                            type="button"
                             onClick={() => setOpen(c)}
                             className="grid gap-1 rounded-lg border bg-card p-3 text-left text-sm shadow-xs transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                           >
@@ -215,7 +224,15 @@ export function BoardView({ project }: { project: string }) {
                   <TableBody>
                     {shown.map((c) => (
                       <TableRow key={c.key} className="cursor-pointer" onClick={() => setOpen(c)}>
-                        <TableCell className="font-medium">{c.key}</TableCell>
+                        <TableCell className="font-medium">
+                          <button
+                            type="button"
+                            onClick={() => setOpen(c)}
+                            className="rounded-sm text-left hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                          >
+                            {c.key}
+                          </button>
+                        </TableCell>
                         <TableCell className="max-w-xs truncate">{c.title}</TableCell>
                         <TableCell>
                           <span className="flex items-center gap-1.5">
@@ -227,7 +244,7 @@ export function BoardView({ project }: { project: string }) {
                         </TableCell>
                         <TableCell>{c.assignee ?? "Sin asignar"}</TableCell>
                         <TableCell>{c.priority}</TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right tabular-nums">
                           {c.sp === null ? "—" : pts(c.sp)}
                         </TableCell>
                       </TableRow>

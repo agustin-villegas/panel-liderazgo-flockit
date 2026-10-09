@@ -1,0 +1,54 @@
+---
+title: Panel de cartera
+description: La pantalla de inicio, con todos tus proyectos ordenados por riesgo.
+---
+
+**Quién la ve**: todos los roles. Admin ve todos los proyectos; Team Manager y Cliente, los asignados
+([roles](/docs/guia/roles)).
+
+## Para qué sirve
+
+Detectar de un vistazo qué proyectos vienen mal. Muestra el cumplimiento del **último sprint
+cerrado** de cada proyecto, calculado desde Jira.
+
+## Qué muestra
+
+- **Indicadores**: cantidad de proyectos y cuántos están **En riesgo**, en **Atención** y **En
+  margen**.
+- **Gráfico de cartera**: cumplimiento de los últimos 6 sprints cerrados de cada proyecto.
+- **Una card por proyecto**, ordenadas de más a menos riesgoso: cuenta, nombre, semáforo, medidor
+  de cumplimiento del último sprint, puntos quemados y planificados, tendencia, avance del sprint
+  activo (si hay) y cumplimiento del mes.
+
+El semáforo sale de umbrales fijos: **85 % o más** En margen, **70 % a 84 %** Atención, **menos de
+70 %** En riesgo, y "Sin datos" si no hay sprint cerrado.
+
+## Acciones
+
+<Steps>
+<Step>
+
+Mirá los indicadores y el gráfico para ubicar los proyectos en riesgo.
+
+</Step>
+<Step>
+
+Tocá una card para abrir el [detalle del proyecto](/docs/guia/proyecto).
+
+</Step>
+</Steps>
+
+## Estados
+
+| Situación                       | Qué ves                                                                     |
+| ------------------------------- | --------------------------------------------------------------------------- |
+| Cargando                        | Placeholders grises.                                                        |
+| Sin proyectos (admin)           | "Todavía no hay proyectos" con botón **Crear proyecto**.                    |
+| Sin proyectos (otros roles)     | "Todavía no hay proyectos" y el pedido de que un admin te asigne proyectos. |
+| Error general                   | Mensaje con botón **Reintentar**.                                           |
+| Error de un proyecto (ej. Jira) | La card muestra el error en rojo; el resto de la cartera sigue andando.     |
+
+## Exportar
+
+La cartera no tiene botones Excel/PDF. Para exportar datos, usá las tablas del
+[proyecto](/docs/guia/proyecto).

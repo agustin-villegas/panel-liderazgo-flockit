@@ -1,0 +1,66 @@
+---
+title: Preguntas frecuentes
+description: Las dudas más comunes sobre el uso del panel.
+---
+
+## ¿Por qué no veo un proyecto?
+
+Hay tres causas posibles:
+
+1. **No lo tenés asignado.** Si sos Team Manager o Cliente, solo ves los proyectos en los que
+   figurás como responsable. Los admins ven todos. Pedile a un admin que revise tu asignación.
+2. **Está archivado.** Los proyectos archivados no aparecen en ninguna pantalla.
+3. **Es un problema con Jira.** Si el proyecto aparece pero con un error rojo, falló la lectura
+   (credenciales vencidas, board inexistente). Avisale a un admin.
+
+## ¿Cómo saco un tablero o un proyecto del panel?
+
+**Archivándolo** desde Configuración → Proyectos (solo admin). **No borra nada** del panel ni de
+Jira: el proyecto simplemente deja de mostrarse. Ver [Proyectos](/docs/guia/proyectos).
+
+## ¿Cada cuánto llegan los avisos?
+
+El panel revisa los proyectos **cada 15 minutos** con un cron automático, y también cuando abrís la
+campanita si pasaron más de 15 minutos desde la última revisión. Un evento de Jira puede tardar hasta
+ese tiempo en convertirse en aviso. Ver [Avisos](/docs/guia/avisos).
+
+## ¿Se puede recuperar un usuario deshabilitado?
+
+Sí. Un admin lo habilita desde Configuración → Usuarios con el botón **Habilitar**. Recupera su
+acceso, su rol y su historial. Lo que **no** se recupera son sus sesiones y tokens MCP, que se
+cortaron al deshabilitarlo: tiene que ingresar de nuevo y crear tokens nuevos.
+
+## ¿Puedo borrar un usuario?
+
+No. Los usuarios solo se deshabilitan, para conservar la trazabilidad de lo que hicieron.
+
+## ¿Qué hago si me olvidé la contraseña?
+
+No hay recuperación automática. Un admin puede definirte una nueva desde Configuración → Usuarios
+(Editar y completar la contraseña). Al hacerlo se cierran tus sesiones.
+
+## ¿Por qué no me aparece el asistente ni los tokens MCP?
+
+Porque tu rol es **Cliente**: ese rol no tiene asistente IA ni tokens MCP. Ver
+[Roles y permisos](/docs/guia/roles).
+
+## Los datos no coinciden con lo que veo en Jira
+
+Los datos de Jira se guardan en memoria por unos minutos. En el proyecto, tocá **Recalcular** para
+traer datos frescos. El tablero se refresca solo cada minuto. Si igual no coinciden, revisá la
+auditoría del sprint ([detalle](/docs/guia/detalle-sprint)): cada issue muestra el motivo por el que
+cuenta o no.
+
+## ¿Puedo editar un informe ya guardado?
+
+No: un informe guardado es una foto que no cambia. Para corregir algo, generá uno nuevo.
+
+## ¿Cómo exporto a Excel o PDF?
+
+Con los botones **Excel** y **PDF** de cada tabla. Excel baja un `.csv` que abre Excel; PDF abre la
+impresión del navegador (elegí "Guardar como PDF"). Ver [la guía](/docs/guia).
+
+## ¿Qué significan los colores del semáforo?
+
+**En margen**: 85 % o más. **Atención**: entre 70 % y 84 %. **En riesgo**: menos de 70 %. **Sin
+datos**: todavía no hay sprint cerrado. Los umbrales son fijos.

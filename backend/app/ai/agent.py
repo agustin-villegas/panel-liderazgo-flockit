@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 APP = "panel"
 NAME = "asistente"
-MAX_CALLS = 5  # tool calls por turno (spec §10.2)
+MAX_CALLS = 5  # tool calls por turno (spec §9.2)
 
 SYSTEM = """Sos el asistente del Panel de liderazgo de Flockit. Respondés en español rioplatense,
 directo y breve, a líderes que consultan el cumplimiento de sus proyectos.

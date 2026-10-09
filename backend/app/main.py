@@ -13,6 +13,7 @@ from app.connections.factory import SourceFactory
 from app.connections.router import router as conn_router
 from app.connections.service import ensure_demo
 from app.core.crypto import Cipher
+from app.core.docs import docs_router
 from app.core.errors import AppError, app_error_handler
 from app.core.security import security_headers
 from app.db.database import Database
@@ -22,6 +23,7 @@ from app.notifications.router import internal as internal_router
 from app.notifications.router import router as notif_router
 from app.projects.router import router as projects_router
 from app.reports.router import router as reports_router
+from app.users.router import router as users_router
 
 LOG_FMT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 logging.basicConfig(level=logging.INFO, format=LOG_FMT)
@@ -51,13 +53,21 @@ def create_app(cfg: Settings | None = None, db: Database | None = None) -> FastA
             yield
         await app.state.db.close()
 
-    app = FastAPI(title=cfg.app_name, version="0.1.0", lifespan=lifespan)
+    app = FastAPI(
+        title=cfg.app_name,
+        version="0.1.0",
+        lifespan=lifespan,
+        docs_url=None,
+        redoc_url=None,
+        openapi_url=None,
+    )
+    app.include_router(docs_router(app, cfg))
     mcp.state = app.state
     app.middleware("http")(security_headers)
     app.add_exception_handler(AppError, app_error_handler)
     for r in (
         health_router, auth_router, conn_router, projects_router, reports_router, notif_router,
-        ai_router,
+        ai_router, users_router,
     ):  # fmt: skip
         app.include_router(r, prefix="/api")
     app.include_router(internal_router)

@@ -1,0 +1,13 @@
+{
+  "title": "Panel de liderazgo",
+  "pages": [
+    "index",
+    "guia",
+    "arquitectura",
+    "motor-cumplimiento",
+    "funcionalidades",
+    "configuracion",
+    "api",
+    "desarrollo"
+  ]
+}

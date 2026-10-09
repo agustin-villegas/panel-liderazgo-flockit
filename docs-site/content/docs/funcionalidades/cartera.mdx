@@ -1,0 +1,27 @@
+---
+title: Cartera
+description: Todos los proyectos juntos, ordenados por riesgo.
+---
+
+La pantalla de inicio (`GET /api/cartera`) muestra **una card por proyecto visible** para el usuario:
+el admin ve todos; el Team Manager, solo los asignados.
+
+## Qué trae cada card
+
+- Nombre del proyecto y cuenta.
+- **Semáforo** del último sprint cerrado (ver [motor de cumplimiento](/docs/motor-cumplimiento#semáforo)).
+- Último sprint cerrado: planificados, quemados y porcentaje.
+- **Sprint activo** (si hay): día X de Y y avance provisorio.
+- **Tendencia** de los últimos 6 sprints cerrados.
+- Cumplimiento del último mes cerrado.
+- Si Jira falla para ese proyecto, la card sale con el error en vez de romper toda la cartera.
+
+## Orden
+
+Primero los proyectos **en riesgo**, después **atención**, **en margen** y al final los **sin datos**;
+dentro de cada grupo, por nombre.
+
+## Indicadores de arriba
+
+Cantidad de proyectos y cuántos hay en riesgo, en atención y en margen, más un gráfico de
+cumplimiento por sprint de toda la cartera.

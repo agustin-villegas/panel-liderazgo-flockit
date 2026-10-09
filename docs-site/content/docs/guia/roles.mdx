@@ -1,0 +1,69 @@
+---
+title: Roles y permisos
+description: Qué ve y qué puede hacer cada rol del panel.
+---
+
+Hay tres roles: **Admin**, **Team Manager** y **Cliente**. El rol lo define un admin al crear o
+editar al usuario (ver [Usuarios](/docs/guia/usuarios)).
+
+<Callout type="info" title="El backend decide">
+  El front solo oculta opciones. Aunque alguien llegue a una URL escondida, el servidor responde "No
+  tenés permiso" si el rol no alcanza.
+</Callout>
+
+## Qué proyectos ve cada rol
+
+- **Admin**: todos los proyectos activos (los archivados no aparecen).
+- **Team Manager y Cliente**: **solo los proyectos que tienen asignados**. La regla es la misma para
+  los dos roles: se ve un proyecto si el usuario figura entre sus responsables.
+
+El rol Cliente existe pero **no tiene filtro propio por cuenta**: el panel no cruza al usuario con la
+cuenta (cliente) del proyecto. Ve exactamente lo que tenga asignado, igual que un Team Manager, y
+si no tiene proyectos asignados ve el panel vacío.
+
+<Callout type="warn" title="Asignar proyectos no se hace desde la pantalla">
+  Hoy la interfaz no permite asignar responsables a un proyecto. La asignación se hace por API
+  (campo `managers` de `POST` y `PATCH /api/proyectos`). Al editar un proyecto desde Configuración →
+  Proyectos se conservan los responsables que ya tenía. Un admin ve todo sin necesidad de
+  asignación.
+</Callout>
+
+## Tabla de permisos
+
+| Acción                                                 | Admin | Team Manager |  Cliente  |
+| ------------------------------------------------------ | :---: | :----------: | :-------: |
+| Ingresar, cambiar su contraseña, cerrar sesión         |  Sí   |      Sí      |    Sí     |
+| Ver cartera, proyecto, sprints y tablero               | Todos |  Asignados   | Asignados |
+| Recalcular un proyecto                                 | Todos |  Asignados   | Asignados |
+| Informes: generar, guardar y ver                       | Todos |  Asignados   | Asignados |
+| Avisos (campanita)                                     |  Sí   |      Sí      |    Sí     |
+| Asistente IA                                           |  Sí   |      Sí      |    No     |
+| Tokens MCP (crear, listar, revocar) y uso del MCP      |  Sí   |      Sí      |    No     |
+| Configuración → Conexiones                             |  Sí   |      No      |    No     |
+| Configuración → Proyectos (crear, editar, archivar)    |  Sí   |      No      |    No     |
+| Configuración → Usuarios (alta, edición, deshabilitar) |  Sí   |      No      |    No     |
+| Swagger (`/api/docs`) en producción                    |  Sí   |      No      |    No     |
+
+## Detalles por rol
+
+### Admin
+
+Ve la barra lateral completa, con el grupo **Configuración**. Recibe los avisos de **todos** los
+proyectos. Administra conexiones, proyectos y usuarios.
+
+### Team Manager
+
+Ve cartera, tableros e informes de **sus proyectos**. Usa el asistente IA y puede crear tokens MCP.
+Recibe los avisos de los proyectos que tiene asignados. No ve el grupo Configuración.
+
+### Cliente
+
+Ve cartera, tableros e informes de los proyectos que tenga asignados y recibe sus avisos. **No
+tiene asistente IA ni tokens MCP**: el botón flotante y la opción "Tokens MCP" del perfil no
+aparecen, y el servidor rechaza esos pedidos. Un token MCP existente de un usuario Cliente tampoco
+funciona. No ve Configuración.
+
+<Callout type="warn" title="Qué ve de más un Cliente">
+  Los informes y tableros muestran nombres de personas y de issues de Jira. Antes de asignarle
+  proyectos a un usuario Cliente, revisá que eso sea lo que querés compartir.
+</Callout>

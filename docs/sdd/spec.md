@@ -5,7 +5,7 @@
 >
 > Estado: **borrador para revisión** · Fecha: 2026-10-09
 
-Prioridad de cada módulo: **P0** = imprescindible para la demo · **P1** = deseable · **P2** = si sobra tiempo.
+Prioridad de cada módulo: **P0** = imprescindible para la demo · **P1** = deseable. Lo que no se construye está en §11 (fuera de alcance).
 
 ---
 
@@ -25,19 +25,19 @@ Prioridad de cada módulo: **P0** = imprescindible para la demo · **P1** = dese
 
 ## 2. Roles y permisos
 
-| Acción | Admin | Team Manager | Cliente (P2) |
+| Acción | Admin | Team Manager | Cliente |
 |---|:-:|:-:|:-:|
-| Ver panel de cartera | ✅ todas las cuentas | ✅ sus proyectos | ❌ |
-| Ver detalle de proyecto y cumplimiento | ✅ | ✅ sus proyectos | ✅ solo su cuenta, lectura |
+| Ver panel de cartera | ✅ todas las cuentas | ✅ sus proyectos | ✅ sus proyectos |
+| Ver detalle de proyecto y cumplimiento | ✅ | ✅ sus proyectos | ✅ sus proyectos |
 | ABM de conexiones de Jira | ✅ | ❌ | ❌ |
 | ABM de cuentas y proyectos | ✅ | ❌ | ❌ |
-| ABM de usuarios | ✅ | ❌ | ❌ |
-| Cargar NPS / CSAT | ✅ | ✅ sus proyectos | ❌ |
-| Generar informes | ✅ | ✅ sus proyectos | ❌ (ve los publicados para él) |
+| Alta, edición y habilitar/deshabilitar usuarios | ✅ | ❌ | ❌ |
+| Generar informes | ✅ | ✅ sus proyectos | ✅ sus proyectos |
 | Asistente / MCP | ✅ | ✅ (las tools respetan sus proyectos) | ❌ |
-| Recibir notificaciones | ✅ todas | ✅ sus proyectos | ❌ |
+| Recibir notificaciones | ✅ todas | ✅ sus proyectos | ✅ sus proyectos |
 
-- **"Sus proyectos"**: los que el admin le asignó al Team Manager.
+- **"Sus proyectos"**: los que el admin asignó al usuario (tabla `project_managers`; asignar proyectos desde la UI está fuera de alcance, ver §11). El admin ve todos los proyectos activos.
+- **Rol `cliente`** (`Role.CLIENT`): existe con acceso limitado y **sin filtro por cuenta**. `ProjectService.visible` trata igual a todo rol que no es admin: solo los proyectos donde figura asignado. `account_id` del usuario no se usa en permisos. No tiene asistente ni MCP: el endpoint lo rechaza y su token MCP no autentica.
 - **Todos los permisos se validan en el backend.** Que el front oculte un botón es comodidad, no seguridad.
 
 ---
@@ -56,17 +56,15 @@ Prioridad de cada módulo: **P0** = imprescindible para la demo · **P1** = dese
 - La sesión es una cookie `httpOnly`, `Secure` y `SameSite=Lax`, firmada con `SESSION_SECRET`. Vence en 8 horas y se renueva con la actividad.
 - Cerrar sesión invalida la sesión en el servidor, no solo borra la cookie.
 
-### 3.3 Passkey (P1)
-- Ya logueado, el usuario puede registrar una passkey (huella, Windows Hello o Touch ID) desde su perfil.
-- En el login aparece **"Entrar con passkey"**, que usa WebAuthn sin contraseña.
-- Puede tener varias passkeys, ver la lista (nombre, fecha de alta, último uso) y borrarlas.
+### 3.3 Usuarios (P1)
+- Solo el admin, en **Configuración → Usuarios** (**hecho**): lista, alta y edición.
+- El alta pide nombre, apellido, email, rol (`admin`, `team_manager` o `cliente`), contraseña (mínimo 12 caracteres) y confirmación. El nombre se guarda como "Nombre Apellido".
+- La edición cambia nombre, apellido, email, rol y, opcionalmente, la contraseña.
+- Se puede **deshabilitar o habilitar** un usuario. Deshabilitar corta sus sesiones y sus tokens MCP. No se borra nada.
+- No se puede dejar el sistema sin un admin activo, ni deshabilitarse o quitarse el rol de admin a uno mismo.
+- Asignar proyectos a un Team Manager desde la UI está fuera de alcance (§11).
 
-### 3.4 Usuarios (P1)
-- El admin da de alta usuarios con nombre, email, rol (`team_manager` o `cliente`) y proyectos o cuenta asignados.
-- El alta genera una **contraseña temporal de un solo uso**, que se muestra una sola vez. Al primer ingreso el usuario tiene que cambiarla.
-- Los usuarios se pueden deshabilitar y su sesión se corta. No se borran, para mantener la auditoría.
-
-### 3.5 Pantalla de login (diseño)
+### 3.4 Pantalla de login (diseño)
 - Layout partido. A la izquierda, el gradiente de marca Flock con un **preview animado del panel** (gráfico de planificados vs quemados que se dibuja, KPIs que cuentan). A la derecha, el formulario.
 - En celular se ve solo el formulario, con el gradiente de fondo.
 - Modo claro y oscuro. Se respeta `prefers-reduced-motion` (sin animación).
@@ -77,7 +75,6 @@ Prioridad de cada módulo: **P0** = imprescindible para la demo · **P1** = dese
 - [ ] Al sexto intento fallido en 15 minutos quedo bloqueado, incluso con la contraseña correcta.
 - [ ] Toda ruta de la API sin sesión válida responde 401; con sesión pero sin permiso responde 403.
 - [ ] La cookie de sesión no es accesible desde JavaScript.
-- [ ] (P1) Registro una passkey y después entro sin contraseña.
 
 ---
 
@@ -131,11 +128,10 @@ Prioridad de cada módulo: **P0** = imprescindible para la demo · **P1** = dese
 - **Caché stale-while-revalidate** (la idea de Flock Platform):
   - Datos de menos de 5 minutos: se sirven directo.
   - De 5 minutos a 24 horas: se sirven y se relee Jira en segundo plano.
-  - Sprints **cerrados** ya calculados se guardan como foto y no se vuelven a leer, salvo con "Recalcular" manual.
+  - La caché es en memoria; "Recalcular" fuerza una relectura. Las fotos persistentes de sprints cerrados quedan fuera de alcance (§11).
 - Se respetan los límites de Jira: si devuelve 429, se reintenta con espera exponencial y se muestra "Jira está limitando consultas, reintentando…".
 - **Solo lectura**: la app nunca escribe en Jira.
-- **Texto externo**: títulos y descripciones de Jira se tratan como **datos no confiables**. Se escapan al mostrarlos y, si van al LLM, viajan marcados como dato externo (ver §10).
-- **Webhooks de Jira (P2)**: endpoint opcional que recibe `sprint_closed` e `issue_updated` para invalidar la caché. Se valida la firma HMAC (`X-Hub-Signature`) y se deduplica por `X-Atlassian-Webhook-Identifier`.
+- **Texto externo**: títulos y descripciones de Jira se tratan como **datos no confiables**. Se escapan al mostrarlos y, si van al LLM, viajan marcados como dato externo (ver §9).
 
 ---
 
@@ -184,49 +180,28 @@ Para cada sprint **S** de un proyecto:
 
 ---
 
-## 8. Satisfacción: NPS y CSAT (P1)
+## 8. Pantallas
 
-### 8.1 Carga manual
-- Desde un proyecto: **"Registrar respuesta"** con tipo (NPS o CSAT), período (un sprint del proyecto o un mes), quién respondió (opcional), puntajes y comentario.
-  - **NPS**: una pregunta, "¿Qué tan probable es que nos recomiendes?", escala **1–10**.
-  - **CSAT**: tres preguntas en escala **1–10**: satisfacción del mes, progreso del proyecto y gestión del proyecto.
-- Cada respuesta se puede editar y borrar, y queda en la auditoría.
-
-### 8.2 Fórmulas (como Flocktools)
-- **NPS** = %promotores (9–10) − %detractores (1–6), con 1 decimal. Los pasivos (7–8) cuentan en el total. Siempre se calcula desde las respuestas crudas, **nunca promediando NPS de períodos**.
-- **CSAT** = promedio de las 3 preguntas por respuesta, y después el promedio entre respuestas, con 1 decimal. Tramos: 9–10 muy satisfecho · 7–8 satisfecho · 5–6 neutro · 1–4 insatisfecho.
-- NPS y CSAT nunca se mezclan.
-
-**Criterios de aceptación**
-- [ ] 10 respuestas NPS: 5 de 9–10, 3 de 7–8 y 2 de 1–6 → NPS = 30,0.
-- [ ] CSAT de 2 respuestas (9, 8, 10) y (6, 7, 8) → (9 + 7) / 2 = 8,0.
-
----
-
-## 9. Pantallas
-
-### 9.1 Panel de cartera — Inicio (P0)
-- **KPIs de cartera**: proyectos activos · cumplimiento del último mes cerrado (suma de puntos) · proyectos en alerta · NPS y CSAT del trimestre (P1).
+### 8.1 Panel de cartera — Inicio (P0)
+- **KPIs de cartera**: proyectos activos · cumplimiento del último mes cerrado (suma de puntos) · proyectos en alerta.
 - **Una card por proyecto** con:
   - cuenta y nombre;
   - sprint activo: día X de Y y planificados vs quemados provisorio;
   - cumplimiento de los **últimos 6 sprints cerrados** (mini barras);
   - cumplimiento del mes;
-  - NPS y CSAT del último período (P1);
   - semáforo.
-- **Semáforo** de cumplimiento del último sprint cerrado: **≥ 85 %** en margen · **70–84 %** atención · **< 70 %** en riesgo. Los umbrales son configurables por el admin.
+- **Semáforo** de cumplimiento del último sprint cerrado: **≥ 85 %** en margen · **70–84 %** atención · **< 70 %** en riesgo. Los umbrales son constantes (no editables, ver §11).
 - Ordenado por riesgo primero, con filtros por cuenta y estado.
 - **Accesibilidad**: los colores siempre van con texto y número, nunca color solo. Se usan los tonos de estado aptos para daltonismo de Flock Platform.
 
-### 9.2 Detalle de proyecto (P0)
+### 8.2 Detalle de proyecto (P0)
 - **Gráfico** planificados vs quemados por sprint (barras agrupadas) con la línea de cumplimiento %.
 - **Tabla por sprint**: nombre, fechas, planificados, quemados, %, sin estimar y "ver detalle" (§7.3).
 - **Tabla por persona** del sprint seleccionado.
 - **Tabla por mes.**
-- Pestaña **Satisfacción** con la evolución de NPS y CSAT y las respuestas (P1).
 - **Toda tabla se exporta a Excel y a PDF** (regla de Flock).
 
-### 9.3 Informes (P0: sprint · P2: cliente)
+### 8.3 Informes (P0)
 - **Informe de sprint**: elegís proyecto, sprint y audiencia (equipo, cliente o gerencia). Contiene:
   - encabezado con la marca;
   - **objetivo del sprint** tal como viene de Jira (si no hay, se dice);
@@ -235,9 +210,7 @@ Para cada sprint **S** de un proyecto:
   - corte por **tipo de issue** (cantidad, SP planificados y SP quemados);
   - por persona: planificados vs quemados, y las issues que cerró en este sprint y las que siguen abiertas;
   - issues no terminadas;
-  - NPS y CSAT del período (si hay);
   - **narrativa con IA**, que contrasta la entrega contra el objetivo sin inventar alcance.
-- **Informe de cliente** (P2): por cuenta y mes, con todos sus proyectos, cumplimiento del mes, tendencia y satisfacción.
 - **Narrativa con IA**: recibe **solo los números ya calculados** y redacta un resumen en 3 o 4 oraciones según la audiencia. Si la IA falla, el informe se genera igual sin narrativa. El texto se puede editar antes de guardar.
 - **Guardar** congela el informe como una **foto inmutable** (datos + narrativa + fecha + autor). El historial lista los informes guardados.
 - **Exportar a PDF** con la marca.
@@ -247,15 +220,15 @@ Para cada sprint **S** de un proyecto:
 - [ ] Con la key de IA inválida, el informe se genera igual, con un aviso de "narrativa no disponible".
 - [ ] Un informe guardado no cambia aunque después cambien los datos de Jira.
 
-### 9.4 Configuración (P0/P1)
-- Pestañas: **Conexiones** (P0) · **Cuentas y proyectos** (P0) · **Usuarios** (P1) · **Umbrales y alertas** (P1) · **Auditoría** (P1).
+### 8.4 Configuración (P0)
+- Pestañas: **Conexiones** · **Cuentas y proyectos** · **Usuarios** (P1).
 
-### 9.5 Marca (P0, no configurable)
+### 8.5 Marca (P0, no configurable)
 - La app usa **un solo tema: el que tiene configurado hoy Flock Platform** en Configuración → Marca (leído el 2026-10-09). No hay selector de temas.
 - Todo vive en **un único CSS**: `frontend/src/styles/flock-brand.css`. Incluye tokens de modo claro y oscuro, menú lateral claro, banner con gradiente, botones de marca, semáforo, estados de issue, modal Flock Card, toasts, notificaciones y login `flock_modern`.
 - Ningún componente hardcodea colores: todos usan las variables de ese archivo.
 
-### 9.5.b Tablero de Jira (P0) — inspirado en el portal de Flock Platform
+### 8.5.b Tablero de Jira (P0) — inspirado en el portal de Flock Platform
 
 Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo y de solo lectura.
 
@@ -279,9 +252,7 @@ Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo
 - [ ] "Día X de Y" cuenta solo días hábiles.
 - [ ] Un Team Manager no ve el tablero de un proyecto ajeno (403).
 
-**Después:** portal del cliente (rol cliente que ve solo su cuenta) y resumen semanal con IA.
-
-### 9.6 Notificaciones (P1)
+### 8.6 Notificaciones (P1)
 
 **Eventos que generan un aviso:**
 
@@ -298,9 +269,9 @@ Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo
   - Cada aviso se puede marcar como leído y lleva link a la pantalla correspondiente.
   - Botón "Marcar todas como leídas".
 - **Destinatarios**: los Team Managers del proyecto y el admin.
-- **Detección**: un proceso del backend revisa los proyectos **cada 15 minutos** comparando el estado de los sprints con la última lectura guardada. Si están activos los webhooks de Jira (P2), el aviso es inmediato.
+- **Detección**: un proceso del backend revisa los proyectos **cada 15 minutos** comparando el estado de los sprints con la última lectura guardada.
 - **Sin duplicados**: cada evento se notifica una sola vez. La clave es tipo + proyecto + sprint (+ issue).
-- **Configurable** en Umbrales y alertas: activar o desactivar cada tipo, y los días hábiles de "sin iniciar" y "sin movimiento".
+- Los tipos y los días hábiles de "sin iniciar" (2) y "sin movimiento" (3) son fijos (no editables, ver §11).
 - Los días hábiles excluyen sábados y domingos. Los feriados quedan fuera de alcance.
 
 **Criterios de aceptación**
@@ -309,9 +280,9 @@ Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo
 - [ ] Una issue sin cambios hace 3 días hábiles genera el aviso de "sin movimiento". Si hace 2, no.
 - [ ] Un Team Manager no recibe avisos de proyectos que no son suyos.
 
-## 10. Asistente y MCP (P1)
+## 9. Asistente y MCP (P1)
 
-### 10.1 Tools (todas de solo lectura)
+### 9.1 Tools (todas de solo lectura)
 | Tool | Devuelve |
 |---|---|
 | `listar_proyectos` | Proyectos visibles para el usuario, con su estado |
@@ -319,10 +290,10 @@ Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo
 | `cumplimiento_mensual(proyecto?, mes)` | Agregado mensual por proyecto o cartera |
 | `tendencia(proyecto, n_sprints)` | Serie de los últimos N sprints |
 | `issues_no_terminadas(proyecto, sprint)` | Lista con responsable y SP |
-| `satisfaccion(proyecto?, periodo)` | NPS y CSAT |
 | `proyectos_en_riesgo()` | Proyectos bajo umbral, con motivo |
+| `tablero_sprint(proyecto)` | Tablero del sprint activo |
 
-### 10.2 Asistente en la app
+### 9.2 Asistente en la app
 - Es un widget flotante (**Asistente TM**) abajo a la derecha: se abre, se agranda y se minimiza sin tapar la página; conserva la conversación en la pestaña. En el celular ocupa toda la pantalla.
 - La respuesta viene con formato (Markdown: negritas, listas, tablas) y **tarjetas visuales** armadas con la salida de las tools (sprint con medidor, riesgo con semáforo, tendencia, tablero, issues). Los números de las tarjetas salen del motor, no del texto del modelo.
 - El modelo decide qué tools llamar, con un **máximo de 5 llamadas por turno**.
@@ -330,14 +301,14 @@ Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo
 - **Los números de la respuesta salen de las tools.** El prompt prohíbe calcular y exige citar el sprint o mes de cada dato.
 - El texto de Jira que devuelven las tools viaja marcado como dato externo. Si un título contiene algo como "ignorá las instrucciones…", **no se sigue** y se avisa al usuario.
 
-### 10.3 MCP server
+### 9.3 MCP server
 - Expone las mismas tools por MCP para usar el panel desde Claude Code o Cursor.
 - Se autentica con un **token personal** que el usuario genera en su perfil: va como header, se guarda hasheado y se puede revocar. Respeta los permisos de ese usuario.
 
-### 10.4 Observabilidad
+### 9.4 Observabilidad
 - Cada turno del asistente registra modelo, tools llamadas con sus argumentos, tokens de entrada y salida, costo estimado y latencia.
 
-### 10.5 Evals
+### 9.5 Evals
 - Golden set de **al menos 15 preguntas** con respuesta esperada: qué tools se llaman y qué números aparecen.
 - Se corre en CI con los datos de demo.
 
@@ -349,23 +320,29 @@ Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo
 
 ---
 
-## 11. Requisitos no funcionales
+## 10. Requisitos no funcionales
 
 | Tema | Requisito |
 |---|---|
 | **Seguridad** | Secretos solo en variables de entorno del backend. Tokens de Jira cifrados. Contraseñas con hash (argon2id o bcrypt). Cookies seguras. Rate limit en login. CORS limitado al dominio del front. Headers de seguridad (CSP, HSTS). Validación de todo input en el backend. |
 | **Privacidad** | El repo es público: solo datos sintéticos. Nada de nombres reales de clientes ni personas en código, tests o fixtures. |
-| **Auditoría** | Login (OK y fallido), ABM de conexiones, usuarios y proyectos, cambios de umbrales, informes guardados y respuestas NPS/CSAT. |
+| **Auditoría** | Login (OK, fallido, bloqueo y logout), ABM de conexiones y proyectos, e informes guardados. Se registra en base; no hay pantalla de auditoría (§11). |
 | **Performance** | El panel carga en menos de 2 s con datos en caché. Con Jira en frío muestra esqueleto de carga y datos parciales. |
 | **UX** | Español rioplatense. Responsive (desde 400 px). Modo claro y oscuro. Estados vacíos, de carga y de error en cada pantalla. Tipografía DM Sans y tokens de marca Flock. |
 | **Accesibilidad** | Contraste AA. Color nunca solo. Navegable con teclado. `prefers-reduced-motion`. |
-| **Calidad** | Tests del motor de cumplimiento (§7.4) y de las fórmulas NPS/CSAT. Lint y tests en CI para front y back. |
+| **Calidad** | Tests del motor de cumplimiento (§7.4). Lint y tests en CI para front y back. |
 
 ---
 
-## 12. Fuera de alcance
+## 11. Fuera de alcance
 - Escritura en Jira.
-- Envío de encuestas por mail.
 - OAuth de Atlassian (alcanza con API token).
 - Horas y presupuesto (son de Flock Platform).
-- Login con Microsoft (queda documentado como evolución).
+- Login con Microsoft.
+- Passkeys / WebAuthn (la variable `WEBAUTHN_RP_ID` existe en la config pero no se usa).
+- Asignar proyectos a un Team Manager desde la UI.
+- Umbrales del semáforo y alertas editables.
+- Pestaña de auditoría en la UI.
+- Portal del cliente y filtro de proyectos por cuenta (el rol `cliente` existe, ver §2).
+- Webhooks de Jira.
+- Fotos persistentes de sprints cerrados (`sprint_snapshots`).

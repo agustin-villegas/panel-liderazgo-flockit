@@ -8,9 +8,9 @@ type Tone = "brand" | "ok" | "warn" | "crit";
 
 const FILL: Record<Tone, string> = {
   brand: "bg-brand",
-  ok: "bg-[linear-gradient(90deg,var(--ok),#a78bfa)]",
-  warn: "bg-[linear-gradient(90deg,#fb923c,var(--warn))]",
-  crit: "bg-[linear-gradient(90deg,#f87171,var(--crit))]",
+  ok: "bg-[linear-gradient(90deg,var(--ok),var(--ok-soft))]",
+  warn: "bg-[linear-gradient(90deg,var(--warn-soft),var(--warn))]",
+  crit: "bg-[linear-gradient(90deg,var(--crit-soft),var(--crit))]",
 };
 
 type Props = { value: number; label: string; tone?: Tone; size?: "sm" | "md"; className?: string };

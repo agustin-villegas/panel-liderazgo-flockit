@@ -82,7 +82,7 @@ export function LoginForm() {
         <FieldError>{errors.password?.message}</FieldError>
       </Field>
 
-      <Button type="submit" size="lg" className="bg-brand text-white" disabled={isSubmitting}>
+      <Button type="submit" size="lg" variant="brand" disabled={isSubmitting}>
         {isSubmitting && <Loader2 className="size-4 animate-spin" />}
         Ingresar
       </Button>

@@ -15,7 +15,7 @@ BLOCKED_RE = re.compile(r"bloque|blocked|imped|espera|on hold", re.IGNORECASE)
 
 
 def lane_of(category: str | None, status: str, flagged: bool = False) -> Lane:
-    """Carril del tablero según categoría de Jira; bloqueo por nombre o flag (spec §9.5.b)."""
+    """Carril del tablero según categoría de Jira; bloqueo por nombre o flag (spec §8.5.b)."""
     if category == "done":
         return Lane.DONE
     if flagged or BLOCKED_RE.search(status or ""):

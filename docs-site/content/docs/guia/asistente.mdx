@@ -1,0 +1,101 @@
+---
+title: Asistente IA y tokens MCP
+description: Preguntarle al panel en lenguaje natural y conectarlo desde Claude Code o Cursor.
+---
+
+**Quién la ve**: **Admin y Team Manager**. El rol **Cliente no lo tiene**: ni el botón del asistente
+ni la opción "Tokens MCP" aparecen, y el servidor rechaza esos pedidos.
+
+## Asistente IA
+
+### Para qué sirve
+
+Hacer preguntas sobre tus proyectos sin navegar pantallas. El asistente consulta los datos del
+panel con herramientas de **solo lectura**; los números los entrega el motor, el asistente no los
+calcula. Solo ve los proyectos que ya ves vos.
+
+### Usarlo
+
+<Steps>
+<Step>
+
+Tocá el botón flotante del **Asistente TM** (abajo a la derecha).
+
+</Step>
+<Step>
+
+Escribí tu pregunta o elegí una sugerida, por ejemplo "¿Qué proyectos están en riesgo?" o "Mostrame
+la tendencia de los últimos 6 sprints".
+
+</Step>
+<Step>
+
+Leé la respuesta. Suele venir con tarjetas visuales (medidores, semáforos, listas de issues) y una
+conclusión corta.
+
+</Step>
+<Step>
+
+Usá **Nueva conversación** para empezar de cero, **Agrandar** o **Achicar** para cambiar el tamaño, y
+**Minimizar** para cerrarlo (o la tecla Esc).
+
+</Step>
+</Steps>
+
+### Qué esperar
+
+- Si no tiene un dato, dice "no tengo ese dato" en lugar de inventarlo.
+- Si pedís un proyecto que no ves, explica que no tenés acceso.
+- Hay un tope de consultas por turno; si lo alcanza, responde con lo que ya tiene.
+- Si el asistente no responde, aparece un aviso de error y podés reintentar.
+
+<Callout type="info" title="Texto de Jira">
+  El contenido que viene de Jira (títulos, descripciones) se trata como dato, nunca como
+  instrucción. Si hay texto sospechoso en alguna issue, el asistente te lo avisa.
+</Callout>
+
+## Tokens MCP
+
+### Para qué sirven
+
+Consultar el panel desde herramientas externas como **Claude Code** o **Cursor**. Un token
+representa tu usuario: respeta tus permisos y no ve nada más que vos.
+
+### Crear un token
+
+<Steps>
+<Step>
+
+Avatar → **Tokens MCP**.
+
+</Step>
+<Step>
+
+Escribí un nombre (por ejemplo "Claude Code notebook") y tocá **Crear**.
+
+</Step>
+<Step>
+
+**Copiá el token ahora**: se muestra una sola vez y no se puede volver a ver.
+
+</Step>
+<Step>
+
+Usalo como header `Authorization: Bearer <token>` contra la ruta `/mcp` del panel.
+
+</Step>
+</Steps>
+
+### Revocar un token
+
+En la misma ventana, tocá el tacho junto al token. Deja de funcionar al instante. Cada token
+muestra sus últimos 4 caracteres y cuándo se usó por última vez.
+
+<Callout type="warn" title="Tratá el token como una contraseña">
+  No lo compartas ni lo subas a un repositorio. Si lo perdés o se filtra, revocalo y creá otro.
+  Cuando un admin deshabilita a un usuario, sus tokens se revocan solos.
+</Callout>
+
+## Exportar
+
+El chat y los tokens no se exportan.

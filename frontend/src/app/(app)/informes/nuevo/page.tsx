@@ -1,16 +1,18 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Loader2, Save, Sparkles } from "lucide-react";
-import Link from "next/link";
+import { Loader2, Save, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { ErrorState } from "@/components/panel/error-state";
+import { PageHeader } from "@/components/panel/page-header";
 import { ReportDoc } from "@/components/report/report-doc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldLabel } from "@/components/ui/field";
+import { NativeSelect } from "@/components/ui/native-select";
 import {
   api,
   post,
@@ -22,7 +24,6 @@ import {
   type Story,
 } from "@/lib/api/client";
 
-const sel = "h-9 w-full rounded-md border bg-background px-2 text-sm disabled:opacity-50";
 const AUDS: { value: Audience; label: string }[] = [
   { value: "equipo", label: "Equipo" },
   { value: "cliente", label: "Cliente" },
@@ -82,26 +83,18 @@ export default function NewReportPage() {
 
   return (
     <>
-      <Link
-        href="/informes"
-        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" /> Informes
-      </Link>
-      <section className="banner">
-        <h1 className="text-2xl font-bold tracking-tight">Nuevo informe de sprint</h1>
-        <p className="mt-1 text-white/85">
-          Elegí proyecto, sprint y audiencia. La IA redacta; vos revisás y guardás.
-        </p>
-      </section>
+      <PageHeader
+        back={{ href: "/informes", label: "Informes" }}
+        title="Nuevo informe de sprint"
+        description="Elegí proyecto, sprint y audiencia. La IA redacta; vos revisás y guardás."
+      />
 
       <Card className="print:hidden">
-        <CardContent className="grid gap-4 md:grid-cols-[1fr_1fr_180px_auto] md:items-end">
+        <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 lg:items-end">
           <Field>
             <FieldLabel htmlFor="r-proj">Proyecto</FieldLabel>
-            <select
+            <NativeSelect
               id="r-proj"
-              className={sel}
               value={project}
               onChange={(e) => (setProject(e.target.value), setSprint(""), reset())}
             >
@@ -111,13 +104,12 @@ export default function NewReportPage() {
                   {p.name} · {p.account}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
           </Field>
           <Field>
             <FieldLabel htmlFor="r-sprint">Sprint</FieldLabel>
-            <select
+            <NativeSelect
               id="r-sprint"
-              className={sel}
               value={sprint}
               disabled={!project || comp.isLoading}
               onChange={(e) => (setSprint(e.target.value), reset())}
@@ -129,13 +121,12 @@ export default function NewReportPage() {
                   {s.provisional ? " (en curso)" : ""}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
           </Field>
           <Field>
             <FieldLabel htmlFor="r-aud">Audiencia</FieldLabel>
-            <select
+            <NativeSelect
               id="r-aud"
-              className={sel}
               value={audience}
               onChange={(e) => (setAudience(e.target.value as Audience), reset())}
             >
@@ -144,12 +135,12 @@ export default function NewReportPage() {
                   {a.label}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
           </Field>
           <Button
             onClick={() => gen.mutate()}
             disabled={!project || !sprint || gen.isPending}
-            className="bg-brand text-white"
+            variant="brand"
           >
             {gen.isPending ? (
               <Loader2 className="size-4 animate-spin" />
@@ -160,6 +151,23 @@ export default function NewReportPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {projects.error && (
+        <Card>
+          <ErrorState
+            message={`No se pudieron cargar los proyectos: ${projects.error.message}`}
+            onRetry={() => projects.refetch()}
+          />
+        </Card>
+      )}
+      {comp.error && (
+        <Card>
+          <ErrorState
+            message={`No se pudieron cargar los sprints: ${comp.error.message}`}
+            onRetry={() => comp.refetch()}
+          />
+        </Card>
+      )}
 
       {gen.isPending && (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">

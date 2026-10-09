@@ -12,6 +12,7 @@ export type Conn = S["ConnOut"];
 export type ConnIn = S["ConnIn"];
 export type TestOut = S["TestOut"];
 export type Board = S["BoardOut"];
+export type PanelUser = S["UserOut"];
 export type Account = S["AccountOut"];
 export type Project = S["ProjectOut"];
 export type ProjectIn = S["ProjectIn"];

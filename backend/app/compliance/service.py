@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 TTL = timedelta(minutes=5)
 TREND = 6
-OK, WARN = 0.85, 0.70  # umbrales del semáforo (spec §9.1)
+OK, WARN = 0.85, 0.70  # umbrales del semáforo (spec §8.1)
 
 
 def light(pct: float | None) -> str:

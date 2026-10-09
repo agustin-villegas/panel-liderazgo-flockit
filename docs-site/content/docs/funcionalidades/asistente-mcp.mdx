@@ -1,0 +1,69 @@
+---
+title: Asistente IA y MCP
+description: Chat sobre tus proyectos con Google ADK y un servidor MCP con las mismas tools.
+---
+
+## Las tools
+
+Asistente y MCP comparten **una sola implementación** (`backend/app/ai/tools.py`). Son de **solo
+lectura** y filtran por los permisos del usuario.
+
+| Tool                   | Qué hace                                                                     |
+| ---------------------- | ---------------------------------------------------------------------------- |
+| `listar_proyectos`     | Proyectos que el usuario puede ver                                           |
+| `cumplimiento_sprint`  | Planificados, quemados, % y detalle por persona (último cerrado por defecto) |
+| `cumplimiento_mensual` | Cumplimiento por mes, o de un mes `AAAA-MM`                                  |
+| `tendencia`            | Serie de los últimos N sprints cerrados (hasta 12)                           |
+| `issues_no_terminadas` | Issues sin terminar de un sprint, con responsable y SP                       |
+| `proyectos_en_riesgo`  | Proyectos bajo el umbral, con el motivo                                      |
+| `tablero_sprint`       | Tablero del sprint activo                                                    |
+
+## Asistente (Google ADK)
+
+- Endpoint: `POST /api/asistente/mensaje`. En el front es el widget flotante **Asistente TM**.
+- El modelo llama tools, recibe números ya calculados y responde con texto Markdown y tarjetas.
+- Límite de **5 llamadas a tools por turno**.
+- Cada turno se registra en `ai_traces`: modelo, tools usadas, tokens y latencia.
+- El modelo se define con `AI_MODEL` (por defecto `gpt-5.4-mini`) y la clave `OPENAI_API_KEY`;
+  ADK lo usa vía LiteLLM.
+- Solo **admin** y **Team Manager**: el rol cliente no puede usarlo.
+
+### Texto de Jira no confiable
+
+Títulos y otros textos de Jira se recortan (300 caracteres) y se envuelven como
+`«dato_externo: ...»`. Un detector marca los que intentan dar órdenes al modelo (por ejemplo "ignorá
+las instrucciones") y el asistente avisa al usuario en vez de obedecer.
+
+## Servidor MCP
+
+- Ruta `/mcp` en el mismo backend (HTTP _streamable_, sin sesiones en memoria).
+- Autenticación con `Authorization: Bearer <token>`. Sin token válido responde 401.
+- Expone las mismas 7 tools, marcadas de solo lectura.
+
+### Tokens personales
+
+Cada usuario (admin o Team Manager) crea sus tokens desde su perfil:
+
+- `POST /api/perfil/tokens-mcp` devuelve el valor **una sola vez**. En base queda solo el hash y los
+  últimos 4 caracteres.
+- `GET /api/perfil/tokens-mcp` los lista y `DELETE /api/perfil/tokens-mcp/{id}` los revoca.
+- Con el token, el cliente MCP ve **lo mismo que el usuario** en el panel, nada más.
+
+Ejemplo de configuración de un cliente MCP (con un token propio):
+
+```json
+{
+  "mcpServers": {
+    "panel-liderazgo": {
+      "type": "http",
+      "url": "https://<backend>/mcp",
+      "headers": { "Authorization": "Bearer <TU_TOKEN>" }
+    }
+  }
+}
+```
+
+<Callout type="warn">
+  `/mcp` está montado en el backend, fuera del prefijo `/api`. Usá la URL del backend
+  (`https://<backend>/mcp`), no la del front, salvo que el front tenga un rewrite propio para esa ruta.
+</Callout>
