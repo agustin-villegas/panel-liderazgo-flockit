@@ -7,7 +7,6 @@ import { useMemo, useState } from "react";
 import { ExportButtons } from "@/components/panel/export-buttons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -22,6 +21,9 @@ import { api, type SprintBoard, type Ticket } from "@/lib/api/client";
 import type { Col } from "@/lib/export";
 import { day, pct, pts } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { BrandBar } from "@/components/viz/brand-bar";
+import { Gauge } from "@/components/viz/gauge";
+import { PACE_CHIP, pace, type PaceTone } from "@/components/viz/pace";
 
 import { BoardDonut } from "./board-donut";
 import { LANES, LANE_ORDER, type LaneKey } from "./lanes";
@@ -85,25 +87,7 @@ export function BoardView({ project }: { project: string }) {
         </p>
       )}
 
-      {sprint && (
-        <Card>
-          <CardContent className="grid gap-4 md:grid-cols-[1fr_2fr] md:items-center">
-            <div>
-              <p className="text-xs text-muted-foreground">
-                {day(sprint.start)} – {day(sprint.end)}
-              </p>
-              <p className="text-lg font-semibold">{sprint.name}</p>
-              <p className="text-sm text-muted-foreground">
-                Día {sprint.day} de {sprint.days} hábiles
-              </p>
-            </div>
-            <div className="grid gap-3">
-              <Bar label="Tiempo transcurrido" value={sprint.time_pct} />
-              <Bar label="Tarjetas finalizadas" value={data.done_pct ?? 0} />
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {sprint && <SprintHeader sprint={sprint} done={data.done_pct ?? 0} />}
 
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-5" aria-label="Resumen del tablero">
         {tiles.map((t) => (
@@ -270,14 +254,63 @@ export function BoardView({ project }: { project: string }) {
   );
 }
 
-function Bar({ label, value }: { label: string; value: number }) {
+function SprintHeader({
+  sprint,
+  done,
+}: {
+  sprint: NonNullable<SprintBoard["sprint"]>;
+  done: number;
+}) {
+  const p = pace(done, sprint.time_pct);
+  return (
+    <Card className="overflow-hidden">
+      <div className="bg-brand h-1" aria-hidden />
+      <CardContent className="grid gap-6 pt-2 md:grid-cols-[1fr_auto] md:items-center">
+        <div className="grid gap-3">
+          <div>
+            <p className="text-xs text-muted-foreground">
+              {day(sprint.start)} – {day(sprint.end)}
+            </p>
+            <p className="text-xl font-semibold">{sprint.name}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <span className="rounded-full bg-secondary px-3 py-1 font-medium text-secondary-foreground">
+              Día {sprint.day} de {sprint.days} hábiles
+            </span>
+            <span className={cn("rounded-full border px-3 py-1 font-semibold", PACE_CHIP[p.tone])}>
+              {p.label}
+            </span>
+          </div>
+          <div className="grid gap-2">
+            <BarRow label="Tiempo transcurrido" value={sprint.time_pct} tone="brand" />
+            <BarRow label="Tarjetas finalizadas" value={done} tone={p.tone} />
+          </div>
+        </div>
+        <div className="flex justify-center gap-6">
+          <Gauge value={sprint.time_pct} label="Tiempo" tone="brand" />
+          <Gauge value={done} label="Finalizadas" tone={p.tone} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function BarRow({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "brand" | PaceTone;
+}) {
   return (
     <div className="grid gap-1">
       <div className="flex justify-between text-sm">
-        <span>{label}</span>
+        <span className="text-muted-foreground">{label}</span>
         <span className="font-semibold">{pct(value)}</span>
       </div>
-      <Progress value={Math.round(value * 100)} aria-label={label} />
+      <BrandBar value={value} label={label} tone={tone} />
     </div>
   );
 }
