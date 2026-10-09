@@ -522,6 +522,30 @@ export interface components {
       /** Pct */
       pct: number | null;
     };
+    /** BoardCard */
+    BoardCard: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "tablero";
+      /** Project */
+      project: string;
+      /** Sprint */
+      sprint: string | null;
+      /** Todo */
+      todo: number;
+      /** Doing */
+      doing: number;
+      /** Blocked */
+      blocked: number;
+      /** Done */
+      done: number;
+      /** Done Pct */
+      done_pct: number | null;
+      /** Time Pct */
+      time_pct: number | null;
+    };
     /** BoardOut */
     BoardOut: {
       /** Id */
@@ -566,6 +590,14 @@ export interface components {
       answer: string;
       /** Tools */
       tools: string[];
+      /** Cards */
+      cards?: (
+        | components["schemas"]["SprintCard"]
+        | components["schemas"]["RiskCard"]
+        | components["schemas"]["TrendCard"]
+        | components["schemas"]["BoardCard"]
+        | components["schemas"]["IssuesCard"]
+      )[];
       /**
        * Trace Id
        * Format: uuid
@@ -680,6 +712,35 @@ export interface components {
       status: string;
       /** Version */
       version: string;
+    };
+    /** IssueItem */
+    IssueItem: {
+      /** Key */
+      key: string;
+      /** Title */
+      title: string;
+      /** Status */
+      status: string;
+      /** Assignee */
+      assignee: string;
+      /** Sp */
+      sp: number | null;
+    };
+    /** IssuesCard */
+    IssuesCard: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "issues";
+      /** Project */
+      project: string;
+      /** Sprint */
+      sprint: string;
+      /** Total */
+      total: number;
+      /** Items */
+      items: components["schemas"]["IssueItem"][];
     };
     /** LineOut */
     LineOut: {
@@ -819,6 +880,19 @@ export interface components {
       burned: number;
       /** Pct */
       pct: number | null;
+    };
+    /** Point */
+    Point: {
+      /** Label */
+      label: string;
+      /** Pct */
+      pct: number | null;
+      /** Light */
+      light: string;
+      /** Planned */
+      planned?: number | null;
+      /** Burned */
+      burned?: number | null;
     };
     /** PreviewOut */
     PreviewOut: {
@@ -962,6 +1036,29 @@ export interface components {
       /** Author */
       author: string;
     };
+    /** RiskCard */
+    RiskCard: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "riesgo";
+      /** Items */
+      items: components["schemas"]["RiskItem"][];
+      /** No Data */
+      no_data: string[];
+    };
+    /** RiskItem */
+    RiskItem: {
+      /** Project */
+      project: string;
+      /** Sprint */
+      sprint: string;
+      /** Pct */
+      pct: number | null;
+      /** Light */
+      light: string;
+    };
     /** SaveIn */
     SaveIn: {
       /**
@@ -989,6 +1086,30 @@ export interface components {
       cards: components["schemas"]["TicketOut"][];
       /** Notice */
       notice?: string | null;
+    };
+    /** SprintCard */
+    SprintCard: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "sprint";
+      /** Project */
+      project: string;
+      /** Sprint */
+      sprint: string;
+      /** State */
+      state: string;
+      /** Pct */
+      pct: number | null;
+      /** Light */
+      light: string;
+      /** Planned */
+      planned: number | null;
+      /** Burned */
+      burned: number | null;
+      /** People */
+      people: components["schemas"]["Point"][];
     };
     /** SprintInfo */
     SprintInfo: {
@@ -1149,6 +1270,20 @@ export interface components {
       created_at: string;
       /** Last Used At */
       last_used_at: string | null;
+    };
+    /** TrendCard */
+    TrendCard: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      kind: "tendencia";
+      /** Project */
+      project: string;
+      /** Title */
+      title: string;
+      /** Points */
+      points: components["schemas"]["Point"][];
     };
     /** TrendPoint */
     TrendPoint: {

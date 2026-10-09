@@ -321,7 +321,8 @@ Pestaña **Tablero** en el detalle de proyecto, con el **sprint activo** en vivo
 | `proyectos_en_riesgo()` | Proyectos bajo umbral, con motivo |
 
 ### 10.2 Asistente en la app
-- Es un chat lateral.
+- Es un widget flotante (**Asistente TM**) abajo a la derecha: se abre, se agranda y se minimiza sin tapar la página; conserva la conversación en la pestaña. En el celular ocupa toda la pantalla.
+- La respuesta viene con formato (Markdown: negritas, listas, tablas) y **tarjetas visuales** armadas con la salida de las tools (sprint con medidor, riesgo con semáforo, tendencia, tablero, issues). Los números de las tarjetas salen del motor, no del texto del modelo.
 - El modelo decide qué tools llamar, con un **máximo de 5 llamadas por turno**.
 - Las tools **filtran por los permisos del usuario**: un Team Manager no puede consultar proyectos ajenos aunque lo pida.
 - **Los números de la respuesta salen de las tools.** El prompt prohíbe calcular y exige citar el sprint o mes de cada dato.

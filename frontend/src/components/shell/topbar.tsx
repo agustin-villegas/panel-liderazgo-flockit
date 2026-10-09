@@ -1,11 +1,11 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { KeyRound, LogOut, Plug, Sparkles } from "lucide-react";
+import { KeyRound, LogOut, Plug } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { AssistantSheet } from "@/components/assistant/assistant-sheet";
+import { AssistantWidget } from "@/components/assistant/assistant-widget";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,6 @@ export function Topbar() {
   const qc = useQueryClient();
   const { data: me } = useMe();
   const [pwd, setPwd] = useState(false);
-  const [chat, setChat] = useState(false);
   const [mcp, setMcp] = useState(false);
   // el back decide; el front solo oculta (spec §2: el cliente no usa el asistente)
   const ai = !!me && me.role !== "cliente";
@@ -52,12 +51,6 @@ export function Topbar() {
     <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur">
       <SidebarTrigger />
       <div className="flex-1" />
-      {ai && (
-        <Button variant="outline" size="sm" onClick={() => setChat(true)}>
-          <Sparkles className="size-4 text-primary" />
-          Asistente
-        </Button>
-      )}
       <NotificationBell />
       <ThemeToggle />
       <DropdownMenu>
@@ -102,7 +95,7 @@ export function Topbar() {
         </DropdownMenuContent>
       </DropdownMenu>
       <PasswordDialog open={pwd} onClose={() => setPwd(false)} />
-      {ai && <AssistantSheet open={chat} onClose={() => setChat(false)} />}
+      {ai && <AssistantWidget />}
       {ai && <McpDialog open={mcp} onClose={() => setMcp(false)} />}
     </header>
   );

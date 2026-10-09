@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.ai.cards import Card
+
 
 class MsgIn(BaseModel):
     role: Literal["user", "assistant"]
@@ -17,6 +19,7 @@ class ChatIn(BaseModel):
 class ChatOut(BaseModel):
     answer: str
     tools: list[str]
+    cards: list[Card] = Field(default_factory=list)
     trace_id: UUID
 
 

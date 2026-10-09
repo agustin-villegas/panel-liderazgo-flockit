@@ -52,7 +52,9 @@ async def message(
     )
     db.add(trace)
     await db.commit()
-    return ChatOut(answer=ans.text, tools=[t["name"] for t in ans.tools], trace_id=trace.id)
+    return ChatOut(
+        answer=ans.text, tools=[t["name"] for t in ans.tools], cards=ans.cards, trace_id=trace.id
+    )
 
 
 # ── tokens personales del MCP ──

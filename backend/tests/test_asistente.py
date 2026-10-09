@@ -14,6 +14,7 @@ from pydantic import Field
 from sqlalchemy import select
 
 from app.ai.agent import MAX_CALLS
+from app.ai.cards import num, unwrap
 from app.ai.factory import make_box
 from app.ai.models import AiTrace, McpToken
 from app.ai.tools import dumps
@@ -389,3 +390,33 @@ def test_cliente_sin_asistente_ni_tokens(admin, login):
     admin.app.state.chat = FakeChat([Reply("no debería llegar")])
     assert ask(admin).status_code == 403
     assert admin.post("/api/perfil/tokens-mcp", json={"name": "x"}).status_code == 403
+
+
+# ── tarjetas ──
+def test_num_y_unwrap():
+    assert num("30,4 %") == pytest.approx(0.304)
+    assert num("26") == 26.0
+    assert num("sin datos") is None
+    assert unwrap("«dato_externo: Hola»") == "Hola"
+
+
+def test_tarjeta_sprint_igual_al_endpoint(admin):
+    pid = new_project(admin)
+    sprints = admin.get(f"/api/proyectos/{pid}/cumplimiento").json()["sprints"]
+    last = [s for s in sprints if not s["provisional"]][-1]
+    admin.app.state.chat = FakeChat(
+        [Reply(None, [call("cumplimiento_sprint", proyecto="portal")]), Reply("ok")]
+    )
+    card = ask(admin).json()["cards"][0]
+    assert card["kind"] == "sprint"
+    assert card["sprint"] == last["name"]
+    assert card["pct"] == pytest.approx(last["pct"], abs=0.001)
+    assert card["planned"] == last["planned"]
+    assert card["light"] == last["light"]
+
+
+def test_tool_con_error_no_genera_tarjeta(admin):
+    admin.app.state.chat = FakeChat(
+        [Reply(None, [call("cumplimiento_sprint", proyecto="Fantasma")]), Reply("ok")]
+    )
+    assert ask(admin).json()["cards"] == []

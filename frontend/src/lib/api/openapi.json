@@ -1214,6 +1214,81 @@
         "required": ["name", "day", "days", "planned", "burned", "pct"],
         "title": "ActiveOut"
       },
+      "BoardCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "tablero",
+            "title": "Kind",
+            "default": "tablero"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sprint"
+          },
+          "todo": {
+            "type": "integer",
+            "title": "Todo"
+          },
+          "doing": {
+            "type": "integer",
+            "title": "Doing"
+          },
+          "blocked": {
+            "type": "integer",
+            "title": "Blocked"
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          },
+          "done_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done Pct"
+          },
+          "time_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Pct"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project",
+          "sprint",
+          "todo",
+          "doing",
+          "blocked",
+          "done",
+          "done_pct",
+          "time_pct"
+        ],
+        "title": "BoardCard"
+      },
       "BoardOut": {
         "properties": {
           "id": {
@@ -1341,6 +1416,39 @@
             },
             "type": "array",
             "title": "Tools"
+          },
+          "cards": {
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SprintCard"
+                },
+                {
+                  "$ref": "#/components/schemas/RiskCard"
+                },
+                {
+                  "$ref": "#/components/schemas/TrendCard"
+                },
+                {
+                  "$ref": "#/components/schemas/BoardCard"
+                },
+                {
+                  "$ref": "#/components/schemas/IssuesCard"
+                }
+              ],
+              "discriminator": {
+                "propertyName": "kind",
+                "mapping": {
+                  "issues": "#/components/schemas/IssuesCard",
+                  "riesgo": "#/components/schemas/RiskCard",
+                  "sprint": "#/components/schemas/SprintCard",
+                  "tablero": "#/components/schemas/BoardCard",
+                  "tendencia": "#/components/schemas/TrendCard"
+                }
+              }
+            },
+            "type": "array",
+            "title": "Cards"
           },
           "trace_id": {
             "type": "string",
@@ -1643,6 +1751,72 @@
         "type": "object",
         "required": ["status", "version"],
         "title": "Health"
+      },
+      "IssueItem": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "assignee": {
+            "type": "string",
+            "title": "Assignee"
+          },
+          "sp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp"
+          }
+        },
+        "type": "object",
+        "required": ["key", "title", "status", "assignee", "sp"],
+        "title": "IssueItem"
+      },
+      "IssuesCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "issues",
+            "title": "Kind",
+            "default": "issues"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "type": "string",
+            "title": "Sprint"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/IssueItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": ["project", "sprint", "total", "items"],
+        "title": "IssuesCard"
       },
       "LineOut": {
         "properties": {
@@ -2000,6 +2174,54 @@
         "required": ["name", "planned", "burned", "pct"],
         "title": "PersonOut"
       },
+      "Point": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          },
+          "planned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned"
+          },
+          "burned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Burned"
+          }
+        },
+        "type": "object",
+        "required": ["label", "pct", "light"],
+        "title": "Point"
+      },
       "PreviewOut": {
         "properties": {
           "data": {
@@ -2353,6 +2575,63 @@
         "required": ["id", "title", "audience", "project", "pct", "created_at", "author"],
         "title": "ReportRow"
       },
+      "RiskCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "riesgo",
+            "title": "Kind",
+            "default": "riesgo"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RiskItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "no_data": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "No Data"
+          }
+        },
+        "type": "object",
+        "required": ["items", "no_data"],
+        "title": "RiskCard"
+      },
+      "RiskItem": {
+        "properties": {
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "type": "string",
+            "title": "Sprint"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          }
+        },
+        "type": "object",
+        "required": ["project", "sprint", "pct", "light"],
+        "title": "RiskItem"
+      },
       "SaveIn": {
         "properties": {
           "project_id": {
@@ -2435,6 +2714,75 @@
         "type": "object",
         "required": ["sprint", "counts", "done_pct", "cards"],
         "title": "SprintBoardOut"
+      },
+      "SprintCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "sprint",
+            "title": "Kind",
+            "default": "sprint"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "sprint": {
+            "type": "string",
+            "title": "Sprint"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "light": {
+            "type": "string",
+            "title": "Light"
+          },
+          "planned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Planned"
+          },
+          "burned": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Burned"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            },
+            "type": "array",
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": ["project", "sprint", "state", "pct", "light", "planned", "burned", "people"],
+        "title": "SprintCard"
       },
       "SprintInfo": {
         "properties": {
@@ -2846,6 +3194,34 @@
         "type": "object",
         "required": ["id", "name", "last4", "created_at", "last_used_at"],
         "title": "TokenOut"
+      },
+      "TrendCard": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "tendencia",
+            "title": "Kind",
+            "default": "tendencia"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": ["project", "title", "points"],
+        "title": "TrendCard"
       },
       "TrendPoint": {
         "properties": {
