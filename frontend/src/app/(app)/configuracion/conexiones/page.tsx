@@ -143,6 +143,7 @@ export default function ConnectionsPage() {
       <ConnDialog open={open} edit={edit} onClose={() => setOpen(false)} />
       <DeleteDialog
         name={drop?.name ?? null}
+        action="Eliminar"
         detail={`Los ${drop?.projects ?? 0} proyectos que la usan quedan sin conexión.`}
         onCancel={() => setDrop(null)}
         onConfirm={(typed) => drop && remove.mutate({ c: drop, typed })}

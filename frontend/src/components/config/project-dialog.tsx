@@ -16,18 +16,29 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { api, post, type Account, type Board, type Conn, type Project } from "@/lib/api/client";
+import {
+  api,
+  patch,
+  post,
+  type Account,
+  type Board,
+  type Conn,
+  type Project,
+} from "@/lib/api/client";
 
 const NEW = "__nueva__";
 const sel = "bg-background h-9 w-full rounded-md border px-2 text-sm disabled:opacity-50";
 
-export function ProjectDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+type Props = { open: boolean; onClose: () => void; edit?: Project | null };
+
+/** Alta y edición de proyecto; montar con `key` distinta por proyecto. */
+export function ProjectDialog({ open, onClose, edit }: Props) {
   const qc = useQueryClient();
-  const [acc, setAcc] = useState("");
+  const [acc, setAcc] = useState(edit?.account_id ?? "");
   const [accName, setAccName] = useState("");
-  const [conn, setConn] = useState("");
-  const [board, setBoard] = useState("");
-  const [name, setName] = useState("");
+  const [conn, setConn] = useState(edit?.conn_id ?? "");
+  const [board, setBoard] = useState(edit?.board_id ? String(edit.board_id) : "");
+  const [name, setName] = useState(edit?.name ?? "");
 
   const accounts = useQuery({
     queryKey: ["cuentas"],
@@ -50,17 +61,21 @@ export function ProjectDialog({ open, onClose }: { open: boolean; onClose: () =>
       let accountId = acc;
       if (acc === NEW) accountId = (await post<Account>("/cuentas", { name: accName })).id;
       const b = boards.data?.find((x) => String(x.id) === board);
-      return post<Project>("/proyectos", {
+      const body = {
         name,
         account_id: accountId,
         conn_id: conn,
         board_id: Number(board),
-        board_name: b?.name ?? "",
-        managers: [],
-      });
+        board_name: b?.name ?? edit?.board_name ?? "",
+        from_sprint: edit?.from_sprint ?? null,
+        managers: edit?.managers ?? [],
+      };
+      return edit
+        ? patch<Project>(`/proyectos/${edit.id}`, body)
+        : post<Project>("/proyectos", body);
     },
     onSuccess: () => {
-      toast.success("Proyecto creado");
+      toast.success(edit ? "Proyecto actualizado" : "Proyecto creado");
       for (const k of ["proyectos", "cartera", "cuentas", "conexiones"])
         qc.invalidateQueries({ queryKey: [k] });
       close();
@@ -84,7 +99,7 @@ export function ProjectDialog({ open, onClose }: { open: boolean; onClose: () =>
     <Dialog open={open} onOpenChange={(o) => !o && close()}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Nuevo proyecto</DialogTitle>
+          <DialogTitle>{edit ? "Editar proyecto" : "Nuevo proyecto"}</DialogTitle>
           <DialogDescription>
             Vinculá el proyecto a un board de Jira para medir su cumplimiento.
           </DialogDescription>
@@ -165,7 +180,7 @@ export function ProjectDialog({ open, onClose }: { open: boolean; onClose: () =>
           </Button>
           <Button onClick={() => save.mutate()} disabled={!ready || save.isPending}>
             {save.isPending && <Loader2 className="size-4 animate-spin" />}
-            Crear proyecto
+            {edit ? "Guardar cambios" : "Crear proyecto"}
           </Button>
         </DialogFooter>
       </DialogContent>

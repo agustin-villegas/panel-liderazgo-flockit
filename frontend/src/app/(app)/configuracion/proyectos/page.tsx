@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Archive, Plus } from "lucide-react";
+import { Archive, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ import type { Col } from "@/lib/export";
 export default function ProjectsConfigPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [edit, setEdit] = useState<Project | null>(null);
   const [drop, setDrop] = useState<Project | null>(null);
   const projects = useQuery({
     queryKey: ["proyectos"],
@@ -70,7 +71,7 @@ export default function ProjectsConfigPage() {
               cols={cols}
               rows={projects.data ?? []}
             />
-            <Button onClick={() => setOpen(true)} className="print:hidden">
+            <Button onClick={() => (setEdit(null), setOpen(true))} className="print:hidden">
               <Plus className="size-4" /> Nuevo proyecto
             </Button>
           </div>
@@ -105,14 +106,24 @@ export default function ProjectsConfigPage() {
                     <TableCell className="text-muted-foreground">{connName(p.conn_id)}</TableCell>
                     <TableCell className="text-muted-foreground">{p.board_name}</TableCell>
                     <TableCell className="text-right print:hidden">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Archivar"
-                        onClick={() => setDrop(p)}
-                      >
-                        <Archive className="size-4" />
-                      </Button>
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Editar"
+                          onClick={() => (setEdit(p), setOpen(true))}
+                        >
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Archivar"
+                          onClick={() => setDrop(p)}
+                        >
+                          <Archive className="size-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -122,10 +133,13 @@ export default function ProjectsConfigPage() {
         </CardContent>
       </Card>
 
-      <ProjectDialog open={open} onClose={() => setOpen(false)} />
+      {open && (
+        <ProjectDialog key={edit?.id ?? "new"} open edit={edit} onClose={() => setOpen(false)} />
+      )}
       <DeleteDialog
         name={drop?.name ?? null}
-        detail="El proyecto se archiva: deja de aparecer en el panel."
+        action="Archivar"
+        detail="El proyecto deja de aparecer en el panel. Sus datos se conservan."
         onCancel={() => setDrop(null)}
         onConfirm={() => drop && archive.mutate(drop)}
       />
