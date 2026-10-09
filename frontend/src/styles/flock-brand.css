@@ -77,6 +77,9 @@
   --doing: #2563eb;
   --blocked: #dc2626;
   --done: #0d9488;
+  --doing-bg: #dbeafe;
+  --doing-fg: #1d4ed8;
+  --ink: #1c1033; /* texto sobre colores claros de la paleta */
 }
 
 /* ─── Oscuro ─── */
@@ -124,6 +127,8 @@
   --crit-fg: #fca5a5;
   --idle-bg: color-mix(in srgb, #94a3b8 18%, black);
   --idle-fg: #cbd5e1;
+  --doing-bg: color-mix(in srgb, #2563eb 24%, black);
+  --doing-fg: #93c5fd;
 }
 
 /* ─── Utilidades de marca ─── */
@@ -320,4 +325,29 @@
   width: 40%;
   background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.45), transparent);
   animation: shimmer 2.4s ease-in-out infinite;
+}
+
+/* Card interactiva: sube un poco al pasar el mouse o enfocar */
+.lift {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.lift:hover,
+.lift:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px rgb(124 58 237 / 0.35);
+}
+
+/* Tabla larga: encabezado fijo + cebra suave */
+.table-zebra thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--card);
+}
+
+.table-zebra tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--muted) 45%, transparent);
 }

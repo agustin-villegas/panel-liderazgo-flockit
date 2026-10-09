@@ -41,6 +41,9 @@
   --color-doing: var(--doing);
   --color-blocked: var(--blocked);
   --color-done: var(--done);
+  --color-doing-bg: var(--doing-bg);
+  --color-doing-fg: var(--doing-fg);
+  --color-ink: var(--ink);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
