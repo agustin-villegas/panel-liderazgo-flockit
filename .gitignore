@@ -1,0 +1,21 @@
+# Dependencias y entornos
+.venv/
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Secretos: ningún .env se versiona, salvo los .env.example
+.env
+.env.*
+!.env.example
+
+# Build / runtime
+.next/
+dist/
+.vercel/
+.adk/
+logs/
+*.db
+coverage/
