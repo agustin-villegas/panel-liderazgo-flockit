@@ -39,8 +39,9 @@ back, front = ROOT / "backend", ROOT / "frontend"
 errors: list[str] = []
 
 if path.suffix == ".py" and back in path.parents and (uv := tool("uv")):
-    errors.append(run([uv, "run", "ruff", "check", "--fix", str(path)], back))
+    run([uv, "run", "ruff", "check", "--fix", str(path)], back)
     run([uv, "run", "ruff", "format", str(path)], back)
+    errors.append(run([uv, "run", "ruff", "check", str(path)], back))
 
 elif path.suffix in {".ts", ".tsx", ".css", ".json"} and front in path.parents and (pnpm := tool("pnpm")):
     run([pnpm, "exec", "prettier", "--write", str(path)], front)

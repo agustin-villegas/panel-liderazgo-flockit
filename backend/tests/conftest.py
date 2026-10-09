@@ -16,7 +16,7 @@ os.environ.update(
     {
         "DATABASE_URL": "sqlite+aiosqlite:///:memory:",
         "SESSION_SECRET": "s" * 40,
-        "ENCRYPTION_KEY": "k" * 44,
+        "ENCRYPTION_KEY": "A" * 43 + "=",  # 32 bytes en base64
         "CRON_SECRET": "c" * 20,
         "ADMIN_EMAIL": ADMIN,
         "ADMIN_PASSWORD_HASH": get_passwords().hash(PWD),
