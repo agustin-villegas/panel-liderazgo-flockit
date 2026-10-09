@@ -881,6 +881,21 @@ export interface components {
       /** Pct */
       pct: number | null;
     };
+    /** PersonWork */
+    PersonWork: {
+      /** Name */
+      name: string;
+      /** Planned */
+      planned: number;
+      /** Burned */
+      burned: number;
+      /** Pct */
+      pct: number | null;
+      /** Closed */
+      closed: components["schemas"]["WorkItem"][];
+      /** Open */
+      open: components["schemas"]["WorkItem"][];
+    };
     /** Point */
     Point: {
       /** Label */
@@ -968,6 +983,16 @@ export interface components {
       /** Pending */
       pending: components["schemas"]["Pending"][];
       month: components["schemas"]["MonthOut"] | null;
+      /**
+       * Types
+       * @default []
+       */
+      types: components["schemas"]["TypeSlice"][];
+      /**
+       * Work
+       * @default []
+       */
+      work: components["schemas"]["PersonWork"][];
     };
     /** ReportIn */
     ReportIn: {
@@ -1296,6 +1321,17 @@ export interface components {
       /** Pct */
       pct: number | null;
     };
+    /** TypeSlice */
+    TypeSlice: {
+      /** Name */
+      name: string;
+      /** Count */
+      count: number;
+      /** Planned */
+      planned: number;
+      /** Burned */
+      burned: number;
+    };
     /** ValidationError */
     ValidationError: {
       /** Location */
@@ -1308,6 +1344,17 @@ export interface components {
       input?: unknown;
       /** Context */
       ctx?: Record<string, never>;
+    };
+    /** WorkItem */
+    WorkItem: {
+      /** Key */
+      key: string;
+      /** Title */
+      title: string;
+      /** Sp */
+      sp: number | null;
+      /** Status */
+      status: string;
     };
   };
   responses: never;

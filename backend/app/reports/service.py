@@ -1,3 +1,4 @@
+from collections import defaultdict
 from uuid import UUID
 
 from sqlalchemy import select
@@ -8,6 +9,8 @@ from app.ai.guard import wrap
 from app.ai.narrative import Writer
 from app.audit.service import AuditService
 from app.auth.models import User
+from app.compliance.engine import NO_ONE
+from app.compliance.models import Line, SprintResult
 from app.compliance.service import ComplianceService, Snapshot
 from app.connections.models import Connection
 from app.core.errors import AppError, NotFoundError
@@ -16,6 +19,7 @@ from app.projects.service import ProjectService
 from app.reports.models import Report
 from app.reports.schemas import (
     Pending,
+    PersonWork,
     PreviewOut,
     ReportData,
     ReportIn,
@@ -24,9 +28,13 @@ from app.reports.schemas import (
     SaveIn,
     StoryIn,
     TrendPoint,
+    TypeSlice,
+    WorkItem,
 )
 
 TREND = 6
+CLOSED_CAP = 8  # cuántas cerradas ve la IA por persona
+NO_TYPE = "Sin tipo"
 AUD_LABEL = {"equipo": "Equipo", "cliente": "Cliente", "gerencia": "Gerencia"}
 
 
@@ -155,7 +163,54 @@ class ReportService:
                 if not ln.issue.done
             ],
             month=self.comp.month_out(month) if month else None,
+            types=self._types(res.lines),
+            work=self._work(res),
         )
+
+    @staticmethod
+    def _types(lines: list[Line]) -> list[TypeSlice]:
+        """Corte por tipo de issue: cantidad y SP planificados / quemados."""
+        bags: dict[str, list[float]] = {}
+        for ln in lines:
+            name = ln.issue.type.strip() or NO_TYPE
+            bag = bags.setdefault(name, [0.0, 0.0, 0.0])
+            bag[0] += 1
+            bag[1] += ln.issue.pts
+            if ln.burned:
+                bag[2] += ln.issue.pts
+        slices = [
+            TypeSlice(name=name, count=int(n), planned=planned, burned=burned)
+            for name, (n, planned, burned) in bags.items()
+        ]
+        return sorted(slices, key=lambda s: (-s.planned, s.name))
+
+    @staticmethod
+    def _work(res: SprintResult) -> list[PersonWork]:
+        """Por persona: lo que cerró en este sprint y lo que sigue abierto."""
+        closed: dict[str, list[WorkItem]] = defaultdict(list)
+        opened: dict[str, list[WorkItem]] = defaultdict(list)
+        for ln in res.lines:
+            name = ln.issue.assignee or NO_ONE
+            item = WorkItem(
+                key=ln.issue.key, title=ln.issue.title, sp=ln.issue.sp, status=ln.issue.status
+            )
+            if ln.burned:
+                closed[name].append(item)
+            elif not ln.issue.done:
+                opened[name].append(item)
+        for items in (*closed.values(), *opened.values()):
+            items.sort(key=lambda i: i.key)
+        return [
+            PersonWork(
+                name=name,
+                planned=person.planned,
+                burned=person.burned,
+                pct=person.burned / person.planned if person.planned else None,
+                closed=closed.get(name, []),
+                open=opened.get(name, []),
+            )
+            for name, person in sorted(res.people.items(), key=lambda kv: -kv[1].planned)
+        ]
 
     @staticmethod
     def _facts(d: ReportData) -> dict:
@@ -168,15 +223,34 @@ class ReportService:
             "sprint": {
                 "nombre": s.name,
                 "estado": "en curso (provisorio)" if s.provisional else "cerrado",
+                "objetivo": wrap(s.goal) if s.goal else "sin objetivo en Jira",
                 "planificados_sp": fmt(s.planned),
                 "quemados_sp": fmt(s.burned),
                 "cumplimiento": pct(s.pct),
                 "issues_sin_estimar": s.unestimated,
             },
             "tendencia": [{"sprint": t.name, "cumplimiento": pct(t.pct)} for t in d.trend],
+            "tipos": [
+                {
+                    "tipo": t.name,
+                    "cantidad": t.count,
+                    "planificados_sp": fmt(t.planned),
+                    "quemados_sp": fmt(t.burned),
+                }
+                for t in d.types
+            ],
             "por_persona": [
-                {"persona": p.name, "planificados_sp": fmt(p.planned), "quemados_sp": fmt(p.burned)}
-                for p in s.people
+                {
+                    "persona": p.name,
+                    "planificados_sp": fmt(p.planned),
+                    "quemados_sp": fmt(p.burned),
+                    "cumplimiento": pct(p.pct),
+                    "cerradas": [
+                        {"issue": i.key, "titulo": wrap(i.title), "sp": i.sp}
+                        for i in p.closed[:CLOSED_CAP]
+                    ],
+                }
+                for p in d.work
             ],
             "pendientes": {
                 "cantidad": len(d.pending),

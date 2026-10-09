@@ -71,6 +71,7 @@ def to_issue(raw: Raw, sp_field: str, done_ids: set[str]) -> Issue:
         title=f.get("summary", ""),
         status=status.get("name", ""),
         subtask=bool((f.get("issuetype") or {}).get("subtask")),
+        type=(f.get("issuetype") or {}).get("name") or "",
     )
 
 

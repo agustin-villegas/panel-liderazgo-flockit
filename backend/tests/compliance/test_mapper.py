@@ -58,6 +58,15 @@ def test_no_terminada_no_tiene_fecha():
     assert i.done_at is None
 
 
+def test_issue_guarda_el_tipo():
+    i = to_issue(raw_issue(issuetype={"name": "Bug", "subtask": False}), "customfield_10016", DONE)
+    assert i.type == "Bug"
+
+
+def test_issue_sin_nombre_de_tipo():
+    assert to_issue(raw_issue(), "customfield_10016", DONE).type == ""
+
+
 def test_sin_story_points():
     assert to_issue(raw_issue(customfield_10016=None), "customfield_10016", DONE).sp is None
 

@@ -44,6 +44,7 @@ class Issue:
     title: str = ""
     status: str = ""
     subtask: bool = False
+    type: str = ""  # nombre de issuetype en Jira
 
     @property
     def pts(self) -> float:

@@ -229,12 +229,14 @@ Para cada sprint **S** de un proyecto:
 ### 9.3 Informes (P0: sprint · P2: cliente)
 - **Informe de sprint**: elegís proyecto, sprint y audiencia (equipo, cliente o gerencia). Contiene:
   - encabezado con la marca;
+  - **objetivo del sprint** tal como viene de Jira (si no hay, se dice);
   - KPIs del sprint;
-  - gráfico de planificados vs quemados de los últimos sprints;
-  - tabla por persona;
+  - gráfico de planificados vs quemados de los últimos sprints, con la línea de cumplimiento;
+  - corte por **tipo de issue** (cantidad, SP planificados y SP quemados);
+  - por persona: planificados vs quemados, y las issues que cerró en este sprint y las que siguen abiertas;
   - issues no terminadas;
   - NPS y CSAT del período (si hay);
-  - **narrativa con IA**.
+  - **narrativa con IA**, que contrasta la entrega contra el objetivo sin inventar alcance.
 - **Informe de cliente** (P2): por cuenta y mes, con todos sus proyectos, cumplimiento del mes, tendencia y satisfacción.
 - **Narrativa con IA**: recibe **solo los números ya calculados** y redacta un resumen en 3 o 4 oraciones según la audiencia. Si la IA falla, el informe se genera igual sin narrativa. El texto se puede editar antes de guardar.
 - **Guardar** congela el informe como una **foto inmutable** (datos + narrativa + fecha + autor). El historial lista los informes guardados.

@@ -1,9 +1,27 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ComposedChart,
+  Line,
+  Pie,
+  PieChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import { LightBadge } from "@/components/panel/light-badge";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
 import {
   Table,
   TableBody,
@@ -16,24 +34,50 @@ import type { ReportData, Story } from "@/lib/api/client";
 import { day, month, pct, pts } from "@/lib/format";
 
 const AUD: Record<string, string> = { equipo: "Equipo", cliente: "Cliente", gerencia: "Gerencia" };
-const tone = (v: number | null) =>
-  v === null ? "var(--idle)" : v >= 0.85 ? "var(--ok)" : v >= 0.7 ? "var(--warn)" : "var(--crit)";
+const PALETTE = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
+  "var(--chart-6)",
+];
+const trendCfg = {
+  planned: { label: "Planificados", color: "var(--chart-5)" },
+  burned: { label: "Quemados", color: "var(--chart-1)" },
+  pct: { label: "Cumplimiento %", color: "var(--chart-2)" },
+} satisfies ChartConfig;
+const peopleCfg = {
+  planned: { label: "Planificados", color: "var(--chart-5)" },
+  burned: { label: "Quemados", color: "var(--chart-1)" },
+} satisfies ChartConfig;
+
+type Slice = NonNullable<ReportData["types"]>[number];
+type Person = NonNullable<ReportData["work"]>[number];
+type Item = Person["closed"][number];
 
 type Props = {
   data: ReportData;
   audience: string;
   date?: string;
   author?: string;
-  story: React.ReactNode; // lectura o edición, según la pantalla
+  story: React.ReactNode;
 };
 
 /** El documento del informe (pantalla y PDF). Los números vienen del motor. */
 export function ReportDoc({ data, audience, date, author, story }: Props) {
   const s = data.sprint;
+  const types = data.types ?? [];
+  const work = data.work ?? [];
   const trend = data.trend.map((t) => ({
     name: t.name.replace(/^.*?Sprint\s*/i, "S"),
-    pct: t.pct === null ? 0 : Math.round(t.pct * 100),
-    raw: t.pct,
+    planned: t.planned,
+    burned: t.burned,
+    pct: t.pct === null ? null : Math.round(t.pct * 100),
+  }));
+  const slices = types.map((t, i) => ({
+    ...t,
+    fill: PALETTE[i % PALETTE.length],
   }));
 
   return (
@@ -60,6 +104,13 @@ export function ReportDoc({ data, audience, date, author, story }: Props) {
       </header>
 
       <div className="grid gap-8 p-8">
+        <section className="rounded-xl border bg-secondary/50 p-4 print:break-inside-avoid">
+          <h3 className="font-semibold">Objetivo del sprint</h3>
+          <p className="mt-1 text-sm leading-relaxed whitespace-pre-wrap">
+            {s.goal || "Jira no tiene un objetivo cargado para este sprint."}
+          </p>
+        </section>
+
         <section className="grid grid-cols-2 gap-3 md:grid-cols-4 print:grid-cols-4">
           <Kpi label="Cumplimiento" value={pct(s.pct)} extra={<LightBadge light={s.light} />} />
           <Kpi label="Planificados" value={`${pts(s.planned)} SP`} />
@@ -76,46 +127,40 @@ export function ReportDoc({ data, audience, date, author, story }: Props) {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2 print:grid-cols-2">
-          <div className="grid gap-2">
+          <div className="grid gap-2 print:break-inside-avoid">
             <h3 className="font-semibold">Tendencia de cumplimiento</h3>
-            <ChartContainer config={{ pct: { label: "Cumplimiento %" } }} className="h-56 w-full">
-              <BarChart data={trend}>
+            <ChartContainer config={trendCfg} className="aspect-auto h-64 w-full">
+              <ComposedChart data={trend} margin={{ left: 0, right: 8 }}>
                 <CartesianGrid vertical={false} />
                 <XAxis dataKey="name" tickLine={false} axisLine={false} />
-                <YAxis domain={[0, 100]} unit="%" width={40} tickLine={false} axisLine={false} />
+                <YAxis yAxisId="pts" tickLine={false} axisLine={false} width={32} />
+                <YAxis
+                  yAxisId="pct"
+                  orientation="right"
+                  domain={[0, 100]}
+                  unit="%"
+                  tickLine={false}
+                  axisLine={false}
+                  width={40}
+                />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="pct" radius={4}>
-                  {trend.map((t) => (
-                    <Cell key={t.name} fill={tone(t.raw)} />
-                  ))}
-                </Bar>
-              </BarChart>
+                <ChartLegend content={<ChartLegendContent />} />
+                <Bar yAxisId="pts" dataKey="planned" fill="var(--color-planned)" radius={4} />
+                <Bar yAxisId="pts" dataKey="burned" fill="var(--color-burned)" radius={4} />
+                <Line
+                  yAxisId="pct"
+                  dataKey="pct"
+                  stroke="var(--color-pct)"
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
+              </ComposedChart>
             </ChartContainer>
           </div>
-          <div className="grid content-start gap-2">
-            <h3 className="font-semibold">Por persona</h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Persona</TableHead>
-                  <TableHead className="text-right">Plan.</TableHead>
-                  <TableHead className="text-right">Quem.</TableHead>
-                  <TableHead className="text-right">%</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {s.people.map((p) => (
-                  <TableRow key={p.name}>
-                    <TableCell>{p.name}</TableCell>
-                    <TableCell className="text-right">{pts(p.planned)}</TableCell>
-                    <TableCell className="text-right">{pts(p.burned)}</TableCell>
-                    <TableCell className="text-right font-semibold">{pct(p.pct)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <TypeChart slices={slices} />
         </section>
+
+        <People work={work} fallback={s.people} />
 
         <section className="grid gap-2">
           <h3 className="font-semibold">Pendientes del sprint ({data.pending.length})</h3>
@@ -154,6 +199,141 @@ export function ReportDoc({ data, audience, date, author, story }: Props) {
         </p>
       </div>
     </article>
+  );
+}
+
+function TypeChart({ slices }: { slices: (Slice & { fill: string })[] }) {
+  return (
+    <div className="grid content-start gap-2 print:break-inside-avoid">
+      <h3 className="font-semibold">Por tipo de issue</h3>
+      {slices.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Este informe no trae el corte por tipo.</p>
+      ) : (
+        <>
+          <ChartContainer config={{}} className="mx-auto aspect-square h-52 max-w-52">
+            <PieChart>
+              <ChartTooltip content={<ChartTooltipContent hideLabel nameKey="name" />} />
+              <Pie data={slices} dataKey="count" nameKey="name" innerRadius={48} strokeWidth={2}>
+                {slices.map((d) => (
+                  <Cell key={d.name} fill={d.fill} />
+                ))}
+              </Pie>
+            </PieChart>
+          </ChartContainer>
+          <ul className="grid gap-1 text-sm">
+            {slices.map((d) => (
+              <li key={d.name} className="flex items-center justify-between gap-2">
+                <span className="flex items-center gap-2">
+                  <span
+                    className="size-2.5 rounded-full"
+                    style={{ background: d.fill }}
+                    aria-hidden
+                  />
+                  {d.name}
+                </span>
+                <span className="text-muted-foreground">
+                  {d.count} · {pts(d.planned)} plan. · {pts(d.burned)} quem.
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
+
+function People({ work, fallback }: { work: Person[]; fallback: ReportData["sprint"]["people"] }) {
+  const rows = work.length
+    ? work
+    : fallback.map((p) => ({ ...p, closed: [] as Item[], open: [] as Item[] }));
+  return (
+    <section className="grid gap-4">
+      <h3 className="font-semibold">Por persona</h3>
+      {rows.length > 0 && (
+        <ChartContainer
+          config={peopleCfg}
+          className="aspect-auto w-full"
+          style={{ height: Math.max(180, rows.length * 40) }}
+        >
+          <BarChart data={rows} layout="vertical" margin={{ left: 8, right: 8 }}>
+            <CartesianGrid horizontal={false} />
+            <XAxis type="number" tickLine={false} axisLine={false} />
+            <YAxis
+              type="category"
+              dataKey="name"
+              width={176}
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 11 }}
+            />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <ChartLegend content={<ChartLegendContent />} />
+            <Bar dataKey="planned" fill="var(--color-planned)" radius={4} />
+            <Bar dataKey="burned" fill="var(--color-burned)" radius={4} />
+          </BarChart>
+        </ChartContainer>
+      )}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Persona</TableHead>
+            <TableHead className="text-right">Plan.</TableHead>
+            <TableHead className="text-right">Quem.</TableHead>
+            <TableHead className="text-right">%</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rows.map((p) => (
+            <TableRow key={p.name}>
+              <TableCell>{p.name}</TableCell>
+              <TableCell className="text-right">{pts(p.planned)}</TableCell>
+              <TableCell className="text-right">{pts(p.burned)}</TableCell>
+              <TableCell className="text-right font-semibold">{pct(p.pct)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {work.length > 0 && (
+        <div className="grid gap-3">
+          {work.map((p) => (
+            <div key={p.name} className="grid gap-2 rounded-xl border p-4 print:break-inside-avoid">
+              <p className="font-medium">{p.name}</p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <IssueList title="Cerradas en el sprint" items={p.closed} />
+                <IssueList title="Siguen abiertas" items={p.open} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function IssueList({ title, items }: { title: string; items: Item[] }) {
+  return (
+    <div className="grid gap-1">
+      <p className="text-xs font-medium text-muted-foreground">
+        {title} ({items.length})
+      </p>
+      {items.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Ninguna.</p>
+      ) : (
+        <ul className="grid gap-1 text-sm">
+          {items.map((i) => (
+            <li key={i.key} className="flex items-baseline justify-between gap-3">
+              <span>
+                <span className="font-medium">{i.key}</span> {i.title}
+              </span>
+              <span className="shrink-0 text-muted-foreground">
+                {i.sp === null ? "sin estimar" : `${pts(i.sp)} SP`}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

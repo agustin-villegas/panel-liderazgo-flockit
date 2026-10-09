@@ -2174,6 +2174,50 @@
         "required": ["name", "planned", "burned", "pct"],
         "title": "PersonOut"
       },
+      "PersonWork": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "planned": {
+            "type": "number",
+            "title": "Planned"
+          },
+          "burned": {
+            "type": "number",
+            "title": "Burned"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "closed": {
+            "items": {
+              "$ref": "#/components/schemas/WorkItem"
+            },
+            "type": "array",
+            "title": "Closed"
+          },
+          "open": {
+            "items": {
+              "$ref": "#/components/schemas/WorkItem"
+            },
+            "type": "array",
+            "title": "Open"
+          }
+        },
+        "type": "object",
+        "required": ["name", "planned", "burned", "pct", "closed", "open"],
+        "title": "PersonWork"
+      },
       "Point": {
         "properties": {
           "label": {
@@ -2432,6 +2476,22 @@
                 "type": "null"
               }
             ]
+          },
+          "types": {
+            "items": {
+              "$ref": "#/components/schemas/TypeSlice"
+            },
+            "type": "array",
+            "title": "Types",
+            "default": []
+          },
+          "work": {
+            "items": {
+              "$ref": "#/components/schemas/PersonWork"
+            },
+            "type": "array",
+            "title": "Work",
+            "default": []
           }
         },
         "type": "object",
@@ -3253,6 +3313,29 @@
         "required": ["name", "planned", "burned", "pct"],
         "title": "TrendPoint"
       },
+      "TypeSlice": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "planned": {
+            "type": "number",
+            "title": "Planned"
+          },
+          "burned": {
+            "type": "number",
+            "title": "Burned"
+          }
+        },
+        "type": "object",
+        "required": ["name", "count", "planned", "burned"],
+        "title": "TypeSlice"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -3288,6 +3371,36 @@
         "type": "object",
         "required": ["loc", "msg", "type"],
         "title": "ValidationError"
+      },
+      "WorkItem": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "sp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": ["key", "title", "sp", "status"],
+        "title": "WorkItem"
       }
     }
   }
