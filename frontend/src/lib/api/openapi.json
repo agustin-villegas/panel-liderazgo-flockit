@@ -802,6 +802,146 @@
           }
         }
       }
+    },
+    "/api/informes/preview": {
+      "post": {
+        "tags": ["informes"],
+        "summary": "Preview",
+        "operationId": "preview_api_informes_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/informes": {
+      "get": {
+        "tags": ["informes"],
+        "summary": "List All",
+        "operationId": "list_all_api_informes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ReportRow"
+                  },
+                  "type": "array",
+                  "title": "Response List All Api Informes Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["informes"],
+        "summary": "Save",
+        "operationId": "save_api_informes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/informes/{rid}": {
+      "get": {
+        "tags": ["informes"],
+        "summary": "Get",
+        "operationId": "get_api_informes__rid__get",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Rid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1452,6 +1592,47 @@
         "required": ["current", "new"],
         "title": "PasswordIn"
       },
+      "Pending": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee"
+          },
+          "sp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp"
+          }
+        },
+        "type": "object",
+        "required": ["key", "title", "status", "assignee", "sp"],
+        "title": "Pending"
+      },
       "PersonOut": {
         "properties": {
           "name": {
@@ -1481,6 +1662,41 @@
         "type": "object",
         "required": ["name", "planned", "burned", "pct"],
         "title": "PersonOut"
+      },
+      "PreviewOut": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ReportData"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "ai_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Error"
+          }
+        },
+        "type": "object",
+        "required": ["data", "story", "model"],
+        "title": "PreviewOut"
       },
       "ProjectIn": {
         "properties": {
@@ -1620,6 +1836,219 @@
           "managers"
         ],
         "title": "ProjectOut"
+      },
+      "ReportData": {
+        "properties": {
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "account": {
+            "type": "string",
+            "title": "Account"
+          },
+          "sprint": {
+            "$ref": "#/components/schemas/SprintOut"
+          },
+          "trend": {
+            "items": {
+              "$ref": "#/components/schemas/TrendPoint"
+            },
+            "type": "array",
+            "title": "Trend"
+          },
+          "pending": {
+            "items": {
+              "$ref": "#/components/schemas/Pending"
+            },
+            "type": "array",
+            "title": "Pending"
+          },
+          "month": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MonthOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": ["project", "account", "sprint", "trend", "pending", "month"],
+        "title": "ReportData",
+        "description": "Los números del informe: salen del motor, no de la IA."
+      },
+      "ReportIn": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Id"
+          },
+          "sprint_id": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Sprint Id"
+          },
+          "audience": {
+            "type": "string",
+            "enum": ["equipo", "cliente", "gerencia"],
+            "title": "Audience",
+            "default": "equipo"
+          }
+        },
+        "type": "object",
+        "required": ["project_id", "sprint_id"],
+        "title": "ReportIn"
+      },
+      "ReportOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "audience": {
+            "type": "string",
+            "title": "Audience"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "author": {
+            "type": "string",
+            "title": "Author"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ReportData"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "audience",
+          "project_id",
+          "created_at",
+          "author",
+          "data",
+          "story",
+          "model"
+        ],
+        "title": "ReportOut"
+      },
+      "ReportRow": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "audience": {
+            "type": "string",
+            "title": "Audience"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "author": {
+            "type": "string",
+            "title": "Author"
+          }
+        },
+        "type": "object",
+        "required": ["id", "title", "audience", "project", "pct", "created_at", "author"],
+        "title": "ReportRow"
+      },
+      "SaveIn": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Id"
+          },
+          "sprint_id": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Sprint Id"
+          },
+          "audience": {
+            "type": "string",
+            "enum": ["equipo", "cliente", "gerencia"],
+            "title": "Audience",
+            "default": "equipo"
+          },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StoryIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": ["project_id", "sprint_id"],
+        "title": "SaveIn"
       },
       "SprintBoardOut": {
         "properties": {
@@ -1791,6 +2220,26 @@
         ],
         "title": "SprintOut"
       },
+      "StoryIn": {
+        "properties": {
+          "resumen": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "Resumen"
+          },
+          "puntos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 6,
+            "title": "Puntos"
+          }
+        },
+        "type": "object",
+        "required": ["resumen"],
+        "title": "StoryIn"
+      },
       "TestIn": {
         "properties": {
           "site": {
@@ -1958,6 +2407,36 @@
           "updated"
         ],
         "title": "TicketOut"
+      },
+      "TrendPoint": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "planned": {
+            "type": "number",
+            "title": "Planned"
+          },
+          "burned": {
+            "type": "number",
+            "title": "Burned"
+          },
+          "pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct"
+          }
+        },
+        "type": "object",
+        "required": ["name", "planned", "burned", "pct"],
+        "title": "TrendPoint"
       },
       "ValidationError": {
         "properties": {

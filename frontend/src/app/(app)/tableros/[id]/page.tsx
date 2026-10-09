@@ -33,7 +33,8 @@ export default function BoardPage({ params }: PageProps<"/tableros/[id]">) {
         </div>
         <Button
           variant="secondary"
-          render={<Link href={`/proyectos/${id}`} />}
+          nativeButton={false}
+          render={<Link href={`/proyectos/`} />}
           className="print:hidden"
         >
           <LineChart className="size-4" /> Ver cumplimiento
