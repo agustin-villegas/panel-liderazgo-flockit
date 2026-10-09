@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -104,7 +105,8 @@ export function AssistantWidget() {
     }
   }
 
-  return (
+  // portal a body: el header usa backdrop-blur y eso rompe position:fixed de sus hijos
+  return createPortal(
     <>
       <section
         role="dialog"
@@ -235,7 +237,8 @@ export function AssistantWidget() {
           <span className="absolute top-0.5 right-0.5 size-3 rounded-full border-2 border-background bg-accent" />
         )}
       </button>
-    </>
+    </>,
+    document.body,
   );
 }
 
