@@ -15,6 +15,8 @@ export type Board = S["BoardOut"];
 export type Account = S["AccountOut"];
 export type Project = S["ProjectOut"];
 export type ProjectIn = S["ProjectIn"];
+export type SprintBoard = S["SprintBoardOut"];
+export type Ticket = S["TicketOut"];
 
 export class ApiError extends Error {
   constructor(

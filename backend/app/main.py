@@ -32,6 +32,7 @@ def create_app(cfg: Settings | None = None, db: Database | None = None) -> FastA
         app.state.cipher = Cipher(cfg.encryption_key)
         app.state.factory = SourceFactory(app.state.cipher)
         app.state.cache = Cache()
+        app.state.boards = {}  # caché del tablero (60 s)
         async with app.state.db.maker() as s:
             await ensure_admin(s, cfg)
             await ensure_demo(s)

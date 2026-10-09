@@ -727,6 +727,48 @@
           }
         }
       }
+    },
+    "/api/proyectos/{pid}/tablero": {
+      "get": {
+        "tags": ["proyectos"],
+        "summary": "Board",
+        "description": "Tablero de Jira del sprint activo (solo lectura).",
+        "operationId": "board_api_proyectos__pid__tablero_get",
+        "parameters": [
+          {
+            "name": "pid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Pid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SprintBoardOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1090,6 +1132,33 @@
         ],
         "title": "ConnOut",
         "description": "Nunca incluye el token: solo sus últimos 4 caracteres."
+      },
+      "Counts": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "todo": {
+            "type": "integer",
+            "title": "Todo"
+          },
+          "doing": {
+            "type": "integer",
+            "title": "Doing"
+          },
+          "blocked": {
+            "type": "integer",
+            "title": "Blocked"
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          }
+        },
+        "type": "object",
+        "required": ["total", "todo", "doing", "blocked", "done"],
+        "title": "Counts"
       },
       "DetailOut": {
         "properties": {
@@ -1500,6 +1569,96 @@
         ],
         "title": "ProjectOut"
       },
+      "SprintBoardOut": {
+        "properties": {
+          "sprint": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SprintInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "counts": {
+            "$ref": "#/components/schemas/Counts"
+          },
+          "done_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done Pct"
+          },
+          "cards": {
+            "items": {
+              "$ref": "#/components/schemas/TicketOut"
+            },
+            "type": "array",
+            "title": "Cards"
+          },
+          "notice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notice"
+          }
+        },
+        "type": "object",
+        "required": ["sprint", "counts", "done_pct", "cards"],
+        "title": "SprintBoardOut"
+      },
+      "SprintInfo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "state": {
+            "type": "string",
+            "title": "State"
+          },
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End"
+          },
+          "day": {
+            "type": "integer",
+            "title": "Day"
+          },
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "time_pct": {
+            "type": "number",
+            "title": "Time Pct"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "state", "start", "end", "day", "days", "time_pct"],
+        "title": "SprintInfo"
+      },
       "SprintOut": {
         "properties": {
           "id": {
@@ -1664,6 +1823,89 @@
         "type": "object",
         "required": ["ok"],
         "title": "TestOut"
+      },
+      "TicketOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "lane": {
+            "type": "string",
+            "title": "Lane"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "priority": {
+            "type": "string",
+            "title": "Priority"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee"
+          },
+          "sp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sp"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Labels"
+          },
+          "updated": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "title",
+          "status",
+          "lane",
+          "type",
+          "priority",
+          "assignee",
+          "sp",
+          "labels",
+          "updated"
+        ],
+        "title": "TicketOut"
       },
       "ValidationError": {
         "properties": {
