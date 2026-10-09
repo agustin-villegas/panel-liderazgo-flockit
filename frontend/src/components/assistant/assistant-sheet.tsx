@@ -31,7 +31,10 @@ export function AssistantSheet({ open, onClose }: { open: boolean; onClose: () =
   const [busy, setBusy] = useState(false);
   const end = useRef<HTMLDivElement>(null);
 
-  useEffect(() => end.current?.scrollIntoView({ behavior: "smooth" }), [turns, busy]);
+  useEffect(() => {
+    // en Chrome nuevo scrollIntoView devuelve una Promise: no retornarla
+    end.current?.scrollIntoView({ behavior: "smooth" });
+  }, [turns, busy]);
 
   async function send(q: string) {
     const msg = q.trim();
