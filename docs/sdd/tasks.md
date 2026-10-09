@@ -29,3 +29,18 @@ evaluar en fase 5 (plan B: Render).
 - [x] Auditoría: login, login fallido, bloqueo, logout (sin secretos)
 - [x] 14 tests verdes
 - [x] Smoke test contra Supabase: login, me, logout y auditoría OK
+
+## Fase 2 · Motor + Jira ✅
+
+- [x] Motor de cumplimiento (puro): sprint, persona, mes; regla de no duplicación
+- [x] Tests T1–T12 de la spec (incluida la regresión con la planilla histórica) — escritos antes del motor
+- [x] Mapeo de Jira: última finalización desde el changelog, sprints desde `closedSprints` + `sprint`
+- [x] Fuentes: `JiraCloud` (paginado, reintentos en 429, errores claros) y `JiraDemo` (4 boards sintéticos)
+- [x] Tokens cifrados con AES-256-GCM; la API nunca devuelve el token
+- [x] ABM de conexiones (prueba obligatoria antes de guardar, detección del campo de SP)
+- [x] Cuentas y proyectos con Team Managers asignados (cada uno ve solo lo suyo)
+- [x] API: `/api/cartera`, `/api/proyectos/{id}/cumplimiento`, detalle auditable por sprint, recalcular
+- [x] Migración `0002` aplicada en Supabase + smoke test contra la base real
+- [x] 48 tests verdes
+- [ ] Pendiente: fotos persistentes de sprints cerrados (`sprint_snapshots`); hoy la caché es en memoria (5 min)
+- [ ] Pendiente: validar `JiraCloud` contra un sitio real (hoy probado con fakes)

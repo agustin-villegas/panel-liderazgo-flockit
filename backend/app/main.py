@@ -6,15 +6,20 @@ from fastapi import FastAPI
 
 from app.auth.bootstrap import ensure_admin
 from app.auth.router import router as auth_router
+from app.compliance.service import Cache
 from app.config import Settings, get_settings
+from app.connections.factory import SourceFactory
+from app.connections.router import router as conn_router
+from app.connections.service import ensure_demo
+from app.core.crypto import Cipher
 from app.core.errors import AppError, app_error_handler
 from app.core.security import security_headers
 from app.db.database import Database
 from app.health import router as health_router
+from app.projects.router import router as projects_router
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s | %(levelname)s | %(name)s | %(message)s"
-)
+LOG_FMT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+logging.basicConfig(level=logging.INFO, format=LOG_FMT)
 
 
 def create_app(cfg: Settings | None = None, db: Database | None = None) -> FastAPI:
@@ -24,16 +29,20 @@ def create_app(cfg: Settings | None = None, db: Database | None = None) -> FastA
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.db = db or Database(cfg.db_url)
+        app.state.cipher = Cipher(cfg.encryption_key)
+        app.state.factory = SourceFactory(app.state.cipher)
+        app.state.cache = Cache()
         async with app.state.db.maker() as s:
             await ensure_admin(s, cfg)
+            await ensure_demo(s)
         yield
         await app.state.db.close()
 
     app = FastAPI(title=cfg.app_name, version="0.1.0", lifespan=lifespan)
     app.middleware("http")(security_headers)
     app.add_exception_handler(AppError, app_error_handler)
-    app.include_router(health_router, prefix="/api")
-    app.include_router(auth_router, prefix="/api")
+    for r in (health_router, auth_router, conn_router, projects_router):
+        app.include_router(r, prefix="/api")
     return app
 
 
