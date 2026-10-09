@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, CheckCircle2, FolderKanban, FolderPlus, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 
+import { ErrorState } from "@/components/panel/error-state";
+import { PageHeader } from "@/components/panel/page-header";
 import { PortfolioChart } from "@/components/panel/portfolio-chart";
 import { ProjectCard } from "@/components/panel/project-card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +18,7 @@ import { api, type Card as CardData } from "@/lib/api/client";
 
 export default function PortfolioPage() {
   const { data: me } = useMe();
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["cartera"],
     queryFn: () => api<CardData[]>("/cartera"),
   });
@@ -41,12 +43,10 @@ export default function PortfolioPage() {
 
   return (
     <>
-      <section className="banner">
-        <h1 className="text-2xl font-bold tracking-tight">Panel de cartera</h1>
-        <p className="mt-1 text-white/85">
-          Cumplimiento del último sprint cerrado de cada proyecto, calculado desde Jira.
-        </p>
-      </section>
+      <PageHeader
+        title="Panel de cartera"
+        description="Cumplimiento del último sprint cerrado de cada proyecto, calculado desde Jira."
+      />
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Indicadores">
         {kpis.map((k) => (
@@ -69,7 +69,12 @@ export default function PortfolioPage() {
       )}
 
       {error && (
-        <p className="text-sm text-crit-fg">No se pudo cargar la cartera: {error.message}</p>
+        <Card>
+          <ErrorState
+            message={`No se pudo cargar la cartera: ${error.message}`}
+            onRetry={() => refetch()}
+          />
+        </Card>
       )}
 
       {isLoading && (

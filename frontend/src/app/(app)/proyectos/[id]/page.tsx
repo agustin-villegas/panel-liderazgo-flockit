@@ -1,14 +1,15 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, RefreshCw } from "lucide-react";
-import Link from "next/link";
+import { RefreshCw, TableProperties } from "lucide-react";
 import { use, useState } from "react";
 import { toast } from "sonner";
 
 import { BoardView } from "@/components/board/board-view";
+import { ErrorState } from "@/components/panel/error-state";
 import { ExportButtons } from "@/components/panel/export-buttons";
 import { LightBadge } from "@/components/panel/light-badge";
+import { PageHeader } from "@/components/panel/page-header";
 import { ComplianceChart } from "@/components/project/compliance-chart";
 import {
   MonthTable,
@@ -20,8 +21,10 @@ import {
 } from "@/components/project/tables";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Empty } from "@/components/viz/empty";
 import { api, post, type Compliance, type Project } from "@/lib/api/client";
 import { pct, pts } from "@/lib/format";
 
@@ -56,33 +59,22 @@ export default function ProjectPage({ params }: PageProps<"/proyectos/[id]">) {
 
   return (
     <>
-      <Link
-        href="/"
-        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" /> Panel de cartera
-      </Link>
-
-      <section className="banner flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm text-white/80">{proj?.account ?? " "}</p>
-          <h1 className="text-2xl font-bold tracking-tight">{proj?.name ?? "Proyecto"}</h1>
-          <p className="mt-1 text-white/85">
-            {last
-              ? `Último sprint cerrado: ${last.name} · ${pct(last.pct)} (${pts(last.burned)}/${pts(last.planned)} pts)`
-              : "Sin sprints cerrados todavía"}
-          </p>
-        </div>
-        <Button
-          variant="secondary"
-          onClick={() => refresh.mutate()}
-          disabled={refresh.isPending}
-          className="print:hidden"
-        >
-          <RefreshCw className={refresh.isPending ? "size-4 animate-spin" : "size-4"} />
-          Recalcular
-        </Button>
-      </section>
+      <PageHeader
+        back={{ href: "/", label: "Panel de cartera" }}
+        eyebrow={proj?.account ?? " "}
+        title={proj?.name ?? "Proyecto"}
+        description={
+          last
+            ? `Último sprint cerrado: ${last.name} · ${pct(last.pct)} (${pts(last.burned)}/${pts(last.planned)} pts)`
+            : "Sin sprints cerrados todavía"
+        }
+        actions={
+          <Button variant="secondary" onClick={() => refresh.mutate()} disabled={refresh.isPending}>
+            <RefreshCw className={refresh.isPending ? "size-4 animate-spin" : "size-4"} />
+            Recalcular
+          </Button>
+        }
+      />
 
       <Tabs defaultValue="cumplimiento">
         <TabsList className="print:hidden">
@@ -96,7 +88,12 @@ export default function ProjectPage({ params }: PageProps<"/proyectos/[id]">) {
 
         <TabsContent value="cumplimiento" className="grid gap-6">
           {comp.error && (
-            <p className="text-sm text-crit-fg">No se pudo calcular: {comp.error.message}</p>
+            <Card>
+              <ErrorState
+                message={`No se pudo calcular: ${comp.error.message}`}
+                onRetry={() => comp.refetch()}
+              />
+            </Card>
           )}
           {comp.isLoading && <Skeleton className="h-96 rounded-xl" />}
 
@@ -120,17 +117,25 @@ export default function ProjectPage({ params }: PageProps<"/proyectos/[id]">) {
 
                 <TabsContent value="sprints">
                   <Card data-section="sprints">
-                    <CardHeader className="flex flex-row items-center justify-between">
+                    <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
                       <CardTitle>Sprints</CardTitle>
                       <ExportButtons
-                        name={`sprints-${proj?.name}`}
+                        name={`sprints-${proj?.name ?? "proyecto"}`}
                         section="sprints"
                         cols={sprintCols}
                         rows={sprints}
                       />
                     </CardHeader>
                     <CardContent>
-                      <SprintTable project={id} rows={sprints} />
+                      {sprints.length === 0 ? (
+                        <Empty
+                          icon={TableProperties}
+                          title="Todavía no hay sprints"
+                          hint="Cuando el board tenga sprints, aparecen acá."
+                        />
+                      ) : (
+                        <SprintTable project={id} rows={sprints} />
+                      )}
                     </CardContent>
                   </Card>
                 </TabsContent>
@@ -138,10 +143,10 @@ export default function ProjectPage({ params }: PageProps<"/proyectos/[id]">) {
                 <TabsContent value="personas">
                   <Card data-section="personas">
                     <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-3">
                         <CardTitle>Por persona</CardTitle>
-                        <select
-                          className="rounded-md border bg-background px-2 py-1 text-sm"
+                        <NativeSelect
+                          className="w-auto"
                           value={selected?.id}
                           onChange={(e) => setPersonSprint(e.target.value)}
                           aria-label="Sprint"
@@ -151,7 +156,7 @@ export default function ProjectPage({ params }: PageProps<"/proyectos/[id]">) {
                               {s.name}
                             </option>
                           ))}
-                        </select>
+                        </NativeSelect>
                         {selected && <LightBadge light={selected.light} />}
                       </div>
                       <ExportButtons
@@ -169,10 +174,10 @@ export default function ProjectPage({ params }: PageProps<"/proyectos/[id]">) {
 
                 <TabsContent value="meses">
                   <Card data-section="meses">
-                    <CardHeader className="flex flex-row items-center justify-between">
+                    <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
                       <CardTitle>Por mes</CardTitle>
                       <ExportButtons
-                        name={`meses-${proj?.name}`}
+                        name={`meses-${proj?.name ?? "proyecto"}`}
                         section="meses"
                         cols={monthCols}
                         rows={comp.data.months}

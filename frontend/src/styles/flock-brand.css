@@ -68,6 +68,10 @@
   --crit: #dc2626;
   --crit-bg: #fef2f2;
   --crit-fg: #b91c1c;
+  /* Extremo claro de los degradados de gauge y barras */
+  --ok-soft: #a78bfa;
+  --warn-soft: #fb923c;
+  --crit-soft: #f87171;
   --idle: #94a3b8;
   --idle-bg: #f1f5f9;
   --idle-fg: #64748b;
@@ -119,6 +123,9 @@
   --sidebar-border: oklch(0.28 0.06 293.3);
   --sidebar-ring: oklch(0.627 0.265 293.3);
 
+  --ok-soft: #c4b5fd;
+  --warn-soft: #fdba74;
+  --crit-soft: #fca5a5;
   --ok-bg: color-mix(in srgb, #7c3aed 22%, black);
   --ok-fg: #c4b5fd;
   --warn-bg: color-mix(in srgb, #f97316 22%, black);
@@ -227,6 +234,10 @@
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .bar-shine {
+    animation: none !important;
   }
 }
 

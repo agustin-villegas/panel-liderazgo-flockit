@@ -14,7 +14,7 @@ const TILES = [
   { label: "En riesgo", value: "1", dot: "bg-white/30" },
 ];
 
-const FEATURES = ["Cumplimiento de sprints", "Tableros de Jira", "Satisfacción", "Informes"];
+const FEATURES = ["Cumplimiento de sprints", "Tableros de Jira", "Informes", "Avisos"];
 
 export function BrandPanel() {
   return (

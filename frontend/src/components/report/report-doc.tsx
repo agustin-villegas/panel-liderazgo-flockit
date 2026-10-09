@@ -13,6 +13,7 @@ import {
   YAxis,
 } from "recharts";
 
+import { ExportButtons } from "@/components/panel/export-buttons";
 import { LightBadge } from "@/components/panel/light-badge";
 import {
   ChartContainer,
@@ -30,7 +31,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { ReportData, Story } from "@/lib/api/client";
+import type { Col } from "@/lib/export";
 import { day, month, pct, pts } from "@/lib/format";
 
 const AUD: Record<string, string> = { equipo: "Equipo", cliente: "Cliente", gerencia: "Gerencia" };
@@ -55,6 +58,24 @@ const peopleCfg = {
 type Slice = NonNullable<ReportData["types"]>[number];
 type Person = NonNullable<ReportData["work"]>[number];
 type Item = Person["closed"][number];
+type Pending = ReportData["pending"][number];
+type Row = ReportData["sprint"]["people"][number];
+
+const pendingCols: Col<Pending>[] = [
+  { label: "Issue", value: (p) => p.key },
+  { label: "Título", value: (p) => p.title },
+  { label: "Estado", value: (p) => p.status },
+  { label: "Responsable", value: (p) => p.assignee ?? "Sin asignar" },
+  { label: "SP", value: (p) => p.sp },
+];
+const peopleCols: Col<Row>[] = [
+  { label: "Persona", value: (p) => p.name },
+  { label: "Planificados", value: (p) => p.planned },
+  { label: "Quemados", value: (p) => p.burned },
+  { label: "Cumplimiento", value: (p) => pct(p.pct) },
+];
+
+const cut = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
 type Props = {
   data: ReportData;
@@ -85,7 +106,7 @@ export function ReportDoc({ data, audience, date, author, story }: Props) {
       data-section="informe"
       className="overflow-hidden rounded-2xl border bg-card shadow-sm print:overflow-visible print:rounded-none print:border-0 print:shadow-none"
     >
-      <header className="bg-brand flex flex-wrap items-end justify-between gap-4 px-8 py-6 text-white">
+      <header className="bg-brand flex flex-wrap items-end justify-between gap-4 px-4 py-6 text-white sm:px-8">
         <div>
           <p className="text-sm text-white/80">
             {data.account} · Informe de sprint para {AUD[audience] ?? audience}
@@ -103,7 +124,7 @@ export function ReportDoc({ data, audience, date, author, story }: Props) {
         </div>
       </header>
 
-      <div className="grid gap-8 p-8">
+      <div className="grid gap-8 p-4 sm:p-8">
         <section className="rounded-xl border bg-secondary/50 p-4 print:break-inside-avoid">
           <h3 className="font-semibold">Objetivo del sprint</h3>
           <p className="mt-1 text-sm leading-relaxed whitespace-pre-wrap">
@@ -163,7 +184,15 @@ export function ReportDoc({ data, audience, date, author, story }: Props) {
         <People work={work} fallback={s.people} />
 
         <section className="grid gap-2">
-          <h3 className="font-semibold">Pendientes del sprint ({data.pending.length})</h3>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-semibold">Pendientes del sprint ({data.pending.length})</h3>
+            <ExportButtons
+              name={`pendientes-${s.name}`}
+              section="informe"
+              cols={pendingCols}
+              rows={data.pending}
+            />
+          </div>
           {data.pending.length === 0 ? (
             <p className="text-sm text-muted-foreground">Todo lo planificado quedó terminado.</p>
           ) : (
@@ -184,7 +213,9 @@ export function ReportDoc({ data, audience, date, author, story }: Props) {
                     <TableCell>{p.title}</TableCell>
                     <TableCell>{p.status}</TableCell>
                     <TableCell>{p.assignee ?? "Sin asignar"}</TableCell>
-                    <TableCell className="text-right">{p.sp === null ? "—" : pts(p.sp)}</TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {p.sp === null ? "—" : pts(p.sp)}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -244,12 +275,17 @@ function TypeChart({ slices }: { slices: (Slice & { fill: string })[] }) {
 }
 
 function People({ work, fallback }: { work: Person[]; fallback: ReportData["sprint"]["people"] }) {
+  const mobile = useIsMobile();
+  const yw = mobile ? 96 : 176;
   const rows = work.length
     ? work
     : fallback.map((p) => ({ ...p, closed: [] as Item[], open: [] as Item[] }));
   return (
     <section className="grid gap-4">
-      <h3 className="font-semibold">Por persona</h3>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="font-semibold">Por persona</h3>
+        <ExportButtons name="personas" section="informe" cols={peopleCols} rows={rows} />
+      </div>
       {rows.length > 0 && (
         <ChartContainer
           config={peopleCfg}
@@ -262,10 +298,11 @@ function People({ work, fallback }: { work: Person[]; fallback: ReportData["spri
             <YAxis
               type="category"
               dataKey="name"
-              width={176}
+              width={yw}
               tickLine={false}
               axisLine={false}
               tick={{ fontSize: 11 }}
+              tickFormatter={(v: string) => (mobile ? cut(v, 14) : v)}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent />} />
@@ -287,9 +324,9 @@ function People({ work, fallback }: { work: Person[]; fallback: ReportData["spri
           {rows.map((p) => (
             <TableRow key={p.name}>
               <TableCell>{p.name}</TableCell>
-              <TableCell className="text-right">{pts(p.planned)}</TableCell>
-              <TableCell className="text-right">{pts(p.burned)}</TableCell>
-              <TableCell className="text-right font-semibold">{pct(p.pct)}</TableCell>
+              <TableCell className="text-right tabular-nums">{pts(p.planned)}</TableCell>
+              <TableCell className="text-right tabular-nums">{pts(p.burned)}</TableCell>
+              <TableCell className="text-right font-semibold tabular-nums">{pct(p.pct)}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -318,7 +355,7 @@ function IssueList({ title, items }: { title: string; items: Item[] }) {
         {title} ({items.length})
       </p>
       {items.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Ninguna.</p>
+        <p className="text-sm text-muted-foreground">Sin issues</p>
       ) : (
         <ul className="grid gap-1 text-sm">
           {items.map((i) => (

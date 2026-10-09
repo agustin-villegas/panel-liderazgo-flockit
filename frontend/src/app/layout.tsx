@@ -9,8 +9,7 @@ const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Panel de liderazgo · Flock",
-  description:
-    "El estado de todos tus proyectos: sprints, tableros de Jira, satisfacción e informes.",
+  description: "El estado de todos tus proyectos: sprints, tableros de Jira, informes y avisos.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

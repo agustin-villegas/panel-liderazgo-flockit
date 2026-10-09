@@ -17,6 +17,18 @@ import type { MonthRow, SprintRow } from "@/lib/api/client";
 import type { Col } from "@/lib/export";
 import { day, month, pct, pts } from "@/lib/format";
 
+/** Abreviado en móvil, completo desde md. */
+function Abbr({ short, full }: { short: string; full: string }) {
+  return (
+    <>
+      <span className="md:hidden" title={full}>
+        {short}
+      </span>
+      <span className="hidden md:inline">{full}</span>
+    </>
+  );
+}
+
 export const sprintCols: Col<SprintRow>[] = [
   { label: "Sprint", value: (s) => s.name },
   { label: "Inicio", value: (s) => day(s.start) },
@@ -34,8 +46,12 @@ export function SprintTable({ project, rows }: { project: string; rows: SprintRo
         <TableRow>
           <TableHead>Sprint</TableHead>
           <TableHead>Fechas</TableHead>
-          <TableHead className="text-right">Plan.</TableHead>
-          <TableHead className="text-right">Quem.</TableHead>
+          <TableHead className="text-right">
+            <Abbr short="Plan." full="Planificados" />
+          </TableHead>
+          <TableHead className="text-right">
+            <Abbr short="Quem." full="Quemados" />
+          </TableHead>
           <TableHead className="text-right">%</TableHead>
           <TableHead>Estado</TableHead>
           <TableHead className="print:hidden" />
@@ -60,9 +76,9 @@ export function SprintTable({ project, rows }: { project: string; rows: SprintRo
             <TableCell className="text-muted-foreground">
               {day(s.start)} – {day(s.end)}
             </TableCell>
-            <TableCell className="text-right">{pts(s.planned)}</TableCell>
-            <TableCell className="text-right">{pts(s.burned)}</TableCell>
-            <TableCell className="text-right font-semibold">{pct(s.pct)}</TableCell>
+            <TableCell className="text-right tabular-nums">{pts(s.planned)}</TableCell>
+            <TableCell className="text-right tabular-nums">{pts(s.burned)}</TableCell>
+            <TableCell className="text-right font-semibold tabular-nums">{pct(s.pct)}</TableCell>
             <TableCell>
               <LightBadge light={s.light} />
             </TableCell>
@@ -98,8 +114,12 @@ export function MonthTable({ rows }: { rows: MonthRow[] }) {
         <TableRow>
           <TableHead>Mes</TableHead>
           <TableHead className="text-right">Sprints</TableHead>
-          <TableHead className="text-right">Plan.</TableHead>
-          <TableHead className="text-right">Quem.</TableHead>
+          <TableHead className="text-right">
+            <Abbr short="Plan." full="Planificados" />
+          </TableHead>
+          <TableHead className="text-right">
+            <Abbr short="Quem." full="Quemados" />
+          </TableHead>
           <TableHead className="text-right">%</TableHead>
           <TableHead>Estado</TableHead>
         </TableRow>
@@ -108,10 +128,10 @@ export function MonthTable({ rows }: { rows: MonthRow[] }) {
         {[...rows].reverse().map((m) => (
           <TableRow key={m.month}>
             <TableCell className="font-medium capitalize">{month(m.month)}</TableCell>
-            <TableCell className="text-right">{m.sprints}</TableCell>
-            <TableCell className="text-right">{pts(m.planned)}</TableCell>
-            <TableCell className="text-right">{pts(m.burned)}</TableCell>
-            <TableCell className="text-right font-semibold">{pct(m.pct)}</TableCell>
+            <TableCell className="text-right tabular-nums">{m.sprints}</TableCell>
+            <TableCell className="text-right tabular-nums">{pts(m.planned)}</TableCell>
+            <TableCell className="text-right tabular-nums">{pts(m.burned)}</TableCell>
+            <TableCell className="text-right font-semibold tabular-nums">{pct(m.pct)}</TableCell>
             <TableCell>
               <LightBadge light={m.light} />
             </TableCell>
@@ -137,8 +157,12 @@ export function PeopleTable({ rows }: { rows: Person[] }) {
       <TableHeader>
         <TableRow>
           <TableHead>Persona</TableHead>
-          <TableHead className="text-right">Plan.</TableHead>
-          <TableHead className="text-right">Quem.</TableHead>
+          <TableHead className="text-right">
+            <Abbr short="Plan." full="Planificados" />
+          </TableHead>
+          <TableHead className="text-right">
+            <Abbr short="Quem." full="Quemados" />
+          </TableHead>
           <TableHead className="text-right">%</TableHead>
         </TableRow>
       </TableHeader>
@@ -146,9 +170,9 @@ export function PeopleTable({ rows }: { rows: Person[] }) {
         {rows.map((p) => (
           <TableRow key={p.name}>
             <TableCell className="font-medium">{p.name}</TableCell>
-            <TableCell className="text-right">{pts(p.planned)}</TableCell>
-            <TableCell className="text-right">{pts(p.burned)}</TableCell>
-            <TableCell className="text-right font-semibold">{pct(p.pct)}</TableCell>
+            <TableCell className="text-right tabular-nums">{pts(p.planned)}</TableCell>
+            <TableCell className="text-right tabular-nums">{pts(p.burned)}</TableCell>
+            <TableCell className="text-right font-semibold tabular-nums">{pct(p.pct)}</TableCell>
           </TableRow>
         ))}
       </TableBody>

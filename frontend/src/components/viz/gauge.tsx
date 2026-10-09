@@ -6,9 +6,9 @@ type Tone = "brand" | "ok" | "warn" | "crit";
 
 const STOPS: Record<Tone, [string, string]> = {
   brand: ["var(--brand-from)", "var(--brand-to)"],
-  ok: ["#a78bfa", "var(--ok)"],
-  warn: ["#fdba74", "var(--warn)"],
-  crit: ["#fca5a5", "var(--crit)"],
+  ok: ["var(--ok-soft)", "var(--ok)"],
+  warn: ["var(--warn-soft)", "var(--warn)"],
+  crit: ["var(--crit-soft)", "var(--crit)"],
 };
 
 type Props = { value: number | null; label: string; tone?: Tone; size?: number; sub?: string };

@@ -79,8 +79,10 @@ export function McpDialog({ open, onClose }: { open: boolean; onClose: () => voi
               <Button
                 size="icon-sm"
                 variant="ghost"
+                className="size-10 md:size-7"
                 onClick={() => copy(fresh)}
                 aria-label="Copiar"
+                title="Copiar"
               >
                 <Copy className="size-3.5" />
               </Button>
@@ -124,9 +126,11 @@ export function McpDialog({ open, onClose }: { open: boolean; onClose: () => voi
               <Button
                 size="icon-sm"
                 variant="ghost"
+                className="size-10 md:size-7"
                 onClick={() => revoke.mutate(t.id)}
                 disabled={revoke.isPending}
                 aria-label={`Revocar ${t.name}`}
+                title="Revocar"
               >
                 <Trash2 className="size-3.5" />
               </Button>

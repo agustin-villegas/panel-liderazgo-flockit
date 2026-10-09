@@ -16,7 +16,7 @@ TTL = timedelta(seconds=60)
 
 
 class BoardService:
-    """Tablero del sprint activo (spec §9.5.b). Solo lectura."""
+    """Tablero del sprint activo (spec §8.5.b). Solo lectura."""
 
     def __init__(
         self, factory: SourceFactory, cache: dict[UUID, tuple[datetime, SprintBoardOut]]

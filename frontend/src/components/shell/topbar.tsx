@@ -48,7 +48,7 @@ export function Topbar() {
   }
 
   return (
-    <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur">
+    <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background/80 px-4 backdrop-blur md:px-6">
       <SidebarTrigger />
       <div className="flex-1" />
       <NotificationBell />
@@ -56,7 +56,13 @@ export function Topbar() {
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button variant="ghost" size="icon" className="rounded-full" aria-label="Mi perfil" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              aria-label="Mi perfil"
+              title="Mi perfil"
+            />
           }
         >
           <Avatar className="size-8">

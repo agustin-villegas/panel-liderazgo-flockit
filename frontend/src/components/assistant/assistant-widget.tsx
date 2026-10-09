@@ -61,10 +61,14 @@ export function AssistantWidget() {
   const end = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const openRef = useRef(open);
+  const launcher = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
 
   useEffect(() => {
     openRef.current = open;
     if (open) input.current?.focus();
+    else if (wasOpen.current) launcher.current?.focus();
+    wasOpen.current = open;
   }, [open]);
 
   function toggle(next: boolean) {
@@ -110,6 +114,7 @@ export function AssistantWidget() {
     <>
       <section
         role="dialog"
+        aria-modal="true"
         aria-label={NAME}
         aria-hidden={!open}
         inert={!open}
@@ -118,10 +123,10 @@ export function AssistantWidget() {
           "fixed z-50 flex flex-col overflow-hidden border bg-popover text-sm text-popover-foreground shadow-2xl",
           "origin-bottom-right transition-all duration-200 ease-out",
           // celular: pantalla completa · escritorio: flotante sobre el launcher
-          "inset-0 sm:inset-auto sm:right-6 sm:bottom-24 sm:rounded-2xl",
+          "inset-0 sm:inset-auto sm:right-[max(1.5rem,env(safe-area-inset-right))] sm:bottom-[calc(max(1.5rem,env(safe-area-inset-bottom))+4.5rem)] sm:rounded-2xl",
           big
-            ? "sm:h-[min(85vh,860px)] sm:w-[min(720px,calc(100vw-3rem))]"
-            : "sm:h-[min(620px,calc(100vh-8rem))] sm:w-[380px]",
+            ? "sm:h-[min(85dvh,860px)] sm:w-[min(720px,calc(100vw-3rem))]"
+            : "sm:h-[min(620px,calc(100dvh-8rem))] sm:w-[380px]",
           open ? "scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0",
         )}
       >
@@ -213,6 +218,7 @@ export function AssistantWidget() {
             className="rounded-full"
             disabled={busy || !text.trim()}
             aria-label="Enviar"
+            title="Enviar"
           >
             <SendHorizonal className="size-4" />
           </Button>
@@ -221,12 +227,17 @@ export function AssistantWidget() {
 
       <button
         type="button"
+        ref={launcher}
         onClick={() => toggle(!open)}
         aria-label={open ? `Minimizar ${NAME}` : `Abrir ${NAME}`}
         aria-expanded={open}
         title={NAME}
+        style={{
+          bottom: "max(1.5rem, env(safe-area-inset-bottom))",
+          right: "max(1.5rem, env(safe-area-inset-right))",
+        }}
         className={cn(
-          "bg-brand fixed right-6 bottom-6 z-50 size-14 items-center justify-center rounded-full text-white shadow-lg",
+          "bg-brand fixed z-50 size-14 items-center justify-center rounded-full text-white shadow-lg",
           "transition-transform duration-200 hover:scale-105 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95",
           // en celular el panel ocupa todo: el launcher se esconde mientras está abierto
           open ? "hidden sm:flex" : "flex",

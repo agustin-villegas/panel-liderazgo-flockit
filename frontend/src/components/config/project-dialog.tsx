@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 import {
   api,
   patch,
@@ -27,7 +28,6 @@ import {
 } from "@/lib/api/client";
 
 const NEW = "__nueva__";
-const sel = "bg-background h-9 w-full rounded-md border px-2 text-sm disabled:opacity-50";
 
 type Props = { open: boolean; onClose: () => void; edit?: Project | null };
 
@@ -108,7 +108,7 @@ export function ProjectDialog({ open, onClose, edit }: Props) {
         <div className="grid gap-4">
           <Field>
             <FieldLabel htmlFor="p-acc">Cuenta (cliente)</FieldLabel>
-            <select id="p-acc" className={sel} value={acc} onChange={(e) => setAcc(e.target.value)}>
+            <NativeSelect id="p-acc" value={acc} onChange={(e) => setAcc(e.target.value)}>
               <option value="">Elegí una cuenta…</option>
               {accounts.data?.map((a) => (
                 <option key={a.id} value={a.id}>
@@ -116,7 +116,7 @@ export function ProjectDialog({ open, onClose, edit }: Props) {
                 </option>
               ))}
               <option value={NEW}>+ Nueva cuenta</option>
-            </select>
+            </NativeSelect>
             {acc === NEW && (
               <Input
                 placeholder="Nombre de la cuenta"
@@ -128,9 +128,8 @@ export function ProjectDialog({ open, onClose, edit }: Props) {
 
           <Field>
             <FieldLabel htmlFor="p-conn">Conexión de Jira</FieldLabel>
-            <select
+            <NativeSelect
               id="p-conn"
-              className={sel}
               value={conn}
               onChange={(e) => (setConn(e.target.value), setBoard(""))}
             >
@@ -140,14 +139,13 @@ export function ProjectDialog({ open, onClose, edit }: Props) {
                   {c.name}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
           </Field>
 
           <Field>
             <FieldLabel htmlFor="p-board">Board</FieldLabel>
-            <select
+            <NativeSelect
               id="p-board"
-              className={sel}
               value={board}
               disabled={!conn || boards.isLoading}
               onChange={(e) => {
@@ -162,7 +160,7 @@ export function ProjectDialog({ open, onClose, edit }: Props) {
                   {b.name}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
             {boards.error && (
               <FieldDescription className="text-crit-fg">{boards.error.message}</FieldDescription>
             )}
@@ -180,7 +178,7 @@ export function ProjectDialog({ open, onClose, edit }: Props) {
           </Button>
           <Button onClick={() => save.mutate()} disabled={!ready || save.isPending}>
             {save.isPending && <Loader2 className="size-4 animate-spin" />}
-            {edit ? "Guardar cambios" : "Crear proyecto"}
+            {edit ? "Guardar" : "Crear proyecto"}
           </Button>
         </DialogFooter>
       </DialogContent>
