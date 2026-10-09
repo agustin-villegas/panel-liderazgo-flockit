@@ -1,6 +1,7 @@
 from functools import lru_cache
+from urllib.parse import quote
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -12,7 +13,14 @@ class Settings(BaseSettings):
     app_name: str = "Panel de liderazgo"
     env: str = "dev"
 
-    database_url: str
+    # Base: URL completa, o las partes (la contraseña se codifica sola)
+    database_url: str = ""
+    db_password: str = ""
+    db_user: str = "postgres"
+    db_host: str = "localhost"
+    db_port: int = 6543
+    db_name: str = "postgres"
+
     session_secret: str = Field(min_length=32)
     encryption_key: str
     cron_secret: str = Field(min_length=16)
@@ -31,13 +39,23 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     google_api_key: str = ""
 
+    @model_validator(mode="after")
+    def _need_db(self) -> "Settings":
+        if not self.database_url and not self.db_password:
+            raise ValueError("Falta DB_PASSWORD (o DATABASE_URL) en el .env")
+        return self
+
     @property
     def db_url(self) -> str:
+        """URL async para SQLAlchemy."""
+        if not self.database_url:
+            pwd = quote(self.db_password, safe="")
+            return (
+                f"postgresql+asyncpg://{self.db_user}:{pwd}"
+                f"@{self.db_host}:{self.db_port}/{self.db_name}"
+            )
         # Supabase da postgresql://; SQLAlchemy async necesita el driver
-        url = self.database_url
-        if url.startswith("postgresql://"):
-            return url.replace("postgresql://", "postgresql+asyncpg://", 1)
-        return url
+        return self.database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
 
 @lru_cache

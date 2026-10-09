@@ -92,3 +92,9 @@ def test_config_rechaza_password_en_texto_plano(monkeypatch):
     monkeypatch.setenv("ADMIN_PASSWORD_HASH", "mi-clave")
     with pytest.raises(ValidationError):
         Settings(_env_file=None)  # type: ignore[call-arg]
+
+
+def test_db_url_codifica_la_password(monkeypatch):
+    monkeypatch.delenv("DATABASE_URL")
+    cfg = Settings(_env_file=None, db_password="a@b/c#d", db_host="h", db_user="u")  # type: ignore[call-arg]
+    assert cfg.db_url == "postgresql+asyncpg://u:a%40b%2Fc%23d@h:6543/postgres"
