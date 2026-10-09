@@ -13,8 +13,7 @@
 - [x] CI: `ci-backend`, `ci-frontend`
 - [x] Herramientas CLI: bat, fd, sd, eza, uv, ruff
 
-**Nota:** el backend con dependencias pesa ~288 MB (litellm). Supera los 250 MB de Vercel →
-evaluar en fase 5 (plan B: Render).
+**Nota:** el backend pesa ~282 MB en producción. El límite actual de Vercel para funciones Python es 500 MB → entra.
 
 ## Fase 1 · Base y auth ✅
 
@@ -58,3 +57,10 @@ evaluar en fase 5 (plan B: Render).
 - [x] Tipos de la API generados desde OpenAPI (`pnpm gen:api`)
 - [x] Probado de punta a punta con navegador real (Playwright): login, cartera, detalle, auditoría, dark, mobile
 - [ ] Pendiente: asignar Team Managers desde la UI (falta ABM de usuarios, P1)
+
+## Fase 5 · Deploy (en curso)
+
+- [x] Proyectos Vercel: `panel-liderazgo-api` (backend/) y `panel-liderazgo` (frontend/)
+- [x] Variables de entorno de producción cargadas (sin exponer valores)
+- [ ] `vercel deploy --prod` backend y frontend (lo corre el usuario: requiere su aprobación)
+- [ ] Smoke test en producción
